@@ -3,7 +3,7 @@
 Hello and Welcome to fklearn!
 
 We love pull requests from everyone. By participating in this project, you
-agree to abide by our [code of conduct](code-of-conduct.md).
+agree to abide by our [code of conduct](CODE-OF-CONDUCT.md).
 
 
 ## Getting Help
