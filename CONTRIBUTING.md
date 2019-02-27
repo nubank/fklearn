@@ -9,7 +9,7 @@ agree to abide by our [code of conduct](CODE-OF-CONDUCT.md).
 ## Getting Help
 * If you found a bug or need a new feature, you can submit an [issue](https://github.com/nubank/fklearn/issues)
 
-* If you would like to chat with other contributors to fklearn, consider joining the [[![Gitter](https://badges.gitter.im/fklearn-python/general.svg)](https://gitter.im/fklearn-python/general?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge).
+* If you would like to chat with other contributors to fklearn, consider joining the [![Gitter](https://badges.gitter.im/fklearn-python/general.svg)](https://gitter.im/fklearn-python/general?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Contributing
 
