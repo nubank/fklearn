@@ -1,0 +1,105 @@
+.common-values:
+
+  docker-image: &docker-image circleci/python:3.6
+
+  working_directory: &working-directory ~/repo
+
+  # Download and cache dependencies
+  restore-cache: &restore-cache
+    keys:
+      - v1-dependencies-{{ checksum "requirements.txt" }}
+      # fallback to using the latest cache if no exact match is found
+      - v1-dependencies-
+
+  create-venv: &create-venv
+    name: Create virtualenv
+    command: |
+      /usr/local/bin/python3 -m venv venv
+
+  save-cache: &save-cache
+    paths:
+      - ./venv
+    key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+
+.lint-steps: &lint-steps
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - run:
+        name: Check code style (PEP8)
+        command: |
+          . venv/bin/activate
+          venv/bin/python3 -m pip install flake8
+          venv/bin/python3 -m flake8 \
+            --ignore=E731,W503 \
+            --filename=*.py \
+            --exclude=__init__.py \
+            --show-source \
+            --statistics \
+            --max-line-length=120 \
+            src/ tests/
+    - save_cache: *save-cache
+
+
+.build-and-test-steps: &build-and-test-steps
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run:
+        name: Install package
+        command: |
+          . venv/bin/activate
+          venv/bin/python3 -m pip install -e .[test_deps]
+    - run:
+        name: Run tests
+        command: |
+          . venv/bin/activate
+          venv/bin/python3 -m pytest --cov=fklearn tests/
+
+
+.pip-check: &pip-check
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run:
+        name: Run pip check
+        command: |
+          . venv/bin/activate
+          sudo venv/bin/python -m pip install -e .
+          pip check
+
+
+version: 2
+jobs:
+  lint:
+    <<: *lint-steps
+  build-and-test:
+    <<: *build-and-test-steps
+  pip-check:
+    <<: *pip-check
+
+
+workflows:
+  version: 2
+  build-and-test-all:
+    jobs:
+      - lint
+      - build-and-test:
+          context: python-projects
+      - pip-check:
+          context: python-projects
