@@ -1,0 +1,5 @@
+include README.md
+include requirements.txt
+include requirements_test.txt
+include conda.txt
+recursive-include src/fklearn/resources *
