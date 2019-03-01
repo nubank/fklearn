@@ -110,9 +110,6 @@ def test_build_pipeline_idempotency():
             return dataset.assign(x=dataset.x * mult)
         return p, p(df, mult_constant), {"kwargs_learner": {"mult_constant": mult_constant}}
 
-    def dummy_learner(df):
-        return lambda dataset: dataset, df, {"dummy_learner": {"dummy": {}}}
-
     for variation in itertools.permutations([dummy_learner, kwargs_learner, dummy_learner]):
         side_effect_pipeline = build_pipeline(*variation)
         predict_fn, result_df, log = side_effect_pipeline(test_df)
