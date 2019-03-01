@@ -13,14 +13,18 @@
 
   create-venv: &create-venv
     name: Create virtualenv
-    command: |
-      /usr/local/bin/python3 -m venv venv
+    command: . scripts/create_venv.sh
 
   save-cache: &save-cache
     paths:
       - ./venv
     key: v1-dependencies-{{ checksum "requirements.txt" }}
 
+  install-package: &install-package
+    name: Install package
+    command: |
+      . scripts/helpers.sh
+      install_package [test_deps]
 
 .master-branch-filter: &master-branch-filter
   filters:
@@ -32,6 +36,18 @@
     - lint
   <<: *master-branch-filter
 
+.tags-only-filter: &tags-only-filter
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /.*/
+
+.requires-build: &requires-build
+  requires:
+    - build
+  <<: *tags-only-filter
+
 .lint-steps: &lint-steps
   docker:
     - image: *docker-image
@@ -42,17 +58,7 @@
     - run: *create-venv
     - run:
         name: Check code style (PEP8)
-        command: |
-          . venv/bin/activate
-          venv/bin/python3 -m pip install flake8
-          venv/bin/python3 -m flake8 \
-            --ignore=E731,W503 \
-            --filename=*.py \
-            --exclude=__init__.py \
-            --show-source \
-            --statistics \
-            --max-line-length=120 \
-            src/ tests/
+        command: . scripts/lint.sh
     - save_cache: *save-cache
 
 
@@ -65,17 +71,10 @@
     - restore_cache: *restore-cache
     - run: *create-venv
     - save_cache: *save-cache
-    - run:
-        name: Install package
-        command: |
-          . venv/bin/activate
-          venv/bin/python3 -m pip install -e .[test_deps]
+    - run: *install-package
     - run:
         name: Run tests
-        command: |
-          . venv/bin/activate
-          venv/bin/python3 -m pytest --cov=fklearn tests/
-
+        command: . scripts/run_tests.sh
 
 .pip-check: &pip-check
   docker:
@@ -86,12 +85,48 @@
     - restore_cache: *restore-cache
     - run: *create-venv
     - save_cache: *save-cache
+    - run: *install-package
     - run:
         name: Run pip check
         command: |
-          . venv/bin/activate
-          sudo venv/bin/python -m pip install -e .
+          . scripts/helpers.sh
+          activate_venv
           pip check
+
+.build: &build
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run:
+        name: Build package
+        command: . scripts/build.sh
+    - persist_to_workspace:
+        root: ~/repo
+        paths:
+          - dist
+
+.release: &release
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - attach_workspace:
+        at: /tmp/package
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run:
+        name: init .pypirc
+        command: . scripts/init_pypirc.sh
+    - run:
+        name: Release package
+        command: . scripts/release.sh /tmp/package/dist
 
 
 version: 2
@@ -102,6 +137,10 @@ jobs:
     <<: *test-steps
   pip-check:
     <<: *pip-check
+  build:
+    <<: *build
+  release:
+    <<: *release
 
 
 workflows:
@@ -114,3 +153,9 @@ workflows:
           <<: *requires-lint
       - pip-check:
           <<: *requires-lint
+  build-and-release:
+    jobs:
+      - build:
+          <<: *tags-only-filter
+      - release:
+          <<: *requires-build
