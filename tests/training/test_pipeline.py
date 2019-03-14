@@ -1,43 +1,14 @@
-import pandas as pd
-import numpy as np
 import itertools
-import toolz as fp
+
+import numpy as np
+import pandas as pd
 import pytest
+import toolz as fp
 
+from fklearn.training.imputation import placeholder_imputer
 from fklearn.training.pipeline import build_pipeline
-from fklearn.log_schemata import pipeline_schema
-
-
-@fp.curry
-def dummy_imputer(df, columns_to_impute, placeholder_value):
-    def p(new_data_set):
-        new_cols = new_data_set[columns_to_impute].fillna(placeholder_value).to_dict('list')
-        return new_data_set.assign(**new_cols)
-
-    log = {}
-    return p, p(df), log
-
-
-@fp.curry
-def dummy_categorizer(df, columns_to_categorize, replace_unseen=-1):
-    categ_getter = lambda col: df[col].value_counts().to_dict()
-    vec = {column: categ_getter(column) for column in columns_to_categorize}
-
-    def p(new_df):
-        column_categorizer = lambda col: new_df[col].apply(lambda x: (np.nan
-                                                                      if isinstance(x, float) and np.isnan(x)
-                                                                      else vec[col].get(x, replace_unseen)))
-        categ_columns = {col: column_categorizer(col) for col in columns_to_categorize}
-        return new_df.assign(**categ_columns)
-
-    log = {}
-
-    return p, p(df), log
-
-
-@fp.curry
-def dummy_learner(df, **kwargs):
-    return fp.identity, df, {'dummy_learner': {'dummy': 0}}
+from fklearn.training.regression import xgb_regression_learner
+from fklearn.training.transformation import count_categorizer
 
 
 def test_build_pipeline():
@@ -61,19 +32,22 @@ def test_build_pipeline():
     target = "y"
 
     train_fn = build_pipeline(
-        dummy_imputer(columns_to_impute=features, placeholder_value=-999),
-        dummy_categorizer(columns_to_categorize=["cat"]),
-        dummy_learner(features=features,
-                      target=target,
-                      num_estimators=20,
-                      extra_params={"seed": 42}))
+        placeholder_imputer(columns_to_impute=features, placeholder_value=-999),
+        count_categorizer(columns_to_categorize=["cat"]),
+        xgb_regression_learner(features=features,
+                               target=target,
+                               num_estimators=20,
+                               extra_params={"seed": 42}))
 
     predict_fn, pred_train, log = train_fn(df_train)
 
-    pipeline_schema.validate(log)
+    pred_test_with_shap = predict_fn(df_test, apply_shap=True)
+    assert set(pred_test_with_shap.columns) - set(pred_train.columns) == {"shap_values", "shap_expected_value"}
 
-    pred_test = predict_fn(df_test)
-    assert set(pred_test.columns) == set(pred_train.columns)
+    pred_test_without_shap = predict_fn(df_test)
+    assert set(pred_test_without_shap.columns) == set(pred_train.columns)
+
+    pd.util.testing.assert_frame_equal(pred_test_with_shap[pred_test_without_shap.columns], pred_test_without_shap)
 
 
 def test_build_pipeline_no_side_effects():
@@ -108,12 +82,15 @@ def test_build_pipeline_idempotency():
     def kwargs_learner(df):
         def p(dataset, mult):
             return dataset.assign(x=dataset.x * mult)
+
         return p, p(df, mult_constant), {"kwargs_learner": {"mult_constant": mult_constant}}
+
+    def dummy_learner(df):
+        return lambda dataset: dataset, df, {"dummy_learner": {"dummy": {}}}
 
     for variation in itertools.permutations([dummy_learner, kwargs_learner, dummy_learner]):
         side_effect_pipeline = build_pipeline(*variation)
         predict_fn, result_df, log = side_effect_pipeline(test_df)
-        pipeline_schema.validate(log)
 
         pd.util.testing.assert_frame_equal(test_df, orig_df)
         pd.util.testing.assert_frame_equal(result_df, expected_df)
@@ -142,6 +119,7 @@ def test_build_pipeline_predict_arguments_assertion():
     def invalid_learner(df):
         def p(dataset, *a, **b):
             return dataset + len(a) + len(b)
+
         return p, df, {}
 
     with pytest.raises(AssertionError):
