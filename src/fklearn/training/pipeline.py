@@ -1,8 +1,13 @@
-from inspect import signature, Parameter
+from inspect import Parameter, signature
+from typing import Dict
+
+import pandas as pd
 import toolz as fp
 
+from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
-def build_pipeline(*learners):
+
+def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
     """
     Builds a pipeline of chained learners functions with the possibility of using keyword arguments
     in the predict functions of the pipeline.
@@ -34,7 +39,7 @@ def build_pipeline(*learners):
         A log-like Dict that stores information of all learner functions.
     """
 
-    def _has_one_unfilled_arg(learner):
+    def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
         no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
         assert len(no_default_list) <= 1, "Learner {0} has more than one unfilled argument: {1}\n" \
                                           "Make sure all learners are curried properly and only require one argument," \
@@ -43,7 +48,7 @@ def build_pipeline(*learners):
             ', '.join(no_default_list)
         )
 
-    def _no_variable_args(learner, predict_fn):
+    def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None:
         invalid_parameter_kinds = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
         var_args = [p for p, a in signature(predict_fn).parameters.items() if a.kind in invalid_parameter_kinds]
         assert len(var_args) == 0, "Predict function of learner {0} contains variable length arguments: {1}\n" \
@@ -56,27 +61,27 @@ def build_pipeline(*learners):
     for l in learners:
         _has_one_unfilled_arg(l)
 
-    def pipeline(data):
+    def pipeline(data: pd.DataFrame) -> LearnerReturnType:
         current_data = data.copy()
         fns = []
         logs = []
 
         for learner in learners:
-            learner_fn, new_data, learner_log = learner(current_data)
-            _no_variable_args(learner, learner_fn)  # Check for invalid predict fn arguments
-            fns.append(learner_fn)
+            learner_predict_fn, new_data, learner_log = learner(current_data)
+            _no_variable_args(learner, learner_predict_fn)  # Check for invalid predict fn arguments
+            fns.append(learner_predict_fn)
             logs.append(learner_log)
             current_data = new_data
 
-        logs = fp.merge(logs)
+        merged_logs = fp.merge(logs)
 
-        def predict_fn(df, **kwargs):
+        def predict_fn(df: pd.DataFrame, **kwargs: Dict) -> pd.DataFrame:
             # Get the proper arguments for each predict function (based on their signature)
             fns_args = [{k: v for k, v in kwargs.items() if k in signature(f).parameters} for f in fns]
             # Partially apply the arguments to the predict functions when applicable
             fns_with_args = [fp.curry(fn)(**args) if len(args) > 0 else fn for fn, args in zip(fns, fns_args)]
             return fp.pipe(df, *fns_with_args)
 
-        return predict_fn, current_data, logs
+        return predict_fn, current_data, merged_logs
 
     return pipeline
