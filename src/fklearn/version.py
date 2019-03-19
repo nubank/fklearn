@@ -1,7 +1,7 @@
 from os.path import dirname, join
 
 
-def version():
+def version() -> str:
     """
     Get package version
 
