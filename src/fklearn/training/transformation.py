@@ -488,14 +488,8 @@ def label_categorizer(df: pd.DataFrame,
         A list of categorical column names.
     replace_unseen : int, str, float, or nan
         The value to impute unseen categories.
-<<<<<<< HEAD
-
     store_mapping : bool (default: False)
         Whether to store the feature value -> integer dictionary in the log
-=======
-    store_mapping : bool
-        If the mapping should be stored in the log.
->>>>>>> 4e4f42acc585b15015eb44616ab5f37ae73078b1
     """
 
     def categ_dict(series: pd.Series) -> Dict:
