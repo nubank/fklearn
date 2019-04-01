@@ -15,7 +15,8 @@ def validator_iteration(data: pd.DataFrame,
                         test_indexes: pd.Index,
                         fold_num: int,
                         train_fn: LearnerFnType,
-                        eval_fn: EvalFnType) -> LogType:
+                        eval_fn: EvalFnType,
+                        predict_oof: bool = False) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
 
@@ -42,6 +43,9 @@ def validator_iteration(data: pd.DataFrame,
         A partially defined evaluation function that takes a dataset with prediction and
         returns the evaluation logs.
 
+    predict_oof : bool
+        Whether to return out of fold predictions on the logs
+
     Returns
     ----------
     A log-like dictionary evaluations.
@@ -56,13 +60,18 @@ def validator_iteration(data: pd.DataFrame,
     predict_fn, train_out, train_log = train_fn(train_data)
 
     eval_results = []
+    oof_predictions = []
     for test_index in test_indexes:
         test_predictions = predict_fn(data.iloc[test_index])
         eval_results.append(eval_fn(test_predictions))
+        if predict_oof:
+            oof_predictions.append(test_predictions)
 
-    return {'fold_num': fold_num,
+    logs = {'fold_num': fold_num,
             'train_log': train_log,
             'eval_results': eval_results}
+
+    return assoc(logs, "oof_predictions", oof_predictions) if predict_oof else logs
 
 
 @curry
@@ -95,6 +104,9 @@ def validator(train_data: pd.DataFrame,
         A partially defined evaluation function that takes a dataset with prediction and
         returns the evaluation logs.
 
+    predict_oof : bool
+        Whether to return out of fold predictions on the logs
+
     Returns
     ----------
     A list of log-like dictionary evaluations.
@@ -125,11 +137,12 @@ def validator(train_data: pd.DataFrame,
 def parallel_validator_iteration(train_data: pd.DataFrame,
                                  fold: Tuple[int, Tuple[pd.Index, pd.Index]],
                                  train_fn: LearnerFnType,
-                                 eval_fn: EvalFnType) -> LogType:
+                                 eval_fn: EvalFnType,
+                                 predict_oof: bool) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
     train_fn = cloudpickle.loads(train_fn)
     eval_fn = cloudpickle.loads(eval_fn)
-    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn)
+    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof)
 
 
 @curry
@@ -137,7 +150,8 @@ def parallel_validator(train_data: pd.DataFrame,
                        split_fn: SplitterFnType,
                        train_fn: LearnerFnType,
                        eval_fn: EvalFnType,
-                       n_jobs: int = 1) -> ValidatorReturnType:
+                       n_jobs: int = 1,
+                       predict_oof: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold. Tries to run each
@@ -166,6 +180,9 @@ def parallel_validator(train_data: pd.DataFrame,
     n_jobs : int
         Number of parallel processes to spawn.
 
+    predict_oof : bool
+        Whether to return out of fold predictions on the logs
+
     Returns
     ----------
     A list log-like dictionary evaluations.
@@ -176,11 +193,11 @@ def parallel_validator(train_data: pd.DataFrame,
     dumped_eval_fn = cloudpickle.dumps(eval_fn)
 
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, dumped_train_fn, dumped_eval_fn)
+        delayed(parallel_validator_iteration)(train_data, x, dumped_train_fn, dumped_eval_fn, predict_oof)
         for x in enumerate(folds))
     gc.collect()
 
-    train_log = {"train_log": result[0]["train_log"]}
+    train_log = {"train_log": [fold_result["train_log"] for fold_result in result]}
 
     @curry
     def kwdissoc(d: Dict, key: str) -> Dict:
