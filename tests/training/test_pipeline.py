@@ -124,3 +124,42 @@ def test_build_pipeline_predict_arguments_assertion():
 
     with pytest.raises(AssertionError):
         build_pipeline(invalid_learner)(test_df)
+
+
+def test_build_pipeline_serialisation():
+    df_train = pd.DataFrame({
+        'id': ["id1"],
+        'x1': [10.0],
+        'y': [2.3]
+    })
+
+    fn = lambda x: x
+
+    @fp.curry
+    def dummy_learner(df, fn, call):
+        return fn, df, {f"dummy_learner_{call}": {}}
+
+    @fp.curry
+    def dummy_learner_2(df, fn, call):
+        return dummy_learner(df, fn, call)
+
+    @fp.curry
+    def dummy_learner_3(df, fn, call):
+        return fn, df, {f"dummy_learner_{call}": {}, "obj": "a"}
+
+    train_fn = build_pipeline(
+        dummy_learner(fn=fn, call=1),
+        dummy_learner_2(fn=fn, call=2),
+        dummy_learner_3(fn=fn, call=3))
+
+    predict_fn, pred_train, log = train_fn(df_train)
+
+    fkml = {"pipeline": ["dummy_learner", "dummy_learner_2", "dummy_learner_3"],
+            "output_columns": ['id', 'x1', 'y'],
+            "features": ['id', 'x1', 'y'],
+            "learners": {"dummy_learner": {"fn": fn, "log": {"dummy_learner_1": {}}},
+                         "dummy_learner_2": {"fn": fn, "log": {"dummy_learner_2": {}}},
+                         "dummy_learner_3": {"fn": fn, "log": {"dummy_learner_3": {}}, "obj": "a"}}}
+
+    assert log["__fkml__"] == fkml
+    assert "obj" not in log.keys()
