@@ -115,6 +115,13 @@ def test_remove_by_shuffling(train_df, holdout_df, train_fn, eval_fn, base_extra
     features = ["x1", "x2", "x3", "x4", "x5", "x6"]
     predict_fn, _, train_logs = train_fn(train_df, features)
     next_features = remove_by_feature_shuffling(logs[0], predict_fn, eval_fn, holdout_df, base_extractor, metric_name,
-                                                num_removed_by_step=1, threshold=0.5)
+                                                max_removed_by_step=3, threshold=0.5, speed_up_by_importance=True)
 
-    assert sorted(next_features) == sorted(['x1', 'x2', 'x3', 'x5', 'x6'])
+    assert sorted(next_features) == sorted(['x2', 'x5', 'x6'])
+
+    # tests speed_up_by_importance=False
+    next_features = remove_by_feature_shuffling(logs[0], predict_fn, eval_fn, holdout_df, base_extractor, metric_name,
+                                                max_removed_by_step=3, threshold=0.5,
+                                                speed_up_by_importance=False, parallel=True, nthread=2)
+
+    assert sorted(next_features) == sorted(['x1', 'x2', 'x4'])
