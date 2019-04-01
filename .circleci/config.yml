@@ -128,6 +128,19 @@
         name: Release package
         command: . scripts/release.sh /tmp/package/dist
 
+.type-check: &type-check
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run: *install-package
+    - run:
+        name: Run type tests
+        command: . scripts/run_type_check.sh
 
 version: 2
 jobs:
@@ -141,6 +154,8 @@ jobs:
     <<: *build
   release:
     <<: *release
+  type-check:
+    <<: *type-check
 
 
 workflows:
@@ -152,6 +167,8 @@ workflows:
       - test:
           <<: *requires-lint
       - pip-check:
+          <<: *requires-lint
+      - type-check:
           <<: *requires-lint
   build-and-release:
     jobs:
