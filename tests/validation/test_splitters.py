@@ -17,7 +17,8 @@ sample_data.index = [1] * sample_data.shape[0]
 
 
 def test_k_fold_splitter():
-    result, logs = k_fold_splitter(sample_data, 2, 42)
+    # testing without stratification
+    result, logs = k_fold_splitter(sample_data, 2, random_state=42)
 
     assert len(result) == 2
 
@@ -28,6 +29,27 @@ def test_k_fold_splitter():
 
     assert set(train_1_idx) == set(test_2_idx)
     assert set(test_1_idx) == set(train_2_idx)
+
+    # testing with stratification
+    result, logs = k_fold_splitter(sample_data, 2, random_state=42, stratify_column='space')
+
+    assert len(result) == 2
+
+    train_1_idx = result[0][0]
+    test_1_idx = result[0][1][0]
+    train_2_idx = result[1][0]
+    test_2_idx = result[1][1][0]
+
+    assert set(train_1_idx) == set(test_2_idx)
+    assert set(test_1_idx) == set(train_2_idx)
+
+    train_1_strat = sample_data.iloc[train_1_idx]['space']
+    test_1_strat = sample_data.iloc[test_1_idx]['space']
+    train_2_strat = sample_data.iloc[train_2_idx]['space']
+    test_2_strat = sample_data.iloc[test_2_idx]['space']
+
+    assert train_1_strat.nunique() == test_2_strat.nunique()
+    assert train_2_strat.nunique() == test_1_strat.nunique()
 
 
 def test_out_of_time_and_space_splitter():

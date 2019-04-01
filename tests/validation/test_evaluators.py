@@ -1,3 +1,5 @@
+import string
+
 import numpy as np
 import pandas as pd
 
@@ -5,7 +7,7 @@ from fklearn.validation.evaluators import \
     r2_evaluator, mse_evaluator, combined_evaluators, mean_prediction_evaluator, auc_evaluator, \
     precision_evaluator, recall_evaluator, fbeta_score_evaluator, logloss_evaluator, brier_score_evaluator, \
     expected_calibration_error_evaluator, correlation_evaluator, spearman_evaluator, split_evaluator, \
-    temporal_split_evaluator, permutation_evaluator
+    temporal_split_evaluator, permutation_evaluator, hash_evaluator
 
 
 def test_combined_evaluators():
@@ -329,3 +331,46 @@ def test_permutation_evaluator():
 
     assert pimp4['permutation_importance']['abc'] != expected_results2
     assert pimp4['permutation_importance_baseline'] == expected_results2
+
+
+def test_hash_evaluator():
+    rows = 50
+    np.random.seed(42)
+
+    # Generate 120 different categories
+    categories = [''.join(np.random.choice(list(string.ascii_uppercase + string.digits), size=10)) for _ in range(120)]
+    # Create a dataframe with different datatypes
+    df1 = pd.DataFrame({
+        "feature1": np.random.normal(size=rows),
+        "featureCategorical": np.random.choice(categories, size=rows),
+        "featureDuplicate": np.repeat([100, 200], int(rows / 2))
+    })
+
+    # Create a dataframe with shuffled rows
+    df2 = df1.copy().sample(frac=1.).reset_index(drop=True)
+    df2["featureDuplicate"] = np.repeat([900, 1000], int(rows / 2))
+    # create a dataframe changing one value of a feature in the row
+    df3 = df1.copy()
+    df3.iloc[0, 0] = 999.9
+
+    # evaluate only in feature1 and featureCategorical
+    eval_fn = hash_evaluator(hash_columns=["feature1", "featureCategorical"],
+                             eval_name="eval_name")
+    # evaluate hash in all columns
+    eval_fn_all = hash_evaluator(eval_name="eval_name")
+    eval_fn_order = hash_evaluator(hash_columns=["feature1", "featureCategorical"],
+                                   eval_name="eval_name",
+                                   consider_index=True)
+
+    # shuffle preserves the hash with the default parameters
+    assert eval_fn(df1)["eval_name"] == eval_fn(df2)["eval_name"]
+    # if considering the index, the order matters
+    assert eval_fn_order(df1)["eval_name"] != eval_fn_order(df2)["eval_name"]
+    # changing one value of the feature should change the hash
+    assert eval_fn(df1)["eval_name"] != eval_fn(df3)["eval_name"]
+    # if we consider all the features in the dataframe, it should return different hashes for different dataframes
+    assert eval_fn_all(df1)["eval_name"] != eval_fn_all(df2)["eval_name"]
+    # Assert that the hashes stay the same everytime this is run
+    assert eval_fn_all(df1)["eval_name"] == -6356943988420224450
+    assert eval_fn_all(df2)["eval_name"] == -4865376220991082723
+    assert eval_fn_all(df3)["eval_name"] == 141388279445698461
