@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, Optional
 
 import numpy as np
 from numpy import nan
@@ -330,6 +330,47 @@ def apply_replacements(df: pd.DataFrame,
 
 
 @curry
+@log_learner_time(learner_name="value_mapper")
+def value_mapper(df: pd.DataFrame,
+                 value_maps: Dict[str, Dict],
+                 ignore_unseen: bool = True,
+                 replace_unseen_to: Any = np.nan) -> pd.DataFrame:
+    """
+    Map values in selected columns in the DataFrame according to dictionaries of replacements.
+    Learner wrapper for apply_replacements
+
+    Parameters
+    -----------
+
+    df: pandas.DataFrame
+        A Pandas DataFrame containing the data to be replaced.
+
+    value_maps: dict of dicts
+        A dict mapping a col to dict mapping a value to its replacement. For example:
+        value_maps = {"feature1": {1: 2, 3: 5, 6: 8}}
+
+    ignore_unseen: bool
+        If True, values not explicitly declared in value_maps will be left as is.
+        If False, these will be replaced by replace_unseen_to.
+
+    replace_unseen_to: Any
+        Default value to replace when original value is not present in the `vec` dict for the feature.
+    """
+    def new_col_value_map(old_col_value_map: Dict[Any, Any],
+                          new_keys: List[Any]) -> Dict[Any, Dict]:
+        old_keys = old_col_value_map.keys()
+        return {key: old_col_value_map[key] if key in old_keys else key for key in new_keys}
+
+    columns = list(value_maps.keys())
+    if ignore_unseen:
+        value_maps = {col: new_col_value_map(value_maps[col], list(df[col].unique())) for col in columns}
+
+    def p(df: pd.DataFrame) -> pd.DataFrame:
+        return apply_replacements(df, columns, value_maps, replace_unseen=replace_unseen_to)
+    return p, p(df), {"value_maps": value_maps}
+
+
+@curry
 @log_learner_time(learner_name="truncate_categorical")
 def truncate_categorical(df: pd.DataFrame,
                          columns_to_truncate: List[str],
@@ -653,7 +694,7 @@ def standard_scaler(df: pd.DataFrame,
     return p, p(df), log
 
 
-quantile_biner.__doc__ += learner_return_docstring("Standard Scaler")
+standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 
 
 @curry
@@ -693,4 +734,63 @@ def custom_transformer(df: pd.DataFrame,
     return p, p(df), log
 
 
-selector.__doc__ += learner_return_docstring("Custom Transformer")
+custom_transformer.__doc__ += learner_return_docstring("Custom Transformer")
+
+
+@curry
+@log_learner_time(learner_name='null_injector')
+def null_injector(df: pd.DataFrame,
+                  proportion: float,
+                  columns_to_inject: Optional[List[str]] = None,
+                  groups: Optional[List[List[str]]] = None,
+                  seed: int = 1) -> LearnerReturnType:
+    """
+    Applies a custom function to the desired columns.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        A Pandas' DataFrame that must contain `columns_to_inject` as columns
+
+    columns_to_inject : list of str
+        A list of features to inject nulls. If groups is not None it will be ignored.
+
+    proportion : float
+        Proportion of nulls to inject in the columns.
+
+    groups : list of list of str (default = None)
+        A list of group of features. If not None, feature in the same group will be set to NaN together.
+
+    seed : int
+        Random seed for consistency.
+    """
+    assert (proportion > 0.0) & (proportion < 1.0), "proportions must be between 0 and 1"
+    assert (columns_to_inject is None) ^ (groups is None), "Either columns_to_inject or groups must be None."
+
+    n_rows = df.shape[0]
+
+    groups = [[f] for f in columns_to_inject] if columns_to_inject is not None else groups
+
+    null_cols = {}  # type: ignore
+    for seed_i, group in enumerate(groups):  # type: ignore
+        np.random.seed(seed + seed_i)
+        replace_mask = np.random.binomial(1, 1 - proportion, n_rows).astype(bool)
+        null_cols = merge(null_cols, {feature: df[feature].where(replace_mask) for feature in group})
+
+    null_data = df.assign(**null_cols)
+
+    def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
+        return new_data_set
+
+    p.__doc__ = learner_pred_fn_docstring("null_injector")
+
+    log = {'null_injector': {
+        "columns_to_inject": columns_to_inject,
+        "proportion": proportion,
+        "groups": groups
+    }}
+
+    return p, null_data, log
+
+
+null_injector.__doc__ += learner_return_docstring("Null Injector")
