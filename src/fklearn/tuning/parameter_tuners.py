@@ -4,9 +4,9 @@ from typing import Callable, List
 
 from numpy.random import seed
 import pandas as pd
-from toolz import curry
+from toolz import curry, partial
 
-from fklearn.validation.validator import parallel_validator
+from fklearn.validation.validator import parallel_validator, validator
 from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType
 
 SaveIntermediaryFnType = Callable[[ValidatorReturnType], None]
@@ -86,11 +86,12 @@ def random_search_tuner(space: LogType,
     tuning_log : list of dict
         A list of tuning log, each containing a training log and a validation log.
     """
+    validation_fn = partial(parallel_validator, n_jobs=n_jobs) if n_jobs > 1 else validator
 
     def tune_iteration() -> ValidatorReturnType:
         iter_space = {k: space[k]() for k in space}
         train_fn = param_train_fn(iter_space)
-        validator_log = parallel_validator(train_set, split_fn, train_fn, eval_fn, n_jobs)
+        validator_log = validation_fn(train_data=train_set, split_fn=split_fn, train_fn=train_fn, eval_fn=eval_fn)
 
         if save_intermediary_fn is not None:
             save_intermediary_fn(validator_log)
@@ -110,7 +111,8 @@ def grid_search_cv(space: LogType,
                    eval_fn: EvalFnType,
                    save_intermediary_fn: SaveIntermediaryFnType = None,
                    load_intermediary_fn: Callable[[str], List[ValidatorReturnType]] = None,
-                   warm_start_file: str = None) -> List[ValidatorReturnType]:
+                   warm_start_file: str = None,
+                   n_jobs: int = 1) -> List[ValidatorReturnType]:
     """
     Runs several training functions with each run taken from the parameter space
 
@@ -171,15 +173,21 @@ def grid_search_cv(space: LogType,
         is present, we will perform grid search from the last combination of
         parameters.
 
+    n_jobs : int
+        Number of parallel processes to spawn when evaluating a training function
+
+
     Returns
     ----------
     tuning_log : list of dict
         A list of tuning log, each containing a training log and a validation log.
     """
 
+    validation_fn = partial(parallel_validator, n_jobs=n_jobs) if n_jobs > 1 else validator
+
     def tune_iteration(iter_space: LogType) -> ValidatorReturnType:
         train_fn = param_train_fn(iter_space)
-        validator_log = parallel_validator(train_set, split_fn, train_fn, eval_fn)
+        validator_log = validation_fn(train_data=train_set, split_fn=split_fn, train_fn=train_fn, eval_fn=eval_fn)
         validator_log['iter_space'] = OrderedDict(sorted(iter_space.items()))
 
         if save_intermediary_fn is not None:
