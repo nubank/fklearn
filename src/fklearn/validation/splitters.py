@@ -1,11 +1,11 @@
+import operator
 from datetime import datetime, timedelta
 from itertools import chain, repeat, starmap
-import operator
 from typing import Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import GroupKFold, KFold
+from sklearn.model_selection import GroupKFold, KFold, StratifiedKFold
 from sklearn.utils import check_random_state
 from toolz.curried import curry, partial, pipe, assoc, accumulate, map, filter
 
@@ -69,11 +69,14 @@ def _lc_fold_to_indexes(folds: List[Tuple[pd.Series, pd.Series]]) -> List[Tuple[
 @curry
 def k_fold_splitter(train_data: pd.DataFrame,
                     n_splits: int,
-                    random_state: int = None) -> SplitterReturnType:
+                    random_state: int = None,
+                    stratify_column: str = None) -> SplitterReturnType:
     """"
     Makes K random train test split folds for cross validation.
     The folds are made so that every sample is used at least once for
     evaluating and K-1 times for training.
+
+    If stratified is set to True, split preserves the distribution of stratify_column
 
     Parameters
     ----------
@@ -85,13 +88,19 @@ def k_fold_splitter(train_data: pd.DataFrame,
 
     random_state : int
         Seed to be used by the random number generator.
+
+    stratify_column : string
+        Column name in train_data to be used for stratified split
     """
 
-    result = list(map(lambda t: (t[0], [t[1]]),
-                      KFold(n_splits, shuffle=True, random_state=random_state).split(train_data)))
+    if stratify_column is not None:
+        folds = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state) \
+            .split(train_data, train_data[stratify_column])
+    else:
+        folds = KFold(n_splits, shuffle=True, random_state=random_state).split(train_data)
+    result = list(map(lambda f: (f[0], [f[1]]), folds))
 
-    logs = list(map(lambda fold: {"train_size": len(fold[0]), "test_size": train_data.shape[0] - len(fold[0])},
-                    result))
+    logs = [{"train_size": len(fold[0]), "test_size": train_data.shape[0] - len(fold[0])} for fold in result]
 
     return result, logs
 
