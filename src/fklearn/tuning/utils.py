@@ -1,11 +1,12 @@
 from typing import Any, Dict, Generator, List
 
-from toolz.curried import reduce, partial, pipe, first
+from toolz.curried import reduce, partial, pipe, first, curry
 
 from fklearn.metrics.pd_extractors import extract
-from fklearn.types import LogListType, LogType, ExtractorFnType
+from fklearn.types import LogListType, LogType, ExtractorFnType, ValidatorReturnType, EvalReturnType
 
 
+@curry
 def get_avg_metric_from_extractor(logs: LogType, extractor: ExtractorFnType, metric_name: str) -> float:
     metric_folds = extract(logs["validator_log"], extractor)
     return metric_folds[metric_name].mean()
@@ -50,3 +51,9 @@ def gen_dict_extract(key: str, obj: Dict) -> Generator[Any, None, None]:
                 for d in v:
                     for result in gen_dict_extract(key, d):
                         yield result
+
+
+@curry
+def gen_validator_log(eval_log: EvalReturnType, fold_num: int, test_size: int) -> ValidatorReturnType:
+    return {'validator_log': [{'fold_num': fold_num, 'split_log': {'test_size': test_size},
+                               'eval_results': [eval_log]}]}
