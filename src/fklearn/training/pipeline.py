@@ -63,14 +63,27 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
 
     def pipeline(data: pd.DataFrame) -> LearnerReturnType:
         current_data = data.copy()
+        features = list(data.columns)
         fns = []
         logs = []
+        pipeline = []
+        serialisation = {}  # type: dict
 
         for learner in learners:
-            learner_predict_fn, new_data, learner_log = learner(current_data)
-            _no_variable_args(learner, learner_predict_fn)  # Check for invalid predict fn arguments
-            fns.append(learner_predict_fn)
+            learner_fn, new_data, learner_log = learner(current_data)
+            learner_name = learner.__name__
+            model_objects = {}
+            if learner_log.get("obj"):
+                model_objects["obj"] = learner_log.pop("obj")
+
+            serialisation[learner_name] = {"fn": learner_fn,
+                                           "log": learner_log,
+                                           **model_objects}
+
+            _no_variable_args(learner, learner_fn)  # Check for invalid predict fn arguments
+            fns.append(learner_fn)
             logs.append(learner_log)
+            pipeline.append(learner_name)
             current_data = new_data
 
         merged_logs = fp.merge(logs)
@@ -81,6 +94,11 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
             # Partially apply the arguments to the predict functions when applicable
             fns_with_args = [fp.curry(fn)(**args) if len(args) > 0 else fn for fn, args in zip(fns, fns_args)]
             return fp.pipe(df, *fns_with_args)
+
+        merged_logs["__fkml__"] = {"pipeline": pipeline,
+                                   "output_columns": list(current_data.columns),
+                                   "features": features,
+                                   "learners": {**serialisation}}
 
         return predict_fn, current_data, merged_logs
 
