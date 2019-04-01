@@ -78,7 +78,7 @@ def test_parallel_validator():
 
     assert len(validator_log) == 2
     assert validator_log[0]['fold_num'] == 0
-    assert result['train_log']['xgb_classification_learner']['features'] == ['f1']
+    assert result['train_log'][0]['xgb_classification_learner']['features'] == ['f1']
 
     assert len(validator_log[0]['eval_results']) == 3
 
