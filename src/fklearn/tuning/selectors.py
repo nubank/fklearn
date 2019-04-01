@@ -7,8 +7,8 @@ from fklearn.tuning.samplers import remove_features_subsets, remove_by_feature_i
 from fklearn.tuning.stoppers import stop_by_num_features, stop_by_num_features_parallel, stop_by_iter_num, \
     stop_by_no_improvement, stop_by_no_improvement_parallel, aggregate_stop_funcs
 from fklearn.validation.validator import parallel_validator
-from fklearn.types import EvalFnType, ExtractorFnType, LearnerLogType, LearnerReturnType, ListLogListType, \
-    LogListType, SplitterFnType, ValidatorReturnType
+from fklearn.types import EvalFnType, ExtractorFnType, LearnerReturnType, ListLogListType, LogListType, SplitterFnType,\
+    ValidatorReturnType, LogType
 
 SaveIntermediaryFnType = Callable[[List[ValidatorReturnType]], None]
 TuningLearnerFnType = Callable[[pd.DataFrame, List[str]], LearnerReturnType]
@@ -132,12 +132,16 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
                               eval_fn: EvalFnType,
                               extractor: ExtractorFnType,
                               metric_name: str,
+                              max_removed_by_step: int = 5,
                               threshold: float = 0.005,
-                              num_removed_by_step: int = 3,
                               early_stop: int = 2,
                               iter_limit: int = 50,
                               min_remaining_features: int = 50,
-                              save_intermediary_fn: Callable[[LearnerLogType], None] = None) -> LogListType:
+                              save_intermediary_fn: Callable[[LogType], None] = None,
+                              speed_up_by_importance: bool = False,
+                              parallel: bool = False,
+                              nthread: int = 1,
+                              seed: int = 7) -> LogListType:
     """
         Performs train-evaluation iterations while shuffiling the used features
         to compute statistics about feature relevance
@@ -149,10 +153,6 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
 
         test_data : pandas.DataFrame
             A Pandas' DataFrame with test data
-
-        auxiliary_columns: list of str
-            List of columns from the dataset that are not used as features but are
-            used for evaluation or cross validation. (id, date, etc)
 
         param_train_fn : function (pandas.DataFrame, list of str) -> prediction_function, predictions_dataset, logs
             A partially defined AND curried learning function that takes a training set and a feature list and
@@ -172,8 +172,12 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
         metric_name: str
             String with the name of the column that refers to the metric column to be extracted
 
-        num_removed_by_step: int (default 3)
-            Number of features removed at each iteration
+        max_removed_by_step: int (default 5)
+            The maximum number of features to remove. It will only consider the least max_removed_by_step in terms of
+            feature importance. If speed_up_by_importance=True it will first filter the least relevant feature an
+            shuffle only those. If speed_up_by_importance=False it will shuffle all features and drop the last
+            max_removed_by_step in terms of PIMP. In both cases, the features will only be removed if drop in
+            performance is up to the defined threshold.
 
         threshold: float (default 0.005)
             Threshold for model performance comparison
@@ -189,10 +193,28 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
             combining num_removed_by_step and iter_limit accomplishes the same
             functionality as this parameter.
 
-        save_intermediary_fn : function(log) -> save to file
+        save_intermediary_fn: function(log) -> save to file
             Partially defined saver function that receives a log result from a
             tuning step and appends it into a file
             Example: save_intermediary_result(save_path='tuning.pkl')
+
+        speed_up_by_importance: bool (default True)
+            If it should narrow search looking at feature importance first before getting PIMP importance. If True,
+            will only shuffle the top num_removed_by_step in terms of feature importance.
+
+        max_removed_by_step: int (default 50)
+            If speed_up_by_importance=False, this will limit the number of features dropped by iteration. It will only
+            drop the max_removed_by_step features that decrease the metric by the least when dropped.
+
+        parallel: bool (default False)
+            Run shuffling and prediction in parallel. Only applies if speed_up_by_importance=False
+
+        nthread: int (default 1)
+            Number of threads to run predictions. ONly applied if speed_up_by_importance=False
+
+        seed: int (default 7)
+            random state for consistency.
+
 
         Returns
         ----------
@@ -206,8 +228,12 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
                                               eval_data=test_data,
                                               extractor=extractor,
                                               metric_name=metric_name,
-                                              num_removed_by_step=num_removed_by_step,
-                                              threshold=threshold)
+                                              max_removed_by_step=max_removed_by_step,
+                                              threshold=threshold,
+                                              speed_up_by_importance=speed_up_by_importance,
+                                              parallel=parallel,
+                                              nthread=nthread,
+                                              seed=seed)
 
     stop_fn = aggregate_stop_funcs(
         stop_by_no_improvement(extractor=extractor, metric_name=metric_name, early_stop=early_stop,
@@ -237,8 +263,12 @@ def poor_man_boruta_selection(train_data: pd.DataFrame,
     predict_fn = predict_fn_first
 
     while not stop_fn(logs):  # type: ignore
-        next_predict_fn, _, next_train_logs = pipe(logs, first, selector_fn(predict_fn=predict_fn),
-                                                   lambda feat: param_train_fn(train_data, feat))
+        next_features = pipe(logs, first, selector_fn(predict_fn=predict_fn))
+
+        if len(next_features) == 0:
+            break
+
+        next_predict_fn, _, next_train_logs = param_train_fn(train_data, next_features)
 
         eval_logs = pipe(test_data, next_predict_fn, eval_fn)
         next_log = {'train_log': next_train_logs, 'validator_log': [
