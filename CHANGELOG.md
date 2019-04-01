@@ -1,6 +1,5 @@
 # Changelog
 
-## [0.0.1] - 2019-02-28
+## [1.13.0] - 2019-04-01
 - **New**
-  - Add pipeline builder
-  - Add pipeline schema and tests
+    - Add public version code
