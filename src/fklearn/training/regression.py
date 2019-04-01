@@ -375,8 +375,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
         'package_version': lgbm.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': bst}
 
     return p, p(df), log
 
