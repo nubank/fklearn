@@ -134,7 +134,7 @@ def test_poor_man_boruta_selection(train_df, holdout_df, train_fn, eval_fn, base
     logs = poor_man_boruta_selection(train_df, holdout_df, train_fn,
                                      features,
                                      eval_fn, base_extractor, metric_name,
-                                     num_removed_by_step=1, threshold=0,
+                                     max_removed_by_step=1, threshold=0,
                                      early_stop=10, iter_limit=50,
                                      min_remaining_features=5)
 
@@ -143,7 +143,7 @@ def test_poor_man_boruta_selection(train_df, holdout_df, train_fn, eval_fn, base
     logs = poor_man_boruta_selection(train_df, holdout_df,
                                      train_fn, features,
                                      eval_fn, base_extractor, metric_name,
-                                     num_removed_by_step=1, threshold=0,
+                                     max_removed_by_step=1, threshold=0,
                                      early_stop=10, iter_limit=1,
                                      min_remaining_features=3)
     assert len(logs) == 1  # Assert stop by iter limit
@@ -151,7 +151,7 @@ def test_poor_man_boruta_selection(train_df, holdout_df, train_fn, eval_fn, base
     logs = poor_man_boruta_selection(train_df, holdout_df,
                                      train_fn, features,
                                      eval_fn, base_extractor, metric_name,
-                                     num_removed_by_step=1, threshold=1,
+                                     max_removed_by_step=1, threshold=1,
                                      early_stop=2, iter_limit=50,
                                      min_remaining_features=1)
     assert len(logs) == 2  # Assert stop by early_stop
