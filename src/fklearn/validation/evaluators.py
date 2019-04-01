@@ -4,6 +4,7 @@ import toolz as fp
 from toolz import curry
 import pandas as pd
 import numpy as np
+from pandas.util import hash_pandas_object
 from sklearn.metrics import roc_auc_score, r2_score, mean_squared_error, log_loss, precision_score, recall_score, \
     fbeta_score, brier_score_loss, mean_absolute_error
 
@@ -702,3 +703,51 @@ def permutation_evaluator(test_data: pd.DataFrame,
         baseline_results = {}
 
     return fp.merge(feature_importance, baseline_results)
+
+
+@curry
+def hash_evaluator(test_data: pd.DataFrame,
+                   hash_columns: List[str] = None,
+                   eval_name: str = None,
+                   consider_index: bool = False) -> EvalReturnType:
+    """
+    Computes the hash of a pandas dataframe, filtered by hash columns. The
+    purpose is to uniquely identify a dataframe, to be able to check if two
+    dataframes are equal or not.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame to be hashed.
+
+    hash_columns : List[str], optional (default=None)
+        A list of column names to filter the dataframe before hashing. If None,
+        it will hash the dataframe with all the columns
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    consider_index: bool, optional (default=False)
+        If true, will consider the index of the dataframe to calculate the hash.
+        The default behaviour will ignore the index and just hash the content of
+        the features.
+
+    Returns
+    ----------
+    A log-like dictionary with the hash of the dataframe
+    """
+    if hash_columns is None:
+        hash_columns = test_data.columns
+
+    def calculate_dataframe_hash(df: pd.DataFrame, eval_name: str) -> EvalReturnType:
+        # Get the hashes per row, them sum all of them in a single value
+        return {eval_name: hash_pandas_object(df).sum()}
+
+    if eval_name is None:
+        eval_name = "hash_evaluator__" + "_".join(sorted(hash_columns))
+    eval_data = test_data[hash_columns]
+
+    if not consider_index:  # set 0 for all indexes
+        return calculate_dataframe_hash(eval_data.set_index(np.zeros(len(eval_data), dtype="int")), eval_name)
+
+    return calculate_dataframe_hash(eval_data, eval_name)
