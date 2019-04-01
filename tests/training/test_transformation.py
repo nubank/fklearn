@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 from fklearn.training.transformation import \
     selector, capper, floorer, prediction_ranger, count_categorizer, label_categorizer, quantile_biner, \
     truncate_categorical, rank_categorical, onehot_categorizer, standard_scaler, ecdfer, discrete_ecdfer, \
-    custom_transformer
+    custom_transformer, value_mapper, null_injector
 
 
 def test_selector():
@@ -105,6 +105,36 @@ def test_prediction_ranger():
     })
 
     assert expected.equals(data)
+
+
+def test_value_mapper():
+    input_df = pd.DataFrame({
+        'feat1': [10, 10, 13, 15],
+        'feat2': [100, 200, 300, None],
+        'feat3': ['a', 'b', 'c', 'b']
+    })
+
+    value_maps = {'feat1': {10: 1, 13: 2},
+                  'feat2': {100: [1, 2, 3]},
+                  'feat3': {'a': 'b', 'b': nan}}
+
+    pred_fn, data_ignore, log = value_mapper(input_df, value_maps)
+    pred_fn, data_not_ignore, log = value_mapper(input_df, value_maps, ignore_unseen=False)
+
+    expected_ignore = pd.DataFrame({
+        'feat1': [1, 1, 2, 15],
+        'feat2': [[1, 2, 3], 200, 300, None],
+        'feat3': ['b', nan, 'c', nan]
+    })
+
+    expected_not_ignore = pd.DataFrame({
+        'feat1': [1, 1, 2, nan],
+        'feat2': [[1, 2, 3], nan, nan, nan],
+        'feat3': ['b', nan, nan, nan]
+    })
+
+    assert expected_ignore.equals(data_ignore)
+    assert expected_not_ignore.equals(data_not_ignore)
 
 
 def test_count_categorizer():
@@ -489,3 +519,47 @@ def test_custom_transformer():
 
     # the transformed input df should contain the squared value of the feat1 column
     assert expected2.equals(data)
+
+
+def test_null_injector():
+
+    train = pd.DataFrame({
+        'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
+        'c': [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0],
+    })
+
+    test = pd.DataFrame({
+        'a': [5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0],
+        'c': [8.0, 9.0, 9.0],
+        'd': [1.0, 1.0, 1.0]
+    })
+
+    p, result, log = null_injector(train, 0.3, ["a", "b"], seed=42)
+
+    expected = pd.DataFrame({
+        'a': [1.0, nan, nan, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, nan, 1.0],
+        'c': [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0],
+    })
+
+    assert expected.equals(result)
+
+    assert p(test).equals(test), "test must be left unchanged"
+
+    # test group nans
+    p, result, log = null_injector(train, 0.3, groups=[["a"], ["b", "c"]], seed=42)
+
+    expected = pd.DataFrame({
+        'a': [1.0, nan, nan, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, nan, 1.0],
+        'c': [9.0, 8.0, 7.0, 6.0, 5.0, nan, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0],
+    })
+
+    assert expected.equals(result)
+
+    assert p(test).equals(test), "test must be left unchanged"
