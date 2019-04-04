@@ -14,13 +14,15 @@
 #
 # import os
 # import sys
+from datetime import datetime
 # sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'fklearn'
-copyright = '2019, Nubank Data Science Team'
+current_year = str(datetime.now().year)
+copyright = current_year + ', Nubank Data Science Team'
 author = 'Nubank Data Science Team'
 
 # The short X.Y version
