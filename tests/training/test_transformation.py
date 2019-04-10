@@ -581,14 +581,14 @@ def test_missing_warner():
 
     p, result, log = missing_warner(train, ["a", "b", "c"], "missing_alert_col_name")
 
-    expected_train = pd.DataFrame({
+    expected_train_1 = pd.DataFrame({
         'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
         'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
         'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
         'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
     })
 
-    expected_test = pd.DataFrame({
+    expected_test_1 = pd.DataFrame({
         'a': [5.0, 6.0, nan, 3.0, 3.0],
         'b': [1.0, nan, 0.0, 2.0, 2.0],
         'c': [nan, 9.0, 9.0, 7.0, 4.0],
@@ -597,6 +597,29 @@ def test_missing_warner():
     })
 
     # train data should not change
-    assert expected_train.equals(result)
+    assert expected_train_1.equals(result)
 
-    assert expected_test.equals(p(test))
+    assert expected_test_1.equals(p(test))
+
+    p, result, log = missing_warner(train, ["a", "b", "c"], "missing_alert_col_name", True, "missing_alert_explaining")
+
+    expected_train_2 = pd.DataFrame({
+        'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
+        'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
+    })
+
+    expected_test_2 = pd.DataFrame({
+        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'b': [1.0, nan, 0.0, 2.0, 2.0],
+        'c': [nan, 9.0, 9.0, 7.0, 4.0],
+        'd': [1.0, 1.0, 1.0, nan, 6.0],
+        'missing_alert_col_name': [False, True, True, False, False],
+        'missing_alert_explaining': [[], ["b"], ["a"], [], []]
+    })
+
+    # train data should not change
+    assert expected_train_2.equals(result)
+
+    assert expected_test_2.equals(p(test))
