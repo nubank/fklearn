@@ -825,10 +825,14 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
 
     def p(dataset: pd.DataFrame) -> pd.DataFrame:
+
+        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> pd.DataFrame:
+            cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
+            return np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
+
         new_dataset = dataset.assign(**{new_column_name: lambda df: df[cols_without_missing].isna().sum(axis=1) > 0})
         if detailed_warning and detailed_column_name:
-            return new_dataset.assign(**{detailed_column_name: lambda df: df[cols_without_missing].isna().swifter.apply(
-                lambda x: list(compress(list(df.columns), list(x))), axis=1)})
+            return new_dataset.assign(**{detailed_column_name: lambda df: detailed_assignment(df, cols_without_missing)})
         else:
             return new_dataset
 

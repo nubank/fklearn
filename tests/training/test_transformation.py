@@ -573,7 +573,7 @@ def test_missing_warner():
     })
 
     test = pd.DataFrame({
-        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'a': [5.0, nan, nan, 3.0, 3.0],
         'b': [1.0, nan, 0.0, 2.0, 2.0],
         'c': [nan, 9.0, 9.0, 7.0, 4.0],
         'd': [1.0, 1.0, 1.0, nan, 6.0]
@@ -589,7 +589,7 @@ def test_missing_warner():
     })
 
     expected_test_1 = pd.DataFrame({
-        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'a': [5.0, nan, nan, 3.0, 3.0],
         'b': [1.0, nan, 0.0, 2.0, 2.0],
         'c': [nan, 9.0, 9.0, 7.0, 4.0],
         'd': [1.0, 1.0, 1.0, nan, 6.0],
@@ -611,12 +611,12 @@ def test_missing_warner():
     })
 
     expected_test_2 = pd.DataFrame({
-        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'a': [5.0, nan, nan, 3.0, 3.0],
         'b': [1.0, nan, 0.0, 2.0, 2.0],
         'c': [nan, 9.0, 9.0, 7.0, 4.0],
         'd': [1.0, 1.0, 1.0, nan, 6.0],
         'missing_alert_col_name': [False, True, True, False, False],
-        'missing_alert_explaining': [[], ["b"], ["a"], [], []]
+        'missing_alert_explaining': [[], ["a", "b"], ["a"], [], []]
     })
 
     # train data should not change
