@@ -831,8 +831,8 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
 
         new_dataset = dataset.assign(**{new_column_name: lambda df: df[cols_without_missing].isna().sum(axis=1) > 0})
         if detailed_warning and detailed_column_name:
-            return new_dataset.assign(**{detailed_column_name:
-                                             lambda df: detailed_assignment(df, cols_without_missing)})
+            return new_dataset.assign(**{detailed_column_name: lambda df: detailed_assignment(df,
+                                                                                              cols_without_missing)})
         else:
             return new_dataset
 
