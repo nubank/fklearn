@@ -522,7 +522,6 @@ def test_custom_transformer():
 
 
 def test_null_injector():
-
     train = pd.DataFrame({
         'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
         'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
@@ -564,40 +563,40 @@ def test_null_injector():
 
     assert p(test).equals(test), "test must be left unchanged"
 
+
 def test_missing_warner():
-        train = pd.DataFrame({
-            'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-            'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
-            'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
-            'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
-        })
+    train = pd.DataFrame({
+        'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
+        'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
+    })
 
-        test = pd.DataFrame({
-            'a': [5.0, 6.0, nan, 3.0, 3.0],
-            'b': [1.0, nan, 0.0, 2.0, 2.0],
-            'c': [nan, 9.0, 9.0, 7.0, 4.0],
-            'd': [1.0, 1.0, 1.0, nan, 6.0]
-        })
+    test = pd.DataFrame({
+        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'b': [1.0, nan, 0.0, 2.0, 2.0],
+        'c': [nan, 9.0, 9.0, 7.0, 4.0],
+        'd': [1.0, 1.0, 1.0, nan, 6.0]
+    })
 
-        p, result, log = missing_warner(train, ["a", "b", "c"], "missing_alert_col_name")
+    p, result, log = missing_warner(train, ["a", "b", "c"], "missing_alert_col_name")
 
-        expected_train = pd.DataFrame({
-            'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-            'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
-            'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
-            'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
-        })
+    expected_train = pd.DataFrame({
+        'a': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+        'b': [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0],
+        'c': [9.0, 8.0, nan, 6.0, 5.0, 4.0, 3.0],
+        'd': [1.0, 8.0, 1.0, 4.0, 3.0, 4.0, 3.0]
+    })
 
-        expected_test = pd.DataFrame({
-            'a': [5.0, 6.0, nan, 3.0, 3.0],
-            'b': [1.0, nan, 0.0, 2.0, 2.0],
-            'c': [nan, 9.0, 9.0, 7.0, 4.0],
-            'd': [1.0, 1.0, 1.0, nan, 6.0],
-            'missing_alert_col_name': [False, True, True, False, False]
-        })
+    expected_test = pd.DataFrame({
+        'a': [5.0, 6.0, nan, 3.0, 3.0],
+        'b': [1.0, nan, 0.0, 2.0, 2.0],
+        'c': [nan, 9.0, 9.0, 7.0, 4.0],
+        'd': [1.0, 1.0, 1.0, nan, 6.0],
+        'missing_alert_col_name': [False, True, True, False, False]
+    })
 
-        # train data should not change
-        assert expected_train.equals(result)
+    # train data should not change
+    assert expected_train.equals(result)
 
-        assert expected_test.equals(p(test))
-
+    assert expected_test.equals(p(test))

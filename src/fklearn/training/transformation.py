@@ -1,16 +1,16 @@
 from typing import Any, Callable, Dict, List, Union, Optional
 
 import numpy as np
-from numpy import nan
 import pandas as pd
-import swifter # NOQA
+import swifter  # NOQA
+from numpy import nan
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
-from fklearn.types import LearnerReturnType, LearnerLogType
 from fklearn.training.utils import log_learner_time
+from fklearn.types import LearnerReturnType, LearnerLogType
 
 
 @curry
@@ -179,10 +179,10 @@ def ecdfer(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("ecdefer")
 
     log = {'ecdfer': {
-           'nobs': len(values),
-           'prediction_column': prediction_column,
-           'ascending': ascending,
-           'transformed_column': [ecdf_column]}}
+        'nobs': len(values),
+        'prediction_column': prediction_column,
+        'ascending': ascending,
+        'transformed_column': [ecdf_column]}}
 
     return p, p(df), log
 
@@ -292,9 +292,9 @@ def prediction_ranger(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("prediction_ranger")
 
     log = {'prediction_ranger': {
-           'prediction_min': prediction_min,
-           'prediction_max': prediction_max,
-           'transformed_column': [prediction_column]}}
+        'prediction_min': prediction_min,
+        'prediction_max': prediction_max,
+        'transformed_column': [prediction_column]}}
 
     return p, p(df), log
 
@@ -356,6 +356,7 @@ def value_mapper(df: pd.DataFrame,
     replace_unseen_to: Any
         Default value to replace when original value is not present in the `vec` dict for the feature.
     """
+
     def new_col_value_map(old_col_value_map: Dict[Any, Any],
                           new_keys: List[Any]) -> Dict[Any, Dict]:
         old_keys = old_col_value_map.keys()
@@ -367,6 +368,7 @@ def value_mapper(df: pd.DataFrame,
 
     def p(df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(df, columns, value_maps, replace_unseen=replace_unseen_to)
+
     return p, p(df), {"value_maps": value_maps}
 
 
@@ -796,10 +798,10 @@ def null_injector(df: pd.DataFrame,
 null_injector.__doc__ += learner_return_docstring("Null Injector")
 
 
-
 @curry
 @log_learner_time(learner_name='missing_warner')
-def missing_warner(df: pd.DataFrame, cols_list: List[str], new_column_name: str = "has_unexpected_missing") -> LearnerReturnType:
+def missing_warner(df: pd.DataFrame, cols_list: List[str],
+                   new_column_name: str = "has_unexpected_missing") -> LearnerReturnType:
     """
     Creates a new column to warn about rows that columns that don't have missing in the training set
     but have missing on the scoring
