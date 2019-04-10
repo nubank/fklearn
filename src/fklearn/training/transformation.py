@@ -1,16 +1,16 @@
 from typing import Any, Callable, Dict, List, Union, Optional
 
 import numpy as np
-from numpy import nan
 import pandas as pd
-import swifter # NOQA
+from numpy import nan
+import swifter  # NOQA
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
-from fklearn.types import LearnerReturnType, LearnerLogType
 from fklearn.training.utils import log_learner_time
+from fklearn.types import LearnerReturnType, LearnerLogType
 
 
 @curry
@@ -179,10 +179,10 @@ def ecdfer(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("ecdefer")
 
     log = {'ecdfer': {
-           'nobs': len(values),
-           'prediction_column': prediction_column,
-           'ascending': ascending,
-           'transformed_column': [ecdf_column]}}
+        'nobs': len(values),
+        'prediction_column': prediction_column,
+        'ascending': ascending,
+        'transformed_column': [ecdf_column]}}
 
     return p, p(df), log
 
@@ -292,9 +292,9 @@ def prediction_ranger(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("prediction_ranger")
 
     log = {'prediction_ranger': {
-           'prediction_min': prediction_min,
-           'prediction_max': prediction_max,
-           'transformed_column': [prediction_column]}}
+        'prediction_min': prediction_min,
+        'prediction_max': prediction_max,
+        'transformed_column': [prediction_column]}}
 
     return p, p(df), log
 
@@ -356,6 +356,7 @@ def value_mapper(df: pd.DataFrame,
     replace_unseen_to: Any
         Default value to replace when original value is not present in the `vec` dict for the feature.
     """
+
     def new_col_value_map(old_col_value_map: Dict[Any, Any],
                           new_keys: List[Any]) -> Dict[Any, Dict]:
         old_keys = old_col_value_map.keys()
@@ -367,6 +368,7 @@ def value_mapper(df: pd.DataFrame,
 
     def p(df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(df, columns, value_maps, replace_unseen=replace_unseen_to)
+
     return p, p(df), {"value_maps": value_maps}
 
 
@@ -794,3 +796,54 @@ def null_injector(df: pd.DataFrame,
 
 
 null_injector.__doc__ += learner_return_docstring("Null Injector")
+
+
+@curry
+@log_learner_time(learner_name='missing_warner')
+def missing_warner(df: pd.DataFrame, cols_list: List[str],
+                   new_column_name: str = "has_unexpected_missing",
+                   detailed_warning: bool = False,
+                   detailed_column_name: Optional[str] = None) -> LearnerReturnType:
+    """
+    Creates a new column to warn about rows that columns that don't have missing in the training set
+    but have missing on the scoring
+    ----------
+    df : pandas.DataFrame
+        A Pandas' DataFrame.
+    cols_list : list of str
+        List of columns to consider when evaluating missingness
+    new_column_name : str
+        Name of the column created to alert the existence of missing values
+    """
+
+    assert ((detailed_warning and detailed_column_name) or ((not detailed_warning) and (
+        not detailed_column_name))), "Either detailed_warning and detailed_column_name " \
+                                     "should be defined or both should be False."
+
+    df_selected = df[cols_list]
+    cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
+
+    def p(dataset: pd.DataFrame) -> pd.DataFrame:
+
+        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> pd.DataFrame:
+            cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
+            return np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
+
+        new_dataset = dataset.assign(**{new_column_name: lambda df: df[cols_without_missing].isna().sum(axis=1) > 0})
+        if detailed_warning and detailed_column_name:
+            return new_dataset.assign(**{detailed_column_name: lambda df: detailed_assignment(df,
+                                                                                              cols_without_missing)})
+        else:
+            return new_dataset
+
+    p.__doc__ = learner_pred_fn_docstring("missing_warner")
+
+    log = {"missing_warner": {
+        "cols_list": cols_list,
+        "cols_without_missing": cols_without_missing}
+    }
+
+    return p, df, log
+
+
+missing_warner.__doc__ += learner_return_docstring("Missing Alerter")
