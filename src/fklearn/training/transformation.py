@@ -794,3 +794,38 @@ def null_injector(df: pd.DataFrame,
 
 
 null_injector.__doc__ += learner_return_docstring("Null Injector")
+
+
+
+@curry
+@log_learner_time(learner_name='missing_warner')
+def missing_warner(df: pd.DataFrame, cols_list: List[str], new_column_name: str = "has_unexpected_missing") -> LearnerReturnType:
+    """
+    Creates a new column to warn about rows that columns that don't have missing in the training set
+    but have missing on the scoring
+    ----------
+    df : pandas.DataFrame
+        A Pandas' DataFrame.
+    cols_list :
+        List of columns to consider when evaluating missingness
+    new_column_name :
+        Name of the column created to alert the existence of missing values
+    """
+
+    df_selected = df[cols_list]
+    cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
+
+    def p(dataset: pd.DataFrame) -> pd.DataFrame:
+        return dataset.assign(**{new_column_name: lambda df: df[cols_without_missing].isna().sum(axis=1) > 0})
+
+    p.__doc__ = learner_pred_fn_docstring("missing_warner")
+
+    log = {"missing_warner": {
+        "cols_list": cols_list,
+        "cols_without_missing": cols_without_missing}
+    }
+
+    return p, df, log
+
+
+missing_warner.__doc__ += learner_return_docstring("Missing Alerter")
