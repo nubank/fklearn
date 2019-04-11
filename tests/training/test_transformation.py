@@ -623,3 +623,23 @@ def test_missing_warner():
     assert expected_train_2.equals(result)
 
     assert expected_test_2.equals(p(test))
+
+    # checking when test has no nulls
+
+    test_2 = pd.DataFrame({
+        'a': [5.0, 3.0, 2.0, 3.0, 3.0],
+        'b': [1.0, 1.0, 0.0, 2.0, 2.0],
+        'c': [3.0, 9.0, 9.0, 7.0, 4.0],
+        'd': [1.0, 1.0, 1.0, 4.0, 6.0]
+    })
+
+    expected_test_3 = pd.DataFrame({
+        'a': [5.0, 3.0, 2.0, 3.0, 3.0],
+        'b': [1.0, 1.0, 0.0, 2.0, 2.0],
+        'c': [3.0, 9.0, 9.0, 7.0, 4.0],
+        'd': [1.0, 1.0, 1.0, 4.0, 6.0],
+        'missing_alert_col_name': [False, False, False, False, False],
+        'missing_alert_explaining': [[], [], [], [], []]
+    })
+
+    assert expected_test_3.equals(p(test_2))

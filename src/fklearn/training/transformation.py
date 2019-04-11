@@ -7,7 +7,6 @@ import swifter  # NOQA
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
-
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time
 from fklearn.types import LearnerReturnType, LearnerLogType
@@ -825,14 +824,18 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
 
     def p(dataset: pd.DataFrame) -> pd.DataFrame:
 
-        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> pd.DataFrame:
+        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> np.array:
             cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
-            return np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
+            missing_by_row_list = np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
+            if missing_by_row_list.size == 0:
+                return np.empty((df.shape[0], 0)).tolist()
+            else:
+                return missing_by_row_list
 
         new_dataset = dataset.assign(**{new_column_name: lambda df: df[cols_without_missing].isna().sum(axis=1) > 0})
         if detailed_warning and detailed_column_name:
-            return new_dataset.assign(**{detailed_column_name: lambda df: detailed_assignment(df,
-                                                                                              cols_without_missing)})
+            missing_by_row_list = detailed_assignment(new_dataset, cols_without_missing)
+            return new_dataset.assign(**{detailed_column_name: missing_by_row_list})
         else:
             return new_dataset
 
