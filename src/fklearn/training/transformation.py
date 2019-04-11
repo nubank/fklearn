@@ -823,7 +823,6 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
 
     def p(dataset: pd.DataFrame) -> pd.DataFrame:
-
         def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> np.array:
             cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
             missing_by_row_list = np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
