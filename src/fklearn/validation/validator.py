@@ -6,7 +6,7 @@ import cloudpickle
 from joblib import Parallel, delayed
 import pandas as pd
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
-
+from typing import Callable, List
 from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType
 
 
@@ -63,6 +63,81 @@ def validator_iteration(data: pd.DataFrame,
     oof_predictions = []
     for test_index in test_indexes:
         test_predictions = predict_fn(data.iloc[test_index])
+        eval_results.append(eval_fn(test_predictions))
+        if predict_oof:
+            oof_predictions.append(test_predictions)
+
+    logs = {'fold_num': fold_num,
+            'train_log': train_log,
+            'eval_results': eval_results}
+
+    return assoc(logs, "oof_predictions", oof_predictions) if predict_oof else logs
+
+
+def chaos_validator_iteration(data: pd.DataFrame,
+                        train_index: pd.Index,
+                        test_indexes: pd.Index,
+                        fold_num: int,
+                        perturb_fn: Callable,
+                        train_fn: LearnerFnType,
+                        eval_fn: EvalFnType,
+                        predict_oof: bool = False,
+                        perturb_train: bool = True) -> LogType:
+    """
+    Perform an iteration of train test split, training and evaluation.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        A Pandas' DataFrame with training and testing subsets
+
+    train_index : numpy.Array
+        The index of the training subset of `data`.
+
+    test_indexes : list of numpy.Array
+        A list of indexes of the testing subsets of `data`.
+
+    fold_num : int
+        The number of the fold in the current iteration
+
+    train_fn : function pandas.DataFrame -> prediction_function, predictions_dataset, logs
+        A partially defined learning function that takes a training set and
+        returns a predict function, a dataset with training predictions and training
+        logs.
+
+    eval_fn : function pandas.DataFrame -> dict
+        A partially defined evaluation function that takes a dataset with prediction and
+        returns the evaluation logs.
+
+    predict_oof : bool
+        Whether to return out of fold predictions on the logs
+
+    perturb_train : bool
+        Wheter to perturb data during training (true) or testing (false) time
+
+    Returns
+    ----------
+    A log-like dictionary evaluations.
+    """
+    if perturb_train:
+        train_data = perturb_fn(data.iloc[train_index])
+    else:
+        train_data = data.iloc[train_index]        
+
+    empty_set_warn = "Splitter on validator_iteration in generating an empty training dataset. train_data.shape is %s" \
+                     % str(train_data.shape)
+    warnings.warn(empty_set_warn) if train_data.shape[0] == 0 else None  # type: ignore
+
+    predict_fn, train_out, train_log = train_fn(train_data)
+
+    eval_results = []
+    oof_predictions = []
+    for test_index in test_indexes:
+        if not perturb_train:
+            test_data = perturb_fn(data.iloc[test_index])
+        else:
+            test_data = data.iloc[test_index]
+        test_predictions = predict_fn(test_data)
         eval_results.append(eval_fn(test_predictions))
         if predict_oof:
             oof_predictions.append(test_predictions)
@@ -210,3 +285,63 @@ def parallel_validator(train_data: pd.DataFrame,
                           list)
 
     return assoc(train_log, "validator_log", validator_logs)
+
+@curry
+def chaos_validator(train_data: pd.DataFrame,
+              perturb_fn: Callable,
+              split_fn: SplitterFnType,
+              train_fn: LearnerFnType,
+              eval_fn: EvalFnType,
+              perturb_train: bool = True) -> ValidatorReturnType:
+    """
+    Splits the training data into folds given by the split function and
+    performs a train-evaluation sequence on each fold by calling
+    `validator_iteration.
+
+    Parameters
+    ----------
+    train_data : pandas.DataFrame
+        A Pandas' DataFrame with training data
+
+    split_fn : function pandas.DataFrame ->  list of tuple
+        Partially defined split function that takes a dataset and returns
+        a list of folds. Each fold is a Tuple of arrays. The fist array in
+        each tuple contains training indexes while the second array
+        contains validation indexes.
+
+    train_fn : function pandas.DataFrame -> prediction_function, predictions_dataset, logs
+        A partially defined learning function that takes a training set and
+        returns a predict function, a dataset with training predictions and training
+        logs.
+
+    eval_fn : function pandas.DataFrame -> dict
+        A partially defined evaluation function that takes a dataset with prediction and
+        returns the evaluation logs.
+
+    predict_oof : bool
+        Whether to return out of fold predictions on the logs
+
+    Returns
+    ----------
+    A list of log-like dictionary evaluations.
+    """
+    folds, logs = split_fn(train_data)
+
+    def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
+        (fold_num, (train_index, test_indexes)) = fold
+        return chaos_validator_iteration(train_data, train_index, test_indexes, fold_num, perturb_fn, train_fn, eval_fn, perturb_train)
+
+    zipped_logs = pipe(folds,
+                       enumerate,
+                       map(fold_iter),
+                       partial(zip, logs))
+
+    def _join_split_log(log_tuple: Tuple[LogType, LogType]) -> Tuple[LogType, LogType]:
+        train_log = {}
+        split_log, validator_log = log_tuple
+        train_log["train_log"] = validator_log["train_log"]
+        return train_log, assoc(dissoc(validator_log, "train_log"), "split_log", split_log)
+
+    train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
+    first_train_log = first(train_logs)
+    return assoc(first_train_log, "validator_log", list(validator_logs))
