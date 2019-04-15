@@ -20,14 +20,33 @@ def random_noise (col: pd.Series) -> pd.Series:
 @curry
 def nullify(col: pd.Series) -> pd.Series:
     return pd.Series([np.nan] * len(col))
-    
+  
 @curry
-def sample_columns (df: pd.DataFrame, perc: float) -> List[str]:
-    return random.sample(list(df.columns), int(len(df.columns) * perc))
+def sample_columns (data: pd.DataFrame, perc: float) -> List[str]:
+    return random.sample(list(data.columns), int(len(data.columns) * perc))
 
 @curry
-def perturbator(df: pd.DataFrame, cols: List[str], corr_fn: Callable) -> pd.DataFrame:
-    copy = df.copy(deep=True)
+def perturbator(data: pd.DataFrame, cols: List[str], corr_fn: Callable) -> pd.DataFrame:
+    copy = data.copy(deep=True)
     for col in cols:
-        copy.loc[:, col] = corr_fn(df[col])
+        copy.loc[:, col] = corr_fn(data[col])
     return copy 
+    """
+    transforms specific columns of a dataset according to an artificial
+    corruption function.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        A Pandas' DataFrame
+
+    cols : List[str]
+        A list of columns to apply the corruption function
+
+    corr_fn : function pandas.Series -> pandas.Series
+        An arbitrary corruption function
+
+    Returns
+    ----------
+    A list of log-like dictionary evaluations.
+    """

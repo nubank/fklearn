@@ -84,7 +84,8 @@ def chaos_validator_iteration(data: pd.DataFrame,
                         predict_oof: bool = False,
                         perturb_train: bool = True) -> LogType:
     """
-    Perform an iteration of train test split, training and evaluation.
+    Perform an iteration of train test split training and evaluation with
+    artificial data corruption (either at train-time or test-time).
 
     Parameters
     ----------
@@ -99,6 +100,11 @@ def chaos_validator_iteration(data: pd.DataFrame,
 
     fold_num : int
         The number of the fold in the current iteration
+    
+    perturb_fn: function pandas.DataFrame -> pandas.DataFrame
+        A partially defined corruption function that takes a dataset and returns
+        a corrupted version.
+    #TODO Logs?
 
     train_fn : function pandas.DataFrame -> prediction_function, predictions_dataset, logs
         A partially defined learning function that takes a training set and
@@ -295,13 +301,18 @@ def chaos_validator(train_data: pd.DataFrame,
               perturb_train: bool = True) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
-    performs a train-evaluation sequence on each fold by calling
-    `validator_iteration.
+    performs a corrupt-train-evaluation or train-corrupt-evaluation sequence 
+    on each fold by calling `validator_iteration.
 
     Parameters
     ----------
     train_data : pandas.DataFrame
         A Pandas' DataFrame with training data
+    
+    perturb_fn: function pandas.DataFrame -> pandas.DataFrame
+        A partially defined corruption function that takes a dataset and returns
+        a corrupted dataset.
+    #TODO Logs?
 
     split_fn : function pandas.DataFrame ->  list of tuple
         Partially defined split function that takes a dataset and returns
