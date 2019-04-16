@@ -54,4 +54,4 @@ def perturbator(data: pd.DataFrame,
     ----------
     A transformed dataset
     """
-    return data.assign(**{col: corruption_fn(data.col) for col in cols}) 
+    return data.assign(**{col: corruption_fn(data[col]) for col in cols}) 
