@@ -1,8 +1,10 @@
-import numpy as np
 import random
+from typing import Callable, List
+
+import numpy as np
 from toolz import curry
 import pandas as pd
-from typing import Callable, List
+
 from fklearn.types import ColumnWisePerturbFnType
 
 @curry

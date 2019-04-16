@@ -1,5 +1,5 @@
 import gc
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 import warnings
 
 import cloudpickle
@@ -8,7 +8,7 @@ import pandas as pd
 from toolz import compose
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
 from toolz.functoolz import identity
-from typing import Callable, List
+
 from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType, PerturbFnType
 
 
