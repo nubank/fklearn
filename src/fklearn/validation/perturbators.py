@@ -15,7 +15,7 @@ def shift_mu(col: pd.Series, perc: float) -> pd.Series:
 
     Parameters
     ----------
-    col : pd.Series 
+    col : pd.Series
         A Pandas' Series
 
     perc : float
@@ -121,4 +121,4 @@ def perturbator(data: pd.DataFrame,
     ----------
     A transformed dataset
     """
-    return data.assign(**{col: corruption_fn(data[col]) for col in cols}) 
+    return data.assign(**{col: corruption_fn(data[col]) for col in cols})
