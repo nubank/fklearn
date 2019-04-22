@@ -15,6 +15,9 @@
 import os
 import sys
 from datetime import datetime
+
+from fklearn import __version__
+
 sys.path.insert(0, os.path.abspath('../../src/'))
 
 
@@ -26,9 +29,9 @@ copyright = current_year + ', Nubank Data Science Team'
 author = 'Nubank Data Science Team'
 
 # The short X.Y version
-version = ''
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = ''
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
