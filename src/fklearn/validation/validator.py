@@ -1,5 +1,5 @@
 import gc
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple
 import warnings
 
 import cloudpickle
@@ -9,7 +9,8 @@ from toolz import compose
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
 from toolz.functoolz import identity
 
-from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType, PerturbFnType
+from fklearn.types import EvalFnType, LearnerFnType, LogType
+from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
 
 
 def validator_iteration(data: pd.DataFrame,
@@ -74,6 +75,7 @@ def validator_iteration(data: pd.DataFrame,
             'eval_results': eval_results}
 
     return assoc(logs, "oof_predictions", oof_predictions) if predict_oof else logs
+
 
 @curry
 def validator(train_data: pd.DataFrame,
