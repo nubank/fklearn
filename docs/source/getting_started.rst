@@ -103,4 +103,5 @@ The ``validator`` function receives some data, the learner function with our mod
 
 Learn More
 ----------
+Check this `jupyter notebook <https://github.com/nubank/fklearn/blob/master/notebooks/Demos.ipynb>`_ for some additional examples.
 
