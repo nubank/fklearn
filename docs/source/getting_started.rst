@@ -32,44 +32,6 @@ Learners
 While in scikit-learn the main abstraction for a model is a class with methods ``fit`` and ``transform``,
 in fklearn we use what we call a **learner function**. A learner function takes in some training data (plus other parameters),
 learns something from it and returns three things: a *prediction function*, the *transformed training data*, and a *log*.
-As an example, here’s a simplified definition of the ``linear_regression_learner``::
-
-    from sklearn.linear_model import LinearRegression
-    from toolz import curry
-
-    @curry
-    def linear_regression_learner(df: pd.DataFrame,
-                                                       features: List[str],
-                                                       target: str,
-                                                       params: Dict[str, Any] = None) -> LearnerReturnType:
-
-       # initialize and fit the linear regression
-       reg = LinearRegression(**params)
-       reg.fit(df[features].values, df[target].values)
-
-       # define the prediction function
-       def p(new_df: pd.DataFrame) -> pd.DataFrame:
-           # note that `reg` here refers to the linear regression fit above, via the function’s closure.
-           return new_df.assign(prediction=reg.predict(new_df[features].values))
-
-       # the log can contain arbitrary information that helps inspect or debug the model
-       log = {'linear_regression_learner': {
-           'features': features,
-           'target': target,
-           'parameters': params,
-           'training_samples': len(df),
-           'feature_importance': dict(zip(features, reg.coef_.flatten()))
-       }
-
-       return p, p(df), log
-
-Notice the use of type hints! They help make functional programming in python less awkward, along with the immensely useful `toolz <https://toolz.readthedocs.io>`_ library.
-
-As we mentioned, a *learner function* returns three things (a function, a dataframe, and a dictionary), as described by the ``LearnerReturnType`` definition::
-
-    LearnerReturnType = Tuple[PredictFnType, pd.DataFrame, LearnerLogType]
-    PredictFnType = Callable[[pd.DataFrame], pd.DataFrame]
-    LearnerLogType = Dict[str, Any]
 
 The **prediction function** always has the same signature: it takes in a dataframe and returns a dataframe (we use Pandas dataframes).
 It should be able to take in any new dataframe (as long as it contains the required columns) and transform it
@@ -80,23 +42,64 @@ The **transformed training data** is usually just the prediction function applie
 
 The **log** is a dictionary, and can include any information that is relevant for inspecting or debugging the learner (e.g. what features were used, how many samples there were in the training set, feature importance or coefficients).
 
-*Learner functions* show some common functional programming properties:
-They are **pure functions**, meaning they always return the same result given the same input, and they have no side-effects. In practice, this means you can call the learner as many times as you want without worrying about getting inconsistent results. This is not always the case when calling fit on a scikit-learn object for example, as objects may mutate.
+Learner functions are usually partially initialized (curried) before being passed to pipelines or applied to data::
 
-They are **higher order functions**, as they return another function (the prediction function). As the prediction function is defined within the learner itself, it can access variables in the learner function’s scope via its closure.
-
-By having consistent signatures, learner functions (and prediction functions) are **composable**. This means building entire pipelines out of them is straightforward, as we’ll see soon.
-
-They are **curriable**, meaning you can initialize them in steps, passing just a few arguments at a time (this is what’s actually happening in the first three lines of our example). This will be useful when defining pipelines, and applying a single model to different datasets while getting consistent results.
-
+   from fklearn.training.regression import linear_regression_learner
+   from fklearn.training.transformation import capper, floorer, prediction_ranger
+   
+   # initialize several learner functions
+   capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50,000})
+   regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
+   ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
+   
+   # apply one individually to some data
+   p, df, log = regression_fn(training_data)
+   
+Available learner functions in fklearn can be found inside the ``fklearn.training`` module.
 
 Pipelines
 #########
 
+Learner functions are usually composed into pipelines that apply them in order to data::
+
+    from fklearn.training.pipeline import build_pipeline
+
+    learner = build_pipeline(capper_fn, regression_fn, ranger_fn)
+    predict_fn, training_predictions, logs = learner(train_data)
+    
+Pipelines behave exactly as individual learner functions. They  guarantee that all steps are applied consistently to both traning and testing/production data.
 
 
 Validation
 ##########
+
+Once we have our pipeline defined, we can use fklearn's validation tools to evaluate the performance of our model in different scenarios and using multiple metrics::
+
+    from fklearn.validation.evaluators import r2_evaluator, spearman_evaluator, combined_evaluators
+    from fklearn.validation.validator import validator
+    from fklearn.validation.splitters import k_fold_splitter, stability_curve_time_splitter
+
+     evaluation_fn = combined_evaluators(evaluators=[
+           r2_evaluator(target_column="spend"),
+           spearman_evaluator(target_column="spend")])
+
+       cv_split_fn = k_fold_splitter(n_splits=3, random_state=42)
+       stability_split_fn = stability_curve_time_splitter(training_time_limit=pd.to_datetime("2018-01-01"),
+                                                          time_column="timestamp")
+
+       cross_validation_results = validator(train_data=train_data,
+                                            split_fn=cv_split_fn,
+                                            train_fn=learner,
+                                            eval_fn=evaluation_fn)
+
+       stability_validation_results = validator(train_data=train_data,
+                                                split_fn=stability_split_fn,
+                                                train_fn=learner,
+                                                eval_fn=evaluation_fn)
+
+The ``validator`` function receives some data, the learner function with our model plus the following:
+1. A *splitting function*: these can be found inside the ``fklearn.validation.splitters`` module. They split the data into training and evaluation folds in different ways, simulating situations where training and testing data differ.
+2. A *evaluation function*: these can be found inside the ``fklearn.validation.evaluators`` module. They compute various performance metrics of interest on our model's predictions. They can be composed by using ``combined_evaluators`` for example.
 
 Learn More
 ----------
