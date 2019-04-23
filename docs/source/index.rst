@@ -1,5 +1,5 @@
 =======
-Fklearn
+fklearn
 =======
 
 **fklearn** uses functional programming principles to make it easier to solve real problems with Machine Learning.

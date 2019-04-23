@@ -71,11 +71,12 @@ def space_time_split_dataset(dataset: pd.DataFrame,
                              time_column: str,
                              holdout_space: np.ndarray = None) -> Tuple[pd.DataFrame, ...]:
     """
-    Splits panel data into a four datasets:
-    1) A training set;
-    2) An in training time, but out sample id hold out dataset;
-    3) An out of training time, but in sample id hold out dataset;
-    4) An out of training time and out of sample id hold out dataset.
+    Splits panel data using both ID and Time columns, resulting in four datasets
+
+    1. A training set;
+    2. An in training time, but out sample id hold out dataset;
+    3. An out of training time, but in sample id hold out dataset;
+    4. An out of training time and out of sample id hold out dataset.
 
     Parameters
     ----------
