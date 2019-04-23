@@ -5,7 +5,7 @@ Getting started
 Installation
 ------------
 
-Fklearn is Python 3.6 compatible only. In order to install it using pip, run::
+The fklearn library is Python 3.6 compatible only. In order to install it using pip, run::
 
     pip install fklearn
 
@@ -46,15 +46,15 @@ Learner functions are usually partially initialized (curried) before being passe
 
    from fklearn.training.regression import linear_regression_learner
    from fklearn.training.transformation import capper, floorer, prediction_ranger
-   
+
    # initialize several learner functions
    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50,000})
    regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
    ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
-   
+
    # apply one individually to some data
    p, df, log = regression_fn(training_data)
-   
+
 Available learner functions in fklearn can be found inside the ``fklearn.training`` module.
 
 Pipelines
@@ -66,7 +66,7 @@ Learner functions are usually composed into pipelines that apply them in order t
 
     learner = build_pipeline(capper_fn, regression_fn, ranger_fn)
     predict_fn, training_predictions, logs = learner(train_data)
-    
+
 Pipelines behave exactly as individual learner functions. They  guarantee that all steps are applied consistently to both traning and testing/production data.
 
 
@@ -103,5 +103,5 @@ The ``validator`` function receives some data, the learner function with our mod
 
 Learn More
 ----------
-Check this `jupyter notebook <https://github.com/nubank/fklearn/blob/master/notebooks/Demos.ipynb>`_ for some additional examples.
 
+Check this `jupyter notebook <https://github.com/nubank/fklearn/blob/master/notebooks/Demos.ipynb>`_ for some additional examples.
