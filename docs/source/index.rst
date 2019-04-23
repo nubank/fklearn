@@ -19,5 +19,6 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   getting_started.rst
-   api.rst
+   getting_started
+   examples/index
+   api
