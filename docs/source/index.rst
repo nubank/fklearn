@@ -2,7 +2,7 @@
 Fklearn
 =======
 
-**fklearn** uses functional programming principles to make it easier to solve real business problems using Machine Learning.
+**fklearn** uses functional programming principles to make it easier to solve real problems with Machine Learning.
 
 The name is a reference to the widely known `scikit-learn <https://scikit-learn.org/stable/>`_ library.
 
