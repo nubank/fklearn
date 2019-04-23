@@ -258,8 +258,9 @@ def time_learning_curve_splitter(train_data: pd.DataFrame,
                                  freq: str = 'M',
                                  holdout_gap: timedelta = timedelta(days=0),
                                  min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
+
     Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with more recent data being added in each fold.
     Useful for learning curve validation, that is, for seeing how hold out performance
@@ -318,7 +319,7 @@ def reverse_time_learning_curve_splitter(train_data: pd.DataFrame,
                                          freq: str = 'MS',
                                          holdout_gap: timedelta = timedelta(days=0),
                                          min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
     Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with less recent data being added in each fold.
@@ -394,6 +395,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
 
     Parameters
     ----------
+
     train_data : pandas.DataFrame
         A Pandas' DataFrame that will be split for learning curve estimation.
 
@@ -412,10 +414,9 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
 
     train_percentages: list or tuple of floats
         A list containing the percentages of IDs to use in the training.
-        Defaults to (0.25, 0.5, 0.75, 1.0)
-        For example:
-            For the default value, there would be four model trainings, containing respectively
-            25%, 50%, 75%, and 100% of the IDs that are not part of the held out set.
+        Defaults to (0.25, 0.5, 0.75, 1.0). For example: For the default value,
+        there would be four model trainings, containing respectively 25%, 50%,
+        75%, and 100% of the IDs that are not part of the held out set.
 
     random_state : int
         A seed for the random number generator that shuffles the IDs.

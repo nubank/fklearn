@@ -221,6 +221,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     Parameters
     ----------
+    
     df : pandas.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column
@@ -287,8 +288,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
         'package': "sklearn",
         'package_version': sk_version,
         'training_samples': len(df)
-    }
-    }
+    }}
 
     return p, p(df), log
 
@@ -307,53 +307,55 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 prediction_column: str = "prediction",
                                 weight_column: str = None) -> LearnerReturnType:
     """
-     Fits an LGBM classifier to the dataset. It first generates a Dataset
-     with the specified features and labels from `df`. Then, it fits a LGBM
-     model to this Dataset. Return the predict function for the model and the
-     predictions for the input dataset.
+    Fits an LGBM classifier to the dataset.
 
-     Parameters
-     ----------
+    It first generates a Dataset
+    with the specified features and labels from `df`. Then, it fits a LGBM
+    model to this Dataset. Return the predict function for the model and the
+    predictions for the input dataset.
 
-     df : pandas.DataFrame
-         A Pandas' DataFrame with features and target columns.
-         The model will be trained to predict the target column
-         from the features.
+    Parameters
+    ----------
 
-     features : list of str
-         A list os column names that are used as features for the model. All this names
-         should be in `df`.
+    df : pandas.DataFrame
+       A pandas DataFrame with features and target columns.
+       The model will be trained to predict the target column
+       from the features.
 
-     target : str
-         The name of the column in `df` that should be used as target for the model.
-         This column should be binary, since this is a classification model.
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
 
-     learning_rate : float
-         Float in the range (0, 1]
-         Step size shrinkage used in update to prevents overfitting. After each boosting step,
-         we can directly get the weights of new features. and eta actually shrinks the
-         feature weights to make the boosting process more conservative.
-         See the learning_rate hyper-parameter in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be binary, since this is a classification model.
 
-     num_estimators : int
-         Int in the range (0, inf)
-         Number of boosted trees to fit.
-         See the num_iterations hyper-parameter in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+    learning_rate : float
+        Float in the range (0, 1]
+        Step size shrinkage used in update to prevents overfitting. After each boosting step,
+        we can directly get the weights of new features. and eta actually shrinks the
+        feature weights to make the boosting process more conservative.
+        See the learning_rate hyper-parameter in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
 
-     extra_params : dict, optional
-         Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
-         Other parameters for the LGBM model. See the list in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
-         If not passed, the default will be used.
+    num_estimators : int
+        Int in the range (0, inf)
+        Number of boosted trees to fit.
+        See the num_iterations hyper-parameter in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
 
-     prediction_column : str
-         The name of the column with the predictions from the model.
+    extra_params : dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
+        Other parameters for the LGBM model. See the list in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+        If not passed, the default will be used.
 
-     weight_column : str, optional
-         The name of the column with scores to weight the data.
-     """
+    prediction_column : str
+        The name of the column with the predictions from the model.
+
+    weight_column : str, optional
+        The name of the column with scores to weight the data.
+    """
     import lightgbm as lgbm
 
     params = extra_params if extra_params else {}
