@@ -1,4 +1,4 @@
-# fkit-learn: Functional Machine Learning
+# fklearn: Functional Machine Learning
 
 ![PyPI](https://img.shields.io/pypi/v/fklearn.svg?style=flat-square)
 [![Documentation Status](https://readthedocs.org/projects/fklearn/badge/?version=latest)](https://fklearn.readthedocs.io/en/latest/?badge=latest)
@@ -7,21 +7,21 @@
 [![codecov.io](https://codecov.io/github/nubank/fklearn/branch/master/graph/badge.svg)](https://codecov.io/github/nubank/fklearn)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**fkit-learn** makes it easier to solve real business problems using Machine Learning. It largely relies on functional programming principles to help achieve this goal.
+**fklearn** uses functional programming principles to make it easier to solve real problems with Machine Learning.
 
-The name is a tribute to the widely known [scikit-learn](https://scikit-learn.org/stable/) library.
+The name is a reference to the widely known [scikit-learn](https://scikit-learn.org/stable/) library.
 
-**Fklearn Principles**
+**fklearn Principles**
 
-1. Models should be production-ready with few extra steps.
-2. Validation should reflect real-life situations.
-3. Production models should match validated models.
-4. Reproducibility should be easily attainable.
-5. In-depth analysis and interpretation of model results should be simple to do.
+1. Validation should reflect real-life situations.
+2. Production models should match validated models.
+3. Models should be production-ready with few extra steps.
+4. Reproducibility and in-depth analysis of model results should be easy to achieve.
 
 
-[Getting Started]() |
 [Documentation](https://fklearn.readthedocs.io/en/latest/) |
+[Getting Started](https://fklearn.readthedocs.io/en/latest/getting_started.html) |
+[API Docs](https://fklearn.readthedocs.io/en/latest/api.html) |
 
 
 ## Installation
