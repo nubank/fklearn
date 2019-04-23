@@ -71,7 +71,7 @@ def k_fold_splitter(train_data: pd.DataFrame,
                     n_splits: int,
                     random_state: int = None,
                     stratify_column: str = None) -> SplitterReturnType:
-    """"
+    """
     Makes K random train/test split folds for cross validation.
     The folds are made so that every sample is used at least once for
     evaluating and K-1 times for training.
@@ -118,7 +118,7 @@ def out_of_time_and_space_splitter(train_data: pd.DataFrame,
                                    time_column: str,
                                    space_column: str,
                                    holdout_gap: timedelta = timedelta(days=0)) -> SplitterReturnType:
-    """"
+    """
     Makes K grouped train/test split folds for cross validation.
     The folds are made so that every ID is used at least once for
     evaluating and K-1 times for training. Also, for each fold, evaluation
@@ -182,7 +182,7 @@ def time_and_space_learning_curve_splitter(train_data: pd.DataFrame,
                                            holdout_gap: timedelta = timedelta(days=0),
                                            random_state: int = None,
                                            min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
     Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with more recent data being added in each fold.
@@ -386,8 +386,9 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
                                     train_percentages: Iterable[float] = (0.25, 0.5, 0.75, 1.0),
                                     random_state: int = None) -> SplitterReturnType:
     """
-    Spatial learning curve: progressively adds more and more examples to the training in order to verify the impact
-    of having more data available on a validation set.
+    Splits the data for a spatial learning curve. Progressively adds more and
+    more examples to the training in order to verify the impact of having more
+    data available on a validation set.
 
     The validation set starts after the training set, with an optional time gap.
 
@@ -468,7 +469,7 @@ def stability_curve_time_splitter(train_data: pd.DataFrame,
                                   time_column: str,
                                   freq: str = 'M',
                                   min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
     Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
@@ -527,7 +528,7 @@ def stability_curve_time_in_space_splitter(train_data: pd.DataFrame,
                                            space_hold_percentage: float = 0.5,
                                            random_state: int = None,
                                            min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
     Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
@@ -604,7 +605,7 @@ def stability_curve_time_space_splitter(train_data: pd.DataFrame,
                                         space_hold_percentage: float = 0.5,
                                         random_state: int = None,
                                         min_samples: int = 1000) -> SplitterReturnType:
-    """"
+    """
     Splits the data into temporal buckets given by the specified frequency.
     Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
