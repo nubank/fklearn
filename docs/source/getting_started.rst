@@ -105,4 +105,4 @@ Learn More
 ----------
 
 * Check this `jupyter notebook <https://github.com/nubank/fklearn/blob/master/notebooks/Demos.ipynb>`_ for some additional examples.
-* Our `blog post <https://medium.com/building-nubank/introducing-fklearn-nubanks-machine-learning-library-part-i-2a1c781035d0>`_ (Part I) gives an overview of the library
+* Our `blog post <https://medium.com/building-nubank/introducing-fklearn-nubanks-machine-learning-library-part-i-2a1c781035d0>`_ (Part I) gives an overview of the library and motivation behind it.
