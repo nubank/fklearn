@@ -221,7 +221,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     Parameters
     ----------
-    
+
     df : pandas.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column

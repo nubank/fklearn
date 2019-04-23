@@ -297,7 +297,7 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
 
     Then the predicted average is (0.1 + 0.05 + 0.00)/3 = 0.05, and the empirical frequency is (0 + 1 + 0)/3 = 1/3.
     Therefore, the distance for this bin is::
-    
+
         |1/3 - 0.05| ~= 0.28.
 
     Graphical intuition::

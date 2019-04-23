@@ -304,7 +304,7 @@ def prediction_ranger(df: pd.DataFrame,
 
     prediction_max : float
         The cap for the prediction.
-    
+
     prediction_column : str
         The name of the column in `df` to cap and floor
     """
