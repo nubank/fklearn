@@ -20,5 +20,4 @@ Contents
    :maxdepth: 1
 
    getting_started.rst
-   examples.rst
    api.rst
