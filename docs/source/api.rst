@@ -2,253 +2,234 @@
 API
 ===
 
-This is a list with all the **fklearn** functions. Docstrings must provide enough information
+This is a list with all relevant **fklearn** functions. Docstrings should provide enough information
 in order to understand any individual function.
 
-Datasets
---------
 
-.. currentmodule:: fklearn.data.datasets
-
-.. autosummary::
-   fklearn.data.datasets.make_confounded_data
-   fklearn.data.datasets.make_tutorial_data
-
-Pd_extractors
+Preprocessing
 -------------
 
-.. currentmodule:: fklearn.metrics.pd_extractors
-
-.. autosummary::
-
-Rebalancing
------------
+Rebalancing (fklearn.preprocessing.rebalancing)
+###############################################
 
 .. currentmodule:: fklearn.preprocessing.rebalancing
 
 .. autosummary::
-   fklearn.preprocessing.rebalancing.rebalance_by_categorical
-   fklearn.preprocessing.rebalancing.rebalance_by_continuous
+   rebalance_by_categorical
+   rebalance_by_continuous
 
-Splitting
----------
+Splitting (fklearn.preprocessing.splitting)
+###########################################
 
 .. currentmodule:: fklearn.preprocessing.splitting
 
 .. autosummary::
-   fklearn.preprocessing.splitting.space_time_split_dataset
-   fklearn.preprocessing.splitting.time_split_dataset
+   space_time_split_dataset
+   time_split_dataset
 
-Calibration
------------
+
+Training
+--------
+
+Calibration (fklearn.training.calibration)
+##########################################
 
 .. currentmodule:: fklearn.training.calibration
 
 .. autosummary::
-   fklearn.training.calibration.isotonic_calibration_learner
+   isotonic_calibration_learner
 
-Classification
---------------
+Classification (fklearn.training.classification)
+################################################
 
 .. currentmodule:: fklearn.training.classification
 
 .. autosummary::
-   fklearn.training.classification.lgbm_classification_learner
-   fklearn.training.classification.logistic_classification_learner
-   fklearn.training.classification.nlp_logistic_classification_learner
-   fklearn.training.classification.xgb_classification_learner
+   lgbm_classification_learner
+   logistic_classification_learner
+   nlp_logistic_classification_learner
+   xgb_classification_learner
 
-Ensemble
---------
+Ensemble (fklearn.training.ensemble)
+####################################
 
 .. currentmodule:: fklearn.training.ensemble
 
 .. autosummary::
-   fklearn.training.ensemble.xgb_octopus_classification_learner
+   xgb_octopus_classification_learner
 
-Imputation
-----------
+Imputation (fklearn.training.imputation)
+########################################
 
 .. currentmodule:: fklearn.training.imputation
 
 .. autosummary::
-   fklearn.training.imputation.imputer
-   fklearn.training.imputation.placeholder_imputer
+   imputer
+   placeholder_imputer
 
 
-Pipeline
---------
+Pipeline (fklearn.training.pipeline)
+####################################
 
 .. currentmodule:: fklearn.training.pipeline
 
 .. autosummary::
-   fklearn.training.pipeline.build_pipeline
+   build_pipeline
 
-Regression
-----------
+Regression (fklearn.training.regression)
+########################################
 
 .. currentmodule:: fklearn.training.regression
 
 .. autosummary::
-   fklearn.training.regression.gp_regression_learner
-   fklearn.training.regression.lgbm_regression_learner
-   fklearn.training.regression.linear_regression_learner
-   fklearn.training.regression.xgb_regression_learner
+   gp_regression_learner
+   lgbm_regression_learner
+   linear_regression_learner
+   xgb_regression_learner
 
-Transformation
---------------
+Transformation (fklearn.training.transformation)
+################################################
 
 .. currentmodule:: fklearn.training.transformation
 
 .. autosummary::
-   fklearn.training.transformation.apply_replacements
-   fklearn.training.transformation.capper
-   fklearn.training.transformation.count_categorizer
-   fklearn.training.transformation.custom_transformer
-   fklearn.training.transformation.discrete_ecdfer
-   fklearn.training.transformation.ecdfer
-   fklearn.training.transformation.floorer
-   fklearn.training.transformation.label_categorizer
-   fklearn.training.transformation.missing_warner
-   fklearn.training.transformation.null_injector
-   fklearn.training.transformation.onehot_categorizer
-   fklearn.training.transformation.prediction_ranger
-   fklearn.training.transformation.quantile_biner
-   fklearn.training.transformation.rank_categorical
-   fklearn.training.transformation.selector
-   fklearn.training.transformation.standard_scaler
-   fklearn.training.transformation.truncate_categorical
-   fklearn.training.transformation.value_mapper
+   apply_replacements
+   capper
+   count_categorizer
+   custom_transformer
+   discrete_ecdfer
+   ecdfer
+   floorer
+   label_categorizer
+   missing_warner
+   null_injector
+   onehot_categorizer
+   prediction_ranger
+   quantile_biner
+   rank_categorical
+   selector
+   standard_scaler
+   truncate_categorical
+   value_mapper
 
-Unsupervised
-------------
+Unsupervised (fklearn.training.unsupervised)
+############################################
 
 .. currentmodule:: fklearn.training.unsupervised
 
 .. autosummary::
-   fklearn.training.unsupervised.isolation_forest_learner
+   isolation_forest_learner
 
-Utils
------
 
-.. currentmodule:: fklearn.training.utils
-.. autosummary::
+Tuning
+------
 
-Model_agnostic_fc
------------------
+Model Agnostic Feature Choice (fklearn.tuning.model_agnostic_fc)
+################################################################
 
 .. currentmodule:: fklearn.tuning.model_agnostic_fc
 
 .. autosummary::
-   fklearn.tuning.model_agnostic_fc.correlation_feature_selection
-   fklearn.tuning.model_agnostic_fc.variance_feature_selection
+   correlation_feature_selection
+   variance_feature_selection
 
-Parameter_tuners
-----------------
+Parameter Tuning (fklearn.tuning.parameter_tuners)
+##################################################
 
 .. currentmodule:: fklearn.tuning.parameter_tuners
 
 .. autosummary::
-   fklearn.tuning.parameter_tuners.grid_search_cv
-   fklearn.tuning.parameter_tuners.random_search_tuner
-   fklearn.tuning.parameter_tuners.seed
+   grid_search_cv
+   random_search_tuner
+   seed
 
-Samplers
---------
+Samplers (fklearn.tuning.samplers)
+##################################
 
 .. currentmodule:: fklearn.tuning.samplers
 
 .. autosummary::
-   fklearn.tuning.samplers.remove_by_feature_importance
-   fklearn.tuning.samplers.remove_by_feature_shuffling
-   fklearn.tuning.samplers.remove_features_subsets
+   remove_by_feature_importance
+   remove_by_feature_shuffling
+   remove_features_subsets
 
-Selectors
----------
+Selectors (fklearn.tuning.selectors)
+####################################
 
 .. currentmodule:: fklearn.tuning.selectors
 
 .. autosummary::
-   fklearn.tuning.selectors.backward_subset_feature_selection
-   fklearn.tuning.selectors.feature_importance_backward_selection
-   fklearn.tuning.selectors.poor_man_boruta_selection
+   backward_subset_feature_selection
+   feature_importance_backward_selection
+   poor_man_boruta_selection
 
-Stoppers
---------
+Stoppers (fklearn.tuning.stoppers)
+##################################
 
 .. currentmodule:: fklearn.tuning.stoppers
 
 .. autosummary::
-   fklearn.tuning.stoppers.aggregate_stop_funcs
-   fklearn.tuning.stoppers.stop_by_iter_num
-   fklearn.tuning.stoppers.stop_by_no_improvement
-   fklearn.tuning.stoppers.stop_by_no_improvement_parallel
-   fklearn.tuning.stoppers.stop_by_num_features
-   fklearn.tuning.stoppers.stop_by_num_features_parallel
+   aggregate_stop_funcs
+   stop_by_iter_num
+   stop_by_no_improvement
+   stop_by_no_improvement_parallel
+   stop_by_num_features
+   stop_by_num_features_parallel
 
-Utils
------
-
-.. currentmodule:: fklearn.tuning.utils
-.. autosummary::
-
-Types
------
-
-.. currentmodule:: fklearn.types.types
-.. autosummary::
-
-Evaluators
+Validation
 ----------
+
+Evaluators (fklearn.validation.evaluators)
+##########################################
 
 .. currentmodule:: fklearn.validation.evaluators
 
 .. autosummary::
-   fklearn.validation.evaluators.auc_evaluator
-   fklearn.validation.evaluators.brier_score_evaluator
-   fklearn.validation.evaluators.combined_evaluators
-   fklearn.validation.evaluators.correlation_evaluator
-   fklearn.validation.evaluators.expected_calibration_error_evaluator
-   fklearn.validation.evaluators.fbeta_score_evaluator
-   fklearn.validation.evaluators.generic_sklearn_evaluator
-   fklearn.validation.evaluators.hash_evaluator
-   fklearn.validation.evaluators.logloss_evaluator
-   fklearn.validation.evaluators.mean_prediction_evaluator
-   fklearn.validation.evaluators.mse_evaluator
-   fklearn.validation.evaluators.permutation_evaluator
-   fklearn.validation.evaluators.precision_evaluator
-   fklearn.validation.evaluators.r2_evaluator
-   fklearn.validation.evaluators.recall_evaluator
-   fklearn.validation.evaluators.spearman_evaluator
-   fklearn.validation.evaluators.split_evaluator
-   fklearn.validation.evaluators.temporal_split_evaluator
+   auc_evaluator
+   brier_score_evaluator
+   combined_evaluators
+   correlation_evaluator
+   expected_calibration_error_evaluator
+   fbeta_score_evaluator
+   generic_sklearn_evaluator
+   hash_evaluator
+   logloss_evaluator
+   mean_prediction_evaluator
+   mse_evaluator
+   permutation_evaluator
+   precision_evaluator
+   r2_evaluator
+   recall_evaluator
+   spearman_evaluator
+   split_evaluator
+   temporal_split_evaluator
 
-Splitters
----------
+Splitters (fklearn.validation.splitters)
+########################################
 
 .. currentmodule:: fklearn.validation.splitters
 
 .. autosummary::
-   fklearn.validation.splitters.forward_stability_curve_time_splitter
-   fklearn.validation.splitters.k_fold_splitter
-   fklearn.validation.splitters.out_of_time_and_space_splitter
-   fklearn.validation.splitters.reverse_time_learning_curve_splitter
-   fklearn.validation.splitters.spatial_learning_curve_splitter
-   fklearn.validation.splitters.stability_curve_time_in_space_splitter
-   fklearn.validation.splitters.stability_curve_time_space_splitter
-   fklearn.validation.splitters.stability_curve_time_splitter
-   fklearn.validation.splitters.time_and_space_learning_curve_splitter
-   fklearn.validation.splitters.time_learning_curve_splitter
+   forward_stability_curve_time_splitter
+   k_fold_splitter
+   out_of_time_and_space_splitter
+   reverse_time_learning_curve_splitter
+   spatial_learning_curve_splitter
+   stability_curve_time_in_space_splitter
+   stability_curve_time_space_splitter
+   stability_curve_time_splitter
+   time_and_space_learning_curve_splitter
+   time_learning_curve_splitter
 
-Validator
----------
+Validator (fklearn.validation.validator)
+########################################
 
 .. currentmodule:: fklearn.validation.validator
 
 .. autosummary::
-   fklearn.validation.validator.parallel_validator
-   fklearn.validation.validator.validator
-   fklearn.validation.validator.validator_iteration
+   parallel_validator
+   validator
+   validator_iteration
 
 Definitions
 -----------
