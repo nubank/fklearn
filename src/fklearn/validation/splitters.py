@@ -72,25 +72,25 @@ def k_fold_splitter(train_data: pd.DataFrame,
                     random_state: int = None,
                     stratify_column: str = None) -> SplitterReturnType:
     """"
-    Makes K random train test split folds for cross validation.
+    Makes K random train/test split folds for cross validation.
     The folds are made so that every sample is used at least once for
     evaluating and K-1 times for training.
 
-    If stratified is set to True, split preserves the distribution of stratify_column
+    If stratified is set to True, the split preserves the distribution of stratify_column
 
     Parameters
     ----------
     train_data : pandas.DataFrame
-        A Pandas' DataFrame that will be spited into K-Folds for cross validation.
+        A Pandas' DataFrame that will be split into K-Folds for cross validation.
 
     n_splits : int
-        The number of folds. K, fot the K-Fold cross validation strategy.
+        The number of folds K for the K-Fold cross validation strategy.
 
     random_state : int
         Seed to be used by the random number generator.
 
     stratify_column : string
-        Column name in train_data to be used for stratified split
+        Column name in train_data to be used for stratified split.
     """
 
     if stratify_column is not None:
@@ -119,29 +119,29 @@ def out_of_time_and_space_splitter(train_data: pd.DataFrame,
                                    space_column: str,
                                    holdout_gap: timedelta = timedelta(days=0)) -> SplitterReturnType:
     """"
-    Makes K grouped train test split folds for cross validation.
+    Makes K grouped train/test split folds for cross validation.
     The folds are made so that every ID is used at least once for
     evaluating and K-1 times for training. Also, for each fold, evaluation
-    will always be out of ID and out of time.
+    will always be out-of-ID and out-of-time.
 
     Parameters
     ----------
     train_data : pandas.DataFrame
-        A Pandas' DataFrame that will be spited into K out of time and ID
+        A Pandas' DataFrame that will be split into K out-of-time and ID
         folds for cross validation.
 
     n_splits : int
-        The number of folds. K, fot the K-Fold cross validation strategy.
+        The number of folds K for the K-Fold cross validation strategy.
 
     in_time_limit : str or datetime.datetime
-        A String representing a the ending time of the training data.
-        It should be in the same format as the Date Column in `train_data`.
+        A String representing the end time of the training data.
+        It should be in the same format as the Date column in `train_data`.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     space_column : str
-        The name of the ID column of `train_data`
+        The name of the ID column of `train_data`.
 
     holdout_gap: datetime.timedelta
         Timedelta of the gap between the end of the training period and the start of the validation period.
@@ -184,7 +184,7 @@ def time_and_space_learning_curve_splitter(train_data: pd.DataFrame,
                                            min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Uses a fixed out of ID and time hold out set for every fold.
+    Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with more recent data being added in each fold.
     Useful for learning curve validation, that is, for seeing how hold out performance
     increases as the training size increases with more recent data.
@@ -196,20 +196,20 @@ def time_and_space_learning_curve_splitter(train_data: pd.DataFrame,
 
     training_time_limit : str
         The Date String for the end of the testing period. Should be of the same
-        format as `time_column`
+        format as `time_column`.
 
     space_column : str
-        The name of the ID column of `train_data`
+        The name of the ID column of `train_data`.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     freq : str
         The temporal frequency.
         See: http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
 
     space_hold_percentage : float
-        The proportion of hold out IDs
+        The proportion of hold out IDs.
 
     holdout_gap: datetime.timedelta
         Timedelta of the gap between the end of the training period and the start of the validation period.
@@ -260,7 +260,7 @@ def time_learning_curve_splitter(train_data: pd.DataFrame,
                                  min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Uses a fixed out of ID and time hold out set for every fold.
+    Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with more recent data being added in each fold.
     Useful for learning curve validation, that is, for seeing how hold out performance
     increases as the training size increases with more recent data.
@@ -272,10 +272,10 @@ def time_learning_curve_splitter(train_data: pd.DataFrame,
 
     training_time_limit : str
         The Date String for the end of the testing period. Should be of the same
-        format as `time_column`
+        format as `time_column`.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     freq : str
         The temporal frequency.
@@ -320,7 +320,7 @@ def reverse_time_learning_curve_splitter(train_data: pd.DataFrame,
                                          min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Uses a fixed out of ID and time hold out set for every fold.
+    Uses a fixed out-of-ID and time hold out set for every fold.
     Training size increases per fold, with less recent data being added in each fold.
     Useful for inverse learning curve validation, that is, for seeing how hold out
     performance increases as the training size increases with less recent data.
@@ -331,11 +331,11 @@ def reverse_time_learning_curve_splitter(train_data: pd.DataFrame,
         A Pandas' DataFrame that will be split inverse learning curve estimation.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     training_time_limit : str
         The Date String for the end of the testing period. Should be of the same
-        format as `time_column`
+        format as `time_column`.
 
     lower_time_limit : str
         A Date String for the begining of the training period. This allows limiting
@@ -388,9 +388,9 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
     Spatial learning curve: progressively adds more and more examples to the training in order to verify the impact
     of having more data available on a validation set.
 
-    The validation set starts after the training set, with an optiona time gap.
+    The validation set starts after the training set, with an optional time gap.
 
-    Similar to the temporal learning curves, but the increases in the training set are spatial.
+    Similar to the temporal learning curves, but with spatial increases in the training set.
 
     Parameters
     ----------
@@ -469,7 +469,7 @@ def stability_curve_time_splitter(train_data: pd.DataFrame,
                                   min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Training set is fixed before hold out and uses a rowling window hold out set.
+    Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
     Useful to see how model performance degrades as the training data gets more
     outdated. Training and holdout sets can have same IDs
@@ -481,17 +481,17 @@ def stability_curve_time_splitter(train_data: pd.DataFrame,
 
     training_time_limit : str
         The Date String for the end of the testing period. Should be of the same
-        format as `time_column`
+        format as `time_column`.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     freq : str
         The temporal frequency.
         See: http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
 
     min_samples : int
-        The minimum number of samples required in the split to keep the split.
+        The minimum number of samples required in a split to keep it.
     """
 
     train_data = train_data.reset_index()
@@ -528,10 +528,10 @@ def stability_curve_time_in_space_splitter(train_data: pd.DataFrame,
                                            min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Training set is fixed before hold out and uses a rowling window hold out set.
+    Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
     Useful to see how model performance degrades as the training data gets more
-    outdated. Folds are made so that ALL IDs in the holdout also appears in
+    outdated. Folds are made so that ALL IDs in the holdout also appear in
     the training set.
 
     Parameters
@@ -541,20 +541,20 @@ def stability_curve_time_in_space_splitter(train_data: pd.DataFrame,
 
     training_time_limit : str
         The Date String for the end of the testing period. Should be of the same
-        format as `time_column`
+        format as `time_column`.
 
     space_column : str
-        The name of the ID column of `train_data`
+        The name of the ID column of `train_data`.
 
     time_column : str
-        The name of the Date column of `train_data`
+        The name of the Date column of `train_data`.
 
     freq : str
         The temporal frequency.
         See: http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
 
-    space_hold_percentage : Float (default=0.5)
-        The proportion of hold out IDs
+    space_hold_percentage : float (default=0.5)
+        The proportion of hold out IDs.
 
     random_state : int
         A seed for the random number generator for ID sampling across train and
@@ -605,7 +605,7 @@ def stability_curve_time_space_splitter(train_data: pd.DataFrame,
                                         min_samples: int = 1000) -> SplitterReturnType:
     """"
     Splits the data into temporal buckets given by the specified frequency.
-    Training set is fixed before hold out and uses a rowling window hold out set.
+    Training set is fixed before hold out and uses a rolling window hold out set.
     Each fold moves the hold out further into the future.
     Useful to see how model performance degrades as the training data gets more
     outdated. Folds are made so that NONE of the IDs in the holdout appears in

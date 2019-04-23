@@ -182,7 +182,7 @@ def xgb_classification_learner(df: pd.DataFrame,
                            "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
 
             if params["objective"] == "multi:softprob":
-                raise NotImplementedError("SHAP values are not implemented for multiclass XGBoost in fkit-learn")
+                raise NotImplementedError("SHAP values are not implemented for multiclass XGBoost in fklearn")
             else:
                 col_dict = merge(col_dict, shap_output)
 
