@@ -4,6 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/fklearn/badge/?version=latest)](https://fklearn.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/fklearn-python/community.svg)](https://gitter.im/fklearn-python/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![CircleCI](https://circleci.com/gh/nubank/fklearn.svg?style=svg)](https://circleci.com/gh/nubank/fklearn)
+[![codecov.io](https://codecov.io/github/nubank/fklearn/branch/master/graph/badge.svg)](https://codecov.io/github/nubank/fklearn)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **fklearn** uses functional programming principles to make it easier to solve real problems with Machine Learning.

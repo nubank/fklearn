@@ -1,0 +1,19 @@
+[run]
+parallel = True
+concurrency = multiprocessing
+branch = True
+
+[report]
+exclude_lines =
+    raise *
+    except *
+
+omit =
+    *test*
+    *env*
+    *git*
+    *init*
+    *version*
+
+include =
+    *src/fklearn*
