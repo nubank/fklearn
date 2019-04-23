@@ -15,7 +15,6 @@ baseline of any NLP classification task, as our model (available as
 .. code-block:: python
 
    import pandas as pd
-   from sklearn.metrics import accuracy_score
    from fklearn.preprocessing.splitting import time_split_dataset
    from fklearn.training.classification import nlp_logistic_classification_learner
    from fklearn.validation.evaluators import fbeta_score_evaluator
