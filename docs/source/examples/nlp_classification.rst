@@ -18,7 +18,7 @@ baseline of any NLP classification task, as our model (available as
    from sklearn.metrics import accuracy_score
    from fklearn.preprocessing.splitting import time_split_dataset
    from fklearn.training.classification import nlp_logistic_classification_learner
-   from fklearn.validation.evaluators import generic_sklearn_evaluator
+   from fklearn.validation.evaluators import fbeta_score_evaluator
 
 
    # Load consumer complaints data
