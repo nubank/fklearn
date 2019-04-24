@@ -87,7 +87,7 @@ def validator(train_data: pd.DataFrame,
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold by calling
-    `validator_iteration.
+    ``validator_iteration``.
 
     Parameters
     ----------

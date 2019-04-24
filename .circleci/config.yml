@@ -8,8 +8,6 @@
   restore-cache: &restore-cache
     keys:
       - v1-dependencies-{{ checksum "requirements.txt" }}
-      # fallback to using the latest cache if no exact match is found
-      - v1-dependencies-
 
   create-venv: &create-venv
     name: Create virtualenv
@@ -110,6 +108,20 @@
         paths:
           - dist
 
+.build-docs: &build-docs
+  docker:
+    - image: *docker-image
+  working_directory: *working-directory
+  steps:
+    - checkout
+    - restore_cache: *restore-cache
+    - run: *create-venv
+    - save_cache: *save-cache
+    - run: *install-package
+    - run:
+        name: Build documentation
+        command: . scripts/build_docs.sh
+
 .release: &release
   docker:
     - image: *docker-image
@@ -152,6 +164,8 @@ jobs:
     <<: *pip-check
   build:
     <<: *build
+  build-docs:
+    <<: *build-docs
   release:
     <<: *release
   type-check:
@@ -169,6 +183,8 @@ workflows:
       - pip-check:
           <<: *requires-lint
       - type-check:
+          <<: *requires-lint
+      - build-docs:
           <<: *requires-lint
   build-and-release:
     jobs:

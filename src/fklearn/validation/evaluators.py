@@ -17,13 +17,16 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
 
     Parameters
     ----------
-    name_prefix: the default name of the evaluator will be name_prefix + target_column
+    name_prefix: str
+        The default name of the evaluator will be name_prefix + target_column.
 
-    sklearn_metric: metric function from sklearn.metrics. It should take as parameters y_true, y_score, kwargs
+    sklearn_metric: Callable
+        Metric function from sklearn.metrics. It should take as parameters y_true, y_score, kwargs.
 
     Returns
     ----------
-    An evaluator function that uses the provided metric
+    eval_fn: Callable
+       An evaluator function that uses the provided metric
     """
 
     def p(test_data: pd.DataFrame,
@@ -69,7 +72,8 @@ def auc_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the ROC AUC Score
+    log: dict
+        A log-like dictionary with the ROC AUC Score
     """
 
     eval_fn = generic_sklearn_evaluator("auc_evaluator__", roc_auc_score)
@@ -107,7 +111,8 @@ def precision_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Precision Score
+    log: dict
+        A log-like dictionary with the Precision Score
     """
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
@@ -145,7 +150,8 @@ def recall_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Precision Score
+    log: dict
+        A log-like dictionary with the Precision Score
     """
 
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
@@ -190,7 +196,8 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Precision Score
+    log: dict
+        A log-like dictionary with the Precision Score
     """
 
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
@@ -223,7 +230,8 @@ def logloss_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the logloss score.
+    log: dict
+        A log-like dictionary with the logloss score.
     """
 
     eval_fn = generic_sklearn_evaluator("logloss_evaluator__", log_loss)
@@ -256,7 +264,8 @@ def brier_score_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Brier score.
+    log: dict
+        A log-like dictionary with the Brier score.
     """
 
     eval_fn = generic_sklearn_evaluator("brier_score_evaluator__", brier_score_loss)
@@ -287,15 +296,17 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
       3. prediction: 0.0, actual 0
 
     Then the predicted average is (0.1 + 0.05 + 0.00)/3 = 0.05, and the empirical frequency is (0 + 1 + 0)/3 = 1/3.
-    Therefore, the distance for this bin is |1/3 - 0.05| ~= 0.28.
+    Therefore, the distance for this bin is::
 
-    Graphical intuition:
+        |1/3 - 0.05| ~= 0.28.
 
-    Actuals (empirical frequency between 0 and 1)
-    |     *
-    |   *
-    | *
-     ______ Predictions (probabilties between 0 and 1)
+    Graphical intuition::
+
+        Actuals (empirical frequency between 0 and 1)
+        |     *
+        |   *
+        | *
+         ______ Predictions (probabilties between 0 and 1)
 
     Parameters
     ----------
@@ -323,8 +334,9 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
         with distance weighed by the number of samples in each bin.
 
     Returns
-    ----------
-    A log-like dictionary with the expected calibration error.
+    -------
+    log: dict
+       A log-like dictionary with the expected calibration error.
     """
 
     if eval_name is None:
@@ -376,7 +388,8 @@ def r2_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the R2 Score
+    log: dict
+        A log-like dictionary with the R2 Score
     """
 
     eval_fn = generic_sklearn_evaluator("r2_evaluator__", r2_score)
@@ -408,7 +421,8 @@ def mse_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the MSE Score
+    log: dict
+        A log-like dictionary with the MSE Score
     """
     eval_fn = generic_sklearn_evaluator("mse_evaluator__", mean_squared_error)
 
@@ -435,7 +449,8 @@ def mean_prediction_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the column mean
+    log: dict
+        A log-like dictionary with the column mean
     """
 
     if eval_name is None:
@@ -468,7 +483,8 @@ def correlation_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Pearson correlation
+    log: dict
+        A log-like dictionary with the Pearson correlation
     """
 
     if eval_name is None:
@@ -504,7 +520,8 @@ def spearman_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the Spearman correlation
+    log: dict
+        A log-like dictionary with the Spearman correlation
     """
 
     if eval_name is None:
@@ -530,7 +547,8 @@ def combined_evaluators(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with the column mean
+    log: dict
+        A log-like dictionary with the column mean
     """
     return fp.merge(e(test_data) for e in evaluators)
 
@@ -566,7 +584,8 @@ def split_evaluator(test_data: pd.DataFrame,
 
     Returns
     ----------
-    A log-like dictionary with evaluation results by split.
+    log: dict
+        A log-like dictionary with evaluation results by split.
     """
     if split_values is None:
         split_values = test_data[split_col].unique()
@@ -614,8 +633,9 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
         the name of the evaluator as it will appear in the logs.
 
     Returns
-    ----------
-    A log-like dictionary with evaluation results by split.
+    -------
+    log: dict
+        A log-like dictionary with evaluation results by split.
     """
 
     formatted_time_col = test_data[time_col].dt.strftime(time_format)
@@ -675,9 +695,10 @@ def permutation_evaluator(test_data: pd.DataFrame,
         the name of the evaluator as it will appear in the logs.
 
     Returns
-    ----------
-    A log-like dictionary with evaluation results by feature shuffle.
-    Use the permutation_extractor for better visualization of the results.
+    -------
+    log: dict
+        A log-like dictionary with evaluation results by feature shuffle.
+        Use the permutation_extractor for better visualization of the results.
     """
 
     if features is None:
@@ -733,8 +754,9 @@ def hash_evaluator(test_data: pd.DataFrame,
         the features.
 
     Returns
-    ----------
-    A log-like dictionary with the hash of the dataframe
+    -------
+    log: dict
+        A log-like dictionary with the hash of the dataframe
     """
     if hash_columns is None:
         hash_columns = test_data.columns

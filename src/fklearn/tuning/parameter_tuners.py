@@ -30,7 +30,7 @@ def random_search_tuner(space: LogType,
     space : dict
         A dictionary with keys as parameter for the model and values as callable that return a parameter.
         Callable must take no parameters and can return always a constant value.
-        Example:
+        Example::
 
             space = {
                 'learning_rate': lambda: np.random.choice([1e-3, 1e-2, 1e-1, 1, 10]),
@@ -42,7 +42,7 @@ def random_search_tuner(space: LogType,
 
     param_train_fn : function(space, train_set) ->  p, new_df, train_log
         A curried training function that os only function of the parameters for the model and the training set.
-        Example:
+        Example::
 
             @curry
             def param_train_fn(space, train_set):
@@ -56,7 +56,7 @@ def random_search_tuner(space: LogType,
         a list of folds. Each fold is a Tuple of arrays. The fist array in
         each tuple contains training indexes while the second array
         contains validation indexes.
-        Examples:
+        Examples::
 
             out_of_time_and_space_splitter(n_splits=n_splits,
                                            in_time_limit=in_time_limit,
@@ -121,7 +121,7 @@ def grid_search_cv(space: LogType,
     space : dict
         A dictionary with keys as parameter for the model and values as callable that return a parameter.
         Callable must take no parameters and can return always a constant value.
-        Example:
+        Example::
 
             space = {
                 'learning_rate': lambda: [1e-3, 1e-2, 1e-1, 1, 10],
@@ -133,7 +133,7 @@ def grid_search_cv(space: LogType,
 
     param_train_fn : function(space, train_set) ->  p, new_df, train_log
         A curried training function that os only function of the parameters for the model and the training set.
-        Example:
+        Example::
 
             @curry
             def param_train_fn(space, train_set):
@@ -147,7 +147,7 @@ def grid_search_cv(space: LogType,
         a list of folds. Each fold is a Tuple of arrays. The fist array in
         each tuple contains training indexes while the second array
         contains validation indexes.
-        Examples:
+        Examples::
 
             out_of_time_and_space_splitter(n_splits=n_splits,
                                            in_time_limit=in_time_limit,
