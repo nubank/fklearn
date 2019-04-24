@@ -19,12 +19,15 @@ def selector(df: pd.DataFrame,
              predict_columns: List[str] = None) -> LearnerReturnType:
     """
     Filters a DataFrames by selecting only the desired columns.
+
     Parameters
     ----------
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns`
+
     training_columns : list of str
         A list of column names that will remain in the dataframe during training time (fit)
+
     predict_columns: list of str
         A list of column names that will remain in the dataframe during prediction time (transform)
         If None, it defaults to `training_columns`.
@@ -59,12 +62,15 @@ def capper(df: pd.DataFrame,
     and used that as the cap for those columns. If precomputed caps
     are passed, the function uses that as the cap value instead of
     computing the maximum.
+
     Parameters
     ----------
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns_to_cap` columns.
+
     columns_to_cap : list of str
         A list os column names that should be caped.
+
     precomputed_caps : dict
         A dictionary on the format {"column_name" : cap_value}.
         That maps column names to pre computed cap values
@@ -102,12 +108,16 @@ def floorer(df: pd.DataFrame,
     and used that as the floot for those columns. If precomputed floors
     are passed, the function uses that as the cap value instead of
     computing the minimun.
+
     Parameters
     ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns_to_floor` columns.
+
     columns_to_floor : list of str
         A list os column names that should be floored.
+
     precomputed_floors : dict
         A dictionary on the format {"column_name" : floor_value}
         that maps column names to pre computed floor values
@@ -146,16 +156,21 @@ def ecdfer(df: pd.DataFrame,
     Learns an Empirical Cumulative Distribution Function from the specified column
     in the input DataFrame. It is usually used in the prediction column to convert
     a predicted probability into a score from 0 to 1000.
+
     Parameters
     ----------
     df : Pandas' pandas.DataFrame
         A Pandas' DataFrame that must contain a `prediction_column` columns.
+
     ascending : bool
         Whether to compute an ascending ECDF or a descending one.
+
     prediction_column : str
-        The name of the column in `df` to learn the ECDF from
+        The name of the column in `df` to learn the ECDF from.
+
     ecdf_column : str
         The name of the new ECDF column added by this function
+
     max_range : int
         The maximum value for the ECDF. It will go will go
          from 0 to max_range.
@@ -201,20 +216,27 @@ def discrete_ecdfer(df: pd.DataFrame,
     Learns an Empirical Cumulative Distribution Function from the specified column
     in the input DataFrame. It is usually used in the prediction column to convert
     a predicted probability into a score from 0 to 1000.
+
     Parameters
     ----------
     df : Pandas' pandas.DataFrame
         A Pandas' DataFrame that must contain a `prediction_column` columns.
+
     ascending : bool
         Whether to compute an ascending ECDF or a descending one.
+
     prediction_column : str
-        The name of the column in `df` to learn the ECDF from
+        The name of the column in `df` to learn the ECDF from.
+
     ecdf_column : str
-        The name of the new ECDF column added by this function
+        The name of the new ECDF column added by this function.
+
     max_range : int
         The maximum value for the ECDF. It will go will go
          from 0 to max_range.
-    round_method: a function perform the round of transformed values for ex: (int, ceil, floor, round)
+
+    round_method: Callable
+        A function perform the round of transformed values for ex: (int, ceil, floor, round)
     """
 
     if ascending:
@@ -271,14 +293,18 @@ def prediction_ranger(df: pd.DataFrame,
                       prediction_column: str = "prediction") -> LearnerReturnType:
     """
     Caps and floors the specified prediction column to a set range.
+
     Parameters
     ----------
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain a `prediction_column` columns.
+
     prediction_min : float
         The floor for the prediction.
+
     prediction_max : float
         The cap for the prediction.
+
     prediction_column : str
         The name of the column in `df` to cap and floor
     """
@@ -307,19 +333,24 @@ def apply_replacements(df: pd.DataFrame,
                        replace_unseen: Any) -> pd.DataFrame:
     """
     Base function to apply the replacements values found on the
-    "vec" vectors into the df DataFrame
+    "vec" vectors into the df DataFrame.
+
     Parameters
     -----------
+
     df: pandas.DataFrame
         A Pandas DataFrame containing the data to be replaced.
+
     columns : list of str
         The df columns names to perform the replacements.
+
     vec: dict
         A dict mapping a col to dict mapping a value to its replacement. For example:
         vec = {"feature1": {1: 2, 3: 5, 6: 8}}
 
     replace_unseen: Any
         Default value to replace when original value is not present in the `vec` dict for the feature
+
     """
     column_categorizer = lambda col: df[col].apply(lambda x: (np.nan
                                                               if isinstance(x, float) and np.isnan(x)
@@ -382,23 +413,28 @@ def truncate_categorical(df: pd.DataFrame,
     """
     Truncate infrequent categories and replace them by a single one.
     You can think of it like "others" category.
+
     Parameters
     ----------
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain a `prediction_column` columns.
+
     columns_to_truncate : list of str
         The df columns names to perform the truncation.
+
     percentile : float
         Categories less frequent than the percentile will be replaced by the
-    same one.
+        same one.
+
     replacement: int, str, float or nan
         The value to use when a category is less frequent that the percentile
-    variable
+        variable.
+
     replace_unseen : int, str, float, or nan
         The value to impute unseen categories.
 
     store_mapping : bool (default: False)
-        Whether to store the feature value -> integer dictionary in the log
+        Whether to store the feature value -> integer dictionary in the log.
     """
     get_categs = lambda col: (df[col].value_counts() / len(df)).to_dict()
     update = lambda d: map(lambda kv: (kv[0], replacement) if kv[1] <= percentile else (kv[0], kv[0]), d.items())
@@ -432,13 +468,16 @@ def rank_categorical(df: pd.DataFrame,
                      replace_unseen: Union[str, float] = nan,
                      store_mapping: bool = False) -> LearnerReturnType:
     """
-    Rank categorical features by their frequency in the trainset.
+    Rank categorical features by their frequency in the train set.
+
     Parameters
     ----------
     df : Pandas' DataFrame
         A Pandas' DataFrame that must contain a `prediction_column` columns.
+
     columns_to_rank : list of str
         The df columns names to perform the rank.
+
     replace_unseen : int, str, float, or nan
         The value to impute unseen categories.
 
@@ -482,12 +521,19 @@ def count_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables by count.
+
+    Parameters
+    ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns_to_categorize` columns.
+
     columns_to_categorize : list of str
         A list of categorical column names.
+
     replace_unseen : int
         The value to impute unseen categories.
+
     store_mapping : bool (default: False)
         Whether to store the feature value -> integer dictionary in the log
     """
@@ -522,14 +568,19 @@ def label_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables with a numeric identifier.
+
     Parameters
     ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns_to_categorize` columns.
+
     columns_to_categorize : list of str
         A list of categorical column names.
+
     replace_unseen : int, str, float, or nan
         The value to impute unseen categories.
+
     store_mapping : bool (default: False)
         Whether to store the feature value -> integer dictionary in the log
     """
@@ -568,16 +619,20 @@ def quantile_biner(df: pd.DataFrame,
     """
     Discretize continuous numerical columns into its quantiles. Uses pandas.qcut
     to find the bins and then numpy.digitize to fit the columns into bins.
+
     Parameters
     ----------
     df : pandas.DataFrame
         A Pandas' DataFrame that must contain `columns_to_categorize` columns.
+
     columns_to_bin : list of str
         A list of numerical column names.
+
     q : int
         Number of quantiles. 10 for deciles, 4 for quartiles, etc.
         Alternately array of quantiles, e.g. [0, .25, .5, .75, 1.] for quartiles.
         See https://pandas.pydata.org/pandas-docs/stable/generated/pandas.qcut.html
+
     right : bool
         Indicating whether the intervals include the right or the left bin edge.
         Default behavior is (right==False) indicating that the interval does not
@@ -615,14 +670,18 @@ def onehot_categorizer(df: pd.DataFrame,
                        store_mapping: bool = False) -> LearnerReturnType:
     """
     Onehot encoding on categorical columns.
+
     Parameters
     ----------
     df : pd.DataFrame
         A Pandas' DataFrame that must contain `columns_to_categorize` columns.
+
     columns_to_categorize : list of str
         A list of categorical column names. Must be non-empty.
+
     hardcode_nans : bool
         Hardcodes an extra column with: 1 if nan or unseen else 0.
+
     drop_first_column : bool
         Drops the first column to create (k-1)-sized one-hot arrays for k
         features per categorical column. Can be used to avoid colinearity.
@@ -668,11 +727,14 @@ def standard_scaler(df: pd.DataFrame,
                     columns_to_scale: List[str]) -> LearnerReturnType:
     """
     Fits a standard scaler to the dataset.
+
     Parameters
     ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame with columns to scale.
-        It must contain all columns listed in `columns_to_scale`
+        It must contain all columns listed in `columns_to_scale`.
+
     columns_to_scale : list of str
         A list of names of the columns for standard scaling.
     """
@@ -716,7 +778,7 @@ def custom_transformer(df: pd.DataFrame,
 
     transformation_function : function(pandas.DataFrame) -> pandas.DataFrame
         A function that receives a DataFrame as input, performs a transformation on its columns
-    and returns another DataFrame.
+        and returns another DataFrame.
 
     """
 
@@ -806,11 +868,16 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
     """
     Creates a new column to warn about rows that columns that don't have missing in the training set
     but have missing on the scoring
+
+    Parameters
     ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame.
+
     cols_list : list of str
         List of columns to consider when evaluating missingness
+
     new_column_name : str
         Name of the column created to alert the existence of missing values
     """
