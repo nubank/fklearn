@@ -7,6 +7,7 @@ fklearn features.
 List of examples
 ----------------
 
-- :doc:`regression`
+- :doc:`learning_curves`
 - :doc:`nlp_classification`
+- :doc:`regression`
 - :doc:`causal_inference`

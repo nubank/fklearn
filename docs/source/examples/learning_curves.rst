@@ -1,11 +1,7 @@
-========
-EXAMPLES
-========
-
-In this section we will showcase the use of some of Fklearn's functionalities.
+:orphan:
 
 Learning Curves
----------------
+===============
 
 In Machine Learning applications, as new data gets collected, one might wonder the impact that training a model with
 newer data will have in the algorithm's performance. One way to do this is to fix a holdout period and a beginning for the
@@ -15,22 +11,16 @@ added to the training set and the model should be retrained and reevaluated.
 Plotting the performance metric versus the end of the training data yield a *learning curve*. Fklearn has a built-in method
 that helps in the process of building learning curves and abstracts much of the process from the hands of the programmer.
 
-Fklearn's `validation` module has a `validator` component that can be used for the building of learning curves. It expects
-4 arguments:
-  1- The data that will be used for training
+Fklearn's ``validation`` module has a ``validator`` component that can be used for the building of learning curves. It expects
+4 arguments
 
-  2- A `splitter` function, such as the `time_learning_curve_splitter` from the `validation.splitters` module. This function
-  will split the training set according to a predetermined frequency (e.g. 1 month). These are combined to form the training data.
-  When running validator, it will initially run the model with the _oldest_ of the splitted data, and successively add
-  newer data.
+#. The data that will be used for training.
+#. A ``splitter`` function, such as the ``time_learning_curve_splitter`` from the ``validation.splitters`` module. This function will split the training set according to a predetermined frequency (e.g. 1 month). These are combined to form the training data. When running validator, it will initially run the model with the _oldest_ of the splitted data, and successively add newer data.
+#. A prediction function. This is the model per se, a function that receives as input a Dataframe and returns, as per Fklearn convention, a triple ``(predict_fn, predicted_df, log)``, where ``predict_fn`` is the function that generates the prediction column, ``predicted_df`` is the input Dataframe with the prediction column added and `log` can contain arbitrary information.
+#. An evaluation function. This specifies the metric that is being used to evaluate the performance of the model. The ``validation.evaluators`` module contains several predefined functions for computing the most common ML metrics.
 
-  3- A prediction function. This is the model per se, a function that receives as input a Dataframe and returns, as per
-  Fklearn convention, a triple `(predict_fn, predicted_df, log)`, where `predict_fn` is the function that generates the
-  prediction column, `predicted_df` is the input Dataframe with the prediction column added and `log` can contain arbitrary
-  information.
-
-  4- An evaluation function. This specifies the metric that is being used to evaluate the performance of the model. The
-  `validation.evaluators` module contains several predefined functions for computing the most common ML metrics.
+Usage
+^^^^^
 
 Below we present a snippet that stitches together these concepts to produce a function to compute a learning curve for a
 simple logistic regression. First, let's define such a model:
@@ -66,12 +56,14 @@ but receives as arguments the ones that were not passed previously.
   # output training logs for the different training ends
   auc_logs = validator.validator(input_df, learning_curve_split_fn, model, eval_fn)
 
+Reverse learning curve
+^^^^^^^^^^^^^^^^^^^^^^
 
 One can also build a *reverse learning curve*, which measures the impact that *old* data has on model performance. In this case,
 if a fixed holdout period, one starts training with the most recent data and adds older data in successive steps.
 
 Fklearn also supports the construction of such curves. For such, it is only necessary to change the `splitter function`
-passed to the `validator`. This amounts to changing `learning_curve_split_fn` in the previous snippet to:
+passed to the ``validator``. This amounts to changing ``learning_curve_split_fn`` in the previous snippet to:
 
 .. code-block:: python
 
