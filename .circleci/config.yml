@@ -26,8 +26,7 @@
 
   install-pandoc: &install-pandoc
     name: Install pandoc
-    command: |
-      . scripts/install_pandoc.sh
+    command: sudo apt-get install pandoc
 
 .master-branch-filter: &master-branch-filter
   filters:
