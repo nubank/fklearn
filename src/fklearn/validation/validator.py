@@ -112,12 +112,10 @@ def validator(train_data: pd.DataFrame,
     perturb_fn_train : PerturbFnType
         A partially defined corruption function that takes a dataset and returns
         a corrupted dataset. Perturbation applied at train-time.
-    #TODO Logs?
 
     perturb_fn_test : PerturbFnType
         A partially defined corruption function that takes a dataset and returns
         a corrupted dataset. Perturbation applied at test-time.
-    #TODO Logs?
 
     predict_oof : bool
         Whether to return out of fold predictions on the logs
