@@ -24,6 +24,10 @@
       . scripts/helpers.sh
       install_package [test_deps]
 
+  install-pandoc: &install-pandoc
+    name: Install pandoc
+    command: sudo apt-get install pandoc
+
 .master-branch-filter: &master-branch-filter
   filters:
     branches:
@@ -117,6 +121,7 @@
     - restore_cache: *restore-cache
     - run: *create-venv
     - save_cache: *save-cache
+    - run: *install-pandoc
     - run: *install-package
     - run:
         name: Build documentation
