@@ -12,10 +12,14 @@ The fklearn library is Python 3.6 compatible only. In order to install it using 
 
 You can also install from the source::
 
-    git clone git@github.com:nubank/fklearn.git
-    cd fklearn
-    git checkout master
-    pip install -e .
+    # clone the repository
+    $ git clone -b master https://github.com/nubank/fklearn.git --depth=1
+    
+    # open the folder
+    $ cd fklearn
+    
+    # install the dependencies
+    $ pip install -e .
 
 
 If you are a MacOs user, you may need to install some dependencies in order to use LGBM. If you have brew installed,
@@ -29,18 +33,17 @@ Basics
 Learners
 ########
 
-While in scikit-learn the main abstraction for a model is a class with methods ``fit`` and ``transform``,
+While in scikit-learn the main abstraction for a model is a class with the methods ``fit`` and ``transform``,
 in fklearn we use what we call a **learner function**. A learner function takes in some training data (plus other parameters),
 learns something from it and returns three things: a *prediction function*, the *transformed training data*, and a *log*.
 
-The **prediction function** always has the same signature: it takes in a dataframe and returns a dataframe (we use Pandas dataframes).
-It should be able to take in any new dataframe (as long as it contains the required columns) and transform it
-(it is equivalent to the transform method of a scikit-learn object).
+The **prediction function** always has the same signature: it takes in a Pandas dataframe and returns a Pandas dataframe.
+It should be able to take in any new dataframe, as long as it contains the required columns, and transform it. The tranform in the fklearn library is equivalent to the transform method of the scikit-learn.
 In this case, the prediction function simply creates a new column with the predictions of the linear regression model that was trained.
 
 The **transformed training data** is usually just the prediction function applied to the training data. It is useful when you want predictions on your training set, or for building pipelines, as we’ll see later.
 
-The **log** is a dictionary, and can include any information that is relevant for inspecting or debugging the learner (e.g. what features were used, how many samples there were in the training set, feature importance or coefficients).
+The **log** is a dictionary, and can include any information that is relevant for inspecting or debugging the learner, e.g., what features were used, how many samples there were in the training set, feature importance or coefficients.
 
 Learner functions are usually partially initialized (curried) before being passed to pipelines or applied to data::
 
