@@ -31,7 +31,7 @@ simple logistic regression. First, let's define such a model:
   from fklearn.training.classification import logistic_classification_learner
 
   input_df = get_data_from_source()
-  model = logistic_classification_learner(fetures: LIST_OF_MODEL_FEATURES
+  model = logistic_classification_learner(features: LIST_OF_MODEL_FEATURES
                                           target: NAME_FOR_TARGET_COL,
                                           prediction_column: NAME_FOR_PREDICTION_COL)
 
