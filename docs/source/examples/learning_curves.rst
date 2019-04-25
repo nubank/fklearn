@@ -31,9 +31,9 @@ simple logistic regression. First, let's define such a model:
   from fklearn.training.classification import logistic_classification_learner
 
   input_df = get_data_from_source()
-  model = logistic_classification_learner(features: LIST_OF_MODEL_FEATURES
-                                          target: NAME_FOR_TARGET_COL,
-                                          prediction_column: NAME_FOR_PREDICTION_COL)
+  model = logistic_classification_learner(features=LIST_OF_MODEL_FEATURES
+                                          target=NAME_FOR_TARGET_COL,
+                                          prediction_column=NAME_FOR_PREDICTION_COL)
 
 
 Note that we *did not* pass the data as an input for the function. The reason for this is that Fklearn functions are *curried*,
