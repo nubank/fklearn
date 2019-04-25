@@ -187,15 +187,15 @@ xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
 
 @curry
-@log_learner_time(learner_name='cat_boost_regressor_learner')
-def CatBoostRegressor_learner(df: pd.DataFrame,
-                              features: List[str],
-                              target: str,
-                              learning_rate: float = 0.1,
-                              num_estimators: int = 100,
-                              extra_params: Dict[str, Any] = None,
-                              prediction_column: str = "prediction",
-                              weight_column: str = None) -> LearnerReturnType:
+@log_learner_time(learner_name='catboost_regressor_learner')
+def catboost_regressor_learner(df: pd.DataFrame,
+                               features: List[str],
+                               target: str,
+                               learning_rate: float = 0.1,
+                               num_estimators: int = 100,
+                               extra_params: Dict[str, Any] = None,
+                               prediction_column: str = "prediction",
+                               weight_column: str = None) -> LearnerReturnType:
     """
     Fits an CatBoost regressor to the dataset. It first generates a Pool
     with the specified features and labels from `df`. Then it fits a CatBoost
@@ -288,7 +288,7 @@ def CatBoostRegressor_learner(df: pd.DataFrame,
     return p, p(df), log
 
 
-CatBoostRegressor_learner.__doc__ += learner_return_docstring("CatBoostRegressor")
+catboost_regressor_learner.__doc__ += learner_return_docstring("CatBoostRegressor")
 
 
 @curry

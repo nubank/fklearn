@@ -5,7 +5,7 @@ import pandas as pd
 
 from fklearn.training.regression import \
     linear_regression_learner, gp_regression_learner, \
-    xgb_regression_learner, lgbm_regression_learner, CatBoostRegressor_learner
+    xgb_regression_learner, lgbm_regression_learner, catboost_regressor_learner
 
 
 def test_linear_regression_learner():
@@ -177,7 +177,7 @@ def test_lgbm_regression_learner():
     assert np.vstack(pred_shap["shap_values"]).shape == (4, 2)
 
 
-def test_CatBoostRegressor_learner():
+def test_catboost_regressor_learner():
     df_train = pd.DataFrame({
         'id': ["id1", "id2", "id3", "id4"],
         'x1': [10.0, 13.0, 10.0, 13.0],
@@ -196,13 +196,13 @@ def test_CatBoostRegressor_learner():
 
     features = ["x1", "x2"]
 
-    learner = CatBoostRegressor_learner(features=features,
-                                        target="y",
-                                        learning_rate=0.1,
-                                        num_estimators=20,
-                                        extra_params={"max_depth": 2, "random_seed": 42},
-                                        prediction_column="prediction",
-                                        weight_column="w")
+    learner = catboost_regressor_learner(features=features,
+                                         target="y",
+                                         learning_rate=0.1,
+                                         num_estimators=20,
+                                         extra_params={"max_depth": 2, "random_seed": 42},
+                                         prediction_column="prediction",
+                                         weight_column="w")
 
     predict_fn, pred_train, log = learner(df_train)
 
