@@ -153,7 +153,7 @@ def validator(train_data: pd.DataFrame,
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     first_train_log = first(train_logs)
 
-    perturbator_log = {}
+    perturbator_log = {'perturbated_train': [], 'perturbated_test': []}
     if perturb_fn_train != identity:
         perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
     if perturb_fn_test != identity:
