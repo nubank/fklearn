@@ -1,8 +1,10 @@
 import warnings
 
 import pandas as pd
+from toolz.functoolz import identity
 
 from fklearn.validation.validator import validator_iteration, validator, parallel_validator
+from fklearn.validation.perturbators import perturbator, nullify
 
 
 def train_fn(df):
@@ -32,6 +34,9 @@ def split_fn(df):
     return [([0, 1], [[2, 3], [2], [3]]),
             ([2, 3], [[0, 1]])], [{"fold": 1}, {"fold": 2}]
 
+perturb_fn_train = identity
+perturb_fn_test = perturbator(cols=['rows'], corruption_fn=nullify(perc=0.25))
+
 
 data = pd.DataFrame({
     'rows': ['row1', 'row2', 'row3', 'row4']
@@ -57,7 +62,7 @@ def test_validator_iteration():
 
 
 def test_validator():
-    result = validator(data, split_fn, train_fn, eval_fn)
+    result = validator(data, split_fn, train_fn, eval_fn, perturb_fn_train, perturb_fn_test)
 
     validator_log = result["validator_log"]
 
@@ -69,6 +74,11 @@ def test_validator():
 
     assert validator_log[1]['fold_num'] == 1
     assert len(validator_log[1]['eval_results']) == 1
+
+    perturbator_log = result["perturbator_log"]
+
+    assert perturbator_log['perturbated_train'] == []
+    assert perturbator_log['perturbated_test'] == ['rows']
 
 
 def test_parallel_validator():
