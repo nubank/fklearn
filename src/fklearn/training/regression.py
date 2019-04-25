@@ -185,16 +185,17 @@ def xgb_regression_learner(df: pd.DataFrame,
 
 xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
+
 @curry
 @log_learner_time(learner_name='cat_boost_regressor_learner')
 def CatBoostRegressor_learner(df: pd.DataFrame,
-                           features: List[str],
-                           target: str,
-                           learning_rate: float = 0.1,
-                           num_estimators: int = 100,
-                           extra_params: Dict[str, Any] = None,
-                           prediction_column: str = "prediction",
-                           weight_column: str = None) -> LearnerReturnType:
+                              features: List[str],
+                              target: str,
+                              learning_rate: float = 0.1,
+                              num_estimators: int = 100,
+                              extra_params: Dict[str, Any] = None,
+                              prediction_column: str = "prediction",
+                              weight_column: str = None) -> LearnerReturnType:
     """
     Fits an CatBoost regressor to the dataset. It first generates a Pool
     with the specified features and labels from `df`. Then it fits a CatBoost
@@ -249,11 +250,10 @@ def CatBoostRegressor_learner(df: pd.DataFrame,
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    
 
     dtrain = Pool(df[features].values, df[target].values, weight=weights, feature_names=list(map(str, features)))
-    cat_boost_regressor = CatBoostRegressor(iterations = num_estimators,**params)
-    cbr = cat_boost_regressor.fit(dtrain,verbose=0)
+    cat_boost_regressor = CatBoostRegressor(iterations=num_estimators, **params)
+    cbr = cat_boost_regressor.fit(dtrain, verbose=0)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         dtest = Pool(new_df[features].values, feature_names=list(map(str, features)))
