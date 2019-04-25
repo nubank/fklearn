@@ -1,6 +1,7 @@
 import gc
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 import warnings
+import inspect
 
 import cloudpickle
 from joblib import Parallel, delayed
@@ -145,8 +146,20 @@ def validator(train_data: pd.DataFrame,
         train_log["train_log"] = validator_log["train_log"]
         return train_log, assoc(dissoc(validator_log, "train_log"), "split_log", split_log)
 
+    def get_perturbed_columns(perturbator: PerturbFnType) -> List[str]:
+        args = inspect.getfullargspec(perturbator).kwonlydefaults
+        return args['cols']
+
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     first_train_log = first(train_logs)
+
+    perturbator_log = {}
+    if perturb_fn_train != identity:
+        perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
+    if perturb_fn_test != identity:
+        perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
+    first_train_log = assoc(first_train_log, "perturbator_log", perturbator_log)
+
     return assoc(first_train_log, "validator_log", list(validator_logs))
 
 
