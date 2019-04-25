@@ -34,6 +34,7 @@ def split_fn(df):
     return [([0, 1], [[2, 3], [2], [3]]),
             ([2, 3], [[0, 1]])], [{"fold": 1}, {"fold": 2}]
 
+
 perturb_fn_train = identity
 perturb_fn_test = perturbator(cols=['rows'], corruption_fn=nullify(perc=0.25))
 

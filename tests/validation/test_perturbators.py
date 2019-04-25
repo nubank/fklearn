@@ -8,7 +8,7 @@ import numpy as np
 def test_shift_mu():
     series = pd.Series([1, 3, 5, 7, 166])
     shift_by = 0.7
-    expected = pd.Series([26.48,  28.48,  30.48,  32.48, 191.48])
+    expected = pd.Series([26.48, 28.48, 30.48, 32.48, 191.48])
     new_series = shift_mu(col=series, perc=shift_by)
     map(np.testing.assert_approx_equal, zip(expected, new_series))
 
