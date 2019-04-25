@@ -16,3 +16,4 @@ tqdm>=4.31.1,<5
 xgboost>=0.81,<1
 scikit-image>=0.14.2,<1
 swifter>=0.284,<0.300
+catboost>=0.14.2,<1
