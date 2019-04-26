@@ -409,4 +409,3 @@ def test_lgbm_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
-    
