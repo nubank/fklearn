@@ -208,6 +208,123 @@ xgb_classification_learner.__doc__ += learner_return_docstring("XGboost Classifi
 
 
 @curry
+@log_learner_time(learner_name='catboost_classification_learner')
+def catboost_classification_learner(df: pd.DataFrame,
+                                    features: List[str],
+                                    target: str,
+                                    learning_rate: float = 0.1,
+                                    num_estimators: int = 100,
+                                    extra_params: LogType = None,
+                                    prediction_column: str = "prediction",
+                                    weight_column: str = None) -> LearnerReturnType:
+    """
+    Fits an CatBoost classifier to the dataset. It first generates a DMatrix
+    with the specified features and labels from `df`. Then, it fits a CatBoost
+    model to this DMatrix. Return the predict function for the model and the
+    predictions for the input dataset.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be binary, since this is a classification model.
+
+    learning_rate : float
+        Float in the range (0, 1]
+        Step size shrinkage used in update to prevents overfitting. After each boosting step,
+        we can directly get the weights of new features. and eta actually shrinks the
+        feature weights to make the boosting process more conservative.
+        See the eta hyper-parameter in:
+        https://catboost.ai/docs/concepts/python-reference_parameters-list.html
+
+    num_estimators : int
+        Int in the range (0, inf)
+        Number of boosted trees to fit.
+        See the n_estimators hyper-parameter in:
+        https://catboost.ai/docs/concepts/python-reference_parameters-list.html
+
+    extra_params : dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
+        Other parameters for the CatBoost model. See the list in:
+        https://catboost.ai/docs/concepts/python-reference_catboostregressor.html
+        If not passed, the default will be used.
+
+    prediction_column : str
+        The name of the column with the predictions from the model.
+        If a multiclass problem, additional prediction_column_i columns will be added for i in range(0,n_classes).
+
+    weight_column : str, optional
+        The name of the column with scores to weight the data.
+    """
+    from catboost import Pool, CatBoostClassifier
+    import catboost
+
+    weights = df[weight_column].values if weight_column else None
+    params = extra_params if extra_params else {}
+    params = assoc(params, "eta", learning_rate)
+    params = params if "objective" in params else assoc(params, "loss_function", 'Logloss')
+
+    dtrain = Pool(df[features].values, df[target].values, weight=weights, feature_names=list(map(str, features)))
+
+    cat_boost_classifier = CatBoostClassifier(iterations=num_estimators, **params)
+    cbr = cat_boost_classifier.fit(dtrain, verbose=0)
+
+    def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
+
+        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)))
+
+        pred = cbr.predict_proba(dtest)[:, 1]
+
+        if params["loss_function"] == "MultiClass":
+            col_dict = {prediction_column + "_" + str(key): value
+                        for (key, value) in enumerate(pred.T)}
+            col_dict.update({prediction_column: pred.argmax(axis=1)})
+        else:
+            col_dict = {prediction_column: pred}
+
+        if apply_shap:
+            import shap
+            explainer = shap.TreeExplainer(cbr)
+            shap_values = list(explainer.shap_values(new_df[features]))
+            shap_expected_value = explainer.expected_value
+
+            shap_output = {"shap_values": shap_values,
+                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+
+            col_dict = merge(col_dict, shap_output)
+
+        return new_df.assign(**col_dict)
+
+    p.__doc__ = learner_pred_fn_docstring("CatBoostClassifier", shap=True)
+
+    log = {'CatBoostClassifier': {
+        'features': features,
+        'target': target,
+        'prediction_column': prediction_column,
+        'package': "catboost",
+        'package_version': catboost.__version__,
+        'parameters': assoc(params, "num_estimators", num_estimators),
+        'feature_importance': cbr.feature_importances_,
+        'training_samples': len(df)
+    }}
+
+    return p, p(df), log
+
+
+catboost_classification_learner.__doc__ += learner_return_docstring("catboost_classification_learner")
+
+
+@curry
 @log_learner_time(learner_name='nlp_logistic_classification_learner')
 def nlp_logistic_classification_learner(df: pd.DataFrame,
                                         text_feature_cols: List[str],
