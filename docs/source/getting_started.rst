@@ -79,23 +79,22 @@ Once we have our pipeline defined, we can use fklearn's validation tools to eval
     from fklearn.validation.validator import validator
     from fklearn.validation.splitters import k_fold_splitter, stability_curve_time_splitter
 
-     evaluation_fn = combined_evaluators(evaluators=[
-           r2_evaluator(target_column="spend"),
-           spearman_evaluator(target_column="spend")])
+    evaluation_fn = combined_evaluators(evaluators=[r2_evaluator(target_column="spend"),
+                                                    spearman_evaluator(target_column="spend")])
 
-       cv_split_fn = k_fold_splitter(n_splits=3, random_state=42)
-       stability_split_fn = stability_curve_time_splitter(training_time_limit=pd.to_datetime("2018-01-01"),
-                                                          time_column="timestamp")
+    cv_split_fn = k_fold_splitter(n_splits=3, random_state=42)
+    stability_split_fn = stability_curve_time_splitter(training_time_limit=pd.to_datetime("2018-01-01"),
+                                                       time_column="timestamp")
 
-       cross_validation_results = validator(train_data=train_data,
-                                            split_fn=cv_split_fn,
-                                            train_fn=learner,
-                                            eval_fn=evaluation_fn)
+    cross_validation_results = validator(train_data=train_data,
+                                         split_fn=cv_split_fn,
+                                         train_fn=learner,
+                                         eval_fn=evaluation_fn)
 
-       stability_validation_results = validator(train_data=train_data,
-                                                split_fn=stability_split_fn,
-                                                train_fn=learner,
-                                                eval_fn=evaluation_fn)
+    stability_validation_results = validator(train_data=train_data,
+                                             split_fn=stability_split_fn,
+                                             train_fn=learner,
+                                             eval_fn=evaluation_fn)
 
 The ``validator`` function receives some data, the learner function with our model plus the following:
 1. A *splitting function*: these can be found inside the ``fklearn.validation.splitters`` module. They split the data into training and evaluation folds in different ways, simulating situations where training and testing data differ.
