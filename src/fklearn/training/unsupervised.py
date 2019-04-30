@@ -7,7 +7,7 @@ from toolz import curry, merge
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
 from fklearn.types import LearnerReturnType
-from fklearn.training.utils import log_learner_time
+from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
@@ -15,8 +15,11 @@ from fklearn.training.utils import log_learner_time
 def isolation_forest_learner(df: pd.DataFrame,
                              features: List[str],
                              params: Dict[str, Any] = None,
-                             prediction_column: str = "prediction") -> LearnerReturnType:
-    """Fits an anomaly detection algorithm (Isolation Forest) to the dataset
+                             prediction_column: str = "prediction",
+                             encode_extra_cols: bool = False,
+                             encode_name_pat: str = "==") -> LearnerReturnType:
+    """
+    Fits an anomaly detection algorithm (Isolation Forest) to the dataset
 
     Parameters
     ----------
@@ -35,10 +38,18 @@ def isolation_forest_learner(df: pd.DataFrame,
 
     prediction_column : str
         The name of the column with the predictions from the model.
+
+    encode_extra_cols : bool (default: False)
+        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
+
+    encode_name_pat : str (default: "==")
+        Pattern defining the names of encoded columns.
     """
 
     default_params = {"n_jobs": -1, "random_state": 1729}
     params = default_params if not params else merge(default_params, params)
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
 
     model = IsolationForest()
     model.set_params(**params)
