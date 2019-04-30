@@ -19,7 +19,9 @@ def logistic_classification_learner(df: pd.DataFrame,
                                     target: str,
                                     params: LogType = None,
                                     prediction_column: str = "prediction",
-                                    weight_column: str = None) -> LearnerReturnType:
+                                    weight_column: str = None,
+                                    encode_extra_cols: bool = False,
+                                    encode_name_pat: str = "==") -> LearnerReturnType:
     """
     Fits an logistic regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -50,12 +52,20 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: False)
+        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
+
+    encode_name_pat : str (default: "==")
+        Pattern defining the names of encoded columns.
     """
 
     def_params = {"C": 0.1, "multi_class": "ovr"}
     merged_params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
 
     clf = LogisticRegression(**merged_params)
     clf.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -156,6 +166,7 @@ def xgb_classification_learner(df: pd.DataFrame,
     encode_name_pat : str (default: "==")
         Pattern defining the names of encoded columns.
     """
+
     import xgboost as xgb
 
     params = extra_params if extra_params else {}
@@ -315,7 +326,9 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 num_estimators: int = 100,
                                 extra_params: LogType = None,
                                 prediction_column: str = "prediction",
-                                weight_column: str = None) -> LearnerReturnType:
+                                weight_column: str = None,
+                                encode_extra_cols: bool = False,
+                                encode_name_pat: str = "==") -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -365,7 +378,14 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: False)
+        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
+
+    encode_name_pat : str (default: "==")
+        Pattern defining the names of encoded columns.
     """
+
     import lightgbm as lgbm
 
     params = extra_params if extra_params else {}
@@ -373,6 +393,8 @@ def lgbm_classification_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'binary')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)
