@@ -100,7 +100,7 @@ def xgb_classification_learner(df: pd.DataFrame,
                                prediction_column: str = "prediction",
                                weight_column: str = None,
                                encode_extra_cols: bool = False,
-                               encode_name_pat: str = "==") -> LeanerReturnType:
+                               encode_name_pat: str = "==") -> LearnerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
