@@ -16,8 +16,6 @@ _(leave only one of the options above)_
 ### Todo list
 - [ ] Documentation
 - [ ] Tests added and passed
-- [ ] Bump version
-- [ ] Edit the changelog: version, date, type of change (*New*, *Breaking*, *Enhancement*, *Bugfix*)
 - [ ] Issue: closes #xxxx  _(write the number of the GitHub issues that this PR resolves)_
 
 ### Background context
