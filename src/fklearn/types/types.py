@@ -32,5 +32,9 @@ SplitterFnType = Callable[[pd.DataFrame], SplitterReturnType]
 # Validator types
 ValidatorReturnType = Dict[str, Union[LogType, LogListType]]
 
+# Perturbator types
+PerturbFnType = Callable[[pd.DataFrame], pd.DataFrame]
+ColumnWisePerturbFnType = Callable[[pd.Series], pd.Series]
+
 # Extractor types
 ExtractorFnType = Callable[[str], float]
