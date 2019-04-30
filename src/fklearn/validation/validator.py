@@ -84,7 +84,8 @@ def validator(train_data: pd.DataFrame,
               train_fn: LearnerFnType,
               eval_fn: EvalFnType,
               perturb_fn_train: PerturbFnType = identity,
-              perturb_fn_test: PerturbFnType = identity) -> ValidatorReturnType:
+              perturb_fn_test: PerturbFnType = identity,
+              predict_oof: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold by calling
@@ -133,7 +134,7 @@ def validator(train_data: pd.DataFrame,
 
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn)
+        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof)
 
     zipped_logs = pipe(folds,
                        enumerate,

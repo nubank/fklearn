@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.13.4] - 2019-04-25
+- **Enhancement**
+    - Add predict_oof as argument to validator
+
 ## [1.13.3] - 2019-04-24
 - **Bug Fix**
     - Fix warning in `placeholder_imputer`
