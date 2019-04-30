@@ -14018,19 +14018,20 @@ dtype: int64</pre>
 </div></section></section><section><section>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[54]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fklearn.preprocessing.splitting</span> <span class="k">import</span> <span class="n">space_time_split_dataset</span>
 
-<span class="n">train_set</span><span class="p">,</span> <span class="n">intime_outspace_hdout</span><span class="p">,</span> <span class="n">outime_inspace_hdout</span><span class="p">,</span> <span class="n">outime_outspace_hdout</span> <span class="o">=</span> <span class="n">space_time_split_dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
-         <span class="n">train_start_date</span><span class="o">=</span><span class="s2">&quot;2017-02-01&quot;</span><span class="p">,</span>
-         <span class="n">train_end_date</span><span class="o">=</span><span class="s2">&quot;2018-07-01&quot;</span><span class="p">,</span>
-         <span class="n">holdout_end_date</span><span class="o">=</span><span class="s2">&quot;2018-10-01&quot;</span><span class="p">,</span>
-         <span class="n">split_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
-         <span class="n">space_holdout_percentage</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-         <span class="n">space_column</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
-         <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;month_date&quot;</span><span class="p">)</span>
+<span class="n">train_set</span><span class="p">,</span> <span class="n">intime_outspace_hdout</span><span class="p">,</span> <span class="n">outime_inspace_hdout</span><span class="p">,</span> <span class="n">outime_outspace_hdout</span> <span class="o">=</span> \
+                                        <span class="n">space_time_split_dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+                                                 <span class="n">train_start_date</span><span class="o">=</span><span class="s2">&quot;2017-02-01&quot;</span><span class="p">,</span>
+                                                 <span class="n">train_end_date</span><span class="o">=</span><span class="s2">&quot;2018-07-01&quot;</span><span class="p">,</span>
+                                                 <span class="n">holdout_end_date</span><span class="o">=</span><span class="s2">&quot;2018-10-01&quot;</span><span class="p">,</span>
+                                                 <span class="n">split_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+                                                 <span class="n">space_holdout_percentage</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                 <span class="n">space_column</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                                                 <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;month_date&quot;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -14040,10 +14041,13 @@ dtype: int64</pre>
 </div><div class="fragment">
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[56]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_set</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">intime_outspace_hdout</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">outime_inspace_hdout</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">outime_outspace_hdout</span><span class="o">.</span><span class="n">shape</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">train_set</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> 
+ <span class="n">intime_outspace_hdout</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> 
+ <span class="n">outime_inspace_hdout</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+ <span class="n">outime_outspace_hdout</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -14056,7 +14060,7 @@ dtype: int64</pre>
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[15]:</div>
+    <div class="prompt output_prompt">Out[56]:</div>
 
 
 
@@ -14080,7 +14084,7 @@ dtype: int64</pre>
 <li><font size="4">  We might want to fill missing values </font></li>
 <li><font size="4">  We want to train our model </font></li>
 <li><font size="4"> We want this transformations to be applied when scoring </font></li>
-<li><font size="4"> Similar to the fit and transform concept from sklearn </font></li>
+<li><font size="4"> We want to apply this same transformations when scoring our model, similarly to the fit and transform concept from sklearn </font></li>
 </ul>
 
 </div>
@@ -14296,6 +14300,88 @@ dtype: int64</pre>
       <td>3158.383160</td>
       <td>3429.540635</td>
       <td>3786.501556</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div></section></section><section><section>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[58]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">train_logs</span><span class="p">[</span><span class="s1">&#39;lgbm_regression_learner&#39;</span><span class="p">][</span><span class="s1">&#39;feature_importance&#39;</span><span class="p">],</span> 
+             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;importance&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[58]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>importance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>avg_last_2_months_spend</th>
+      <td>1155</td>
+    </tr>
+    <tr>
+      <th>spend_desire</th>
+      <td>1128</td>
+    </tr>
+    <tr>
+      <th>income</th>
+      <td>1089</td>
+    </tr>
+    <tr>
+      <th>bureau_score</th>
+      <td>937</td>
+    </tr>
+    <tr>
+      <th>random_noise</th>
+      <td>879</td>
+    </tr>
+    <tr>
+      <th>monthly_spend</th>
+      <td>812</td>
     </tr>
   </tbody>
 </table>
@@ -14713,752 +14799,6 @@ dtype: int64</pre>
   warnings.warn(msg, category=DeprecationWarning)
 </pre>
 </div>
-</div>
-
-</div>
-</div>
-
-</div></div><div class="fragment">
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spatial_learning_curve_logs</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[30]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;train_log&#39;: [{&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.017 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.035 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10269749518304432},
-    &#39;statistics&#39;: array([325.77291813]),
-    &#39;running_time&#39;: &#39;0.078 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 964,
-     &#39;bureau_score&#39;: 868,
-     &#39;spend_desire&#39;: 1067,
-     &#39;random_noise&#39;: 1001,
-     &#39;monthly_spend&#39;: 909,
-     &#39;avg_last_2_months_spend&#39;: 1191},
-    &#39;training_samples&#39;: 5190,
-    &#39;running_time&#39;: &#39;7.954 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd90f0&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.017 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.035 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10269749518304432},
-        &#39;statistics&#39;: array([325.77291813]),
-        &#39;running_time&#39;: &#39;0.078 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 964,
-         &#39;bureau_score&#39;: 868,
-         &#39;spend_desire&#39;: 1067,
-         &#39;random_noise&#39;: 1001,
-         &#39;monthly_spend&#39;: 909,
-         &#39;avg_last_2_months_spend&#39;: 1191},
-        &#39;training_samples&#39;: 5190,
-        &#39;running_time&#39;: &#39;7.954 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd90f0&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}},
-  {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.038 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.069 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10109370381318357},
-    &#39;statistics&#39;: array([325.78182148]),
-    &#39;running_time&#39;: &#39;0.033 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 1013,
-     &#39;bureau_score&#39;: 842,
-     &#39;spend_desire&#39;: 1100,
-     &#39;random_noise&#39;: 1004,
-     &#39;monthly_spend&#39;: 909,
-     &#39;avg_last_2_months_spend&#39;: 1132},
-    &#39;training_samples&#39;: 10149,
-    &#39;running_time&#39;: &#39;8.387 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd92e8&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.038 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.069 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10109370381318357},
-        &#39;statistics&#39;: array([325.78182148]),
-        &#39;running_time&#39;: &#39;0.033 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 1013,
-         &#39;bureau_score&#39;: 842,
-         &#39;spend_desire&#39;: 1100,
-         &#39;random_noise&#39;: 1004,
-         &#39;monthly_spend&#39;: 909,
-         &#39;avg_last_2_months_spend&#39;: 1132},
-        &#39;training_samples&#39;: 10149,
-        &#39;running_time&#39;: &#39;8.387 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd92e8&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}},
-  {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.053 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.020 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10050071530758226},
-    &#39;statistics&#39;: array([328.37156257]),
-    &#39;running_time&#39;: &#39;0.046 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 1137,
-     &#39;bureau_score&#39;: 892,
-     &#39;spend_desire&#39;: 1076,
-     &#39;random_noise&#39;: 932,
-     &#39;monthly_spend&#39;: 824,
-     &#39;avg_last_2_months_spend&#39;: 1139},
-    &#39;training_samples&#39;: 19572,
-    &#39;running_time&#39;: &#39;8.588 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd9fd0&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.053 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.020 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.10050071530758226},
-        &#39;statistics&#39;: array([328.37156257]),
-        &#39;running_time&#39;: &#39;0.046 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 1137,
-         &#39;bureau_score&#39;: 892,
-         &#39;spend_desire&#39;: 1076,
-         &#39;random_noise&#39;: 932,
-         &#39;monthly_spend&#39;: 824,
-         &#39;avg_last_2_months_spend&#39;: 1139},
-        &#39;training_samples&#39;: 19572,
-        &#39;running_time&#39;: &#39;8.588 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd9fd0&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}},
-  {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.059 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.028 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09953488372093024},
-    &#39;statistics&#39;: array([325.85789589]),
-    &#39;running_time&#39;: &#39;0.063 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 1188,
-     &#39;bureau_score&#39;: 904,
-     &#39;spend_desire&#39;: 1140,
-     &#39;random_noise&#39;: 890,
-     &#39;monthly_spend&#39;: 746,
-     &#39;avg_last_2_months_spend&#39;: 1132},
-    &#39;training_samples&#39;: 27950,
-    &#39;running_time&#39;: &#39;8.701 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd1e80&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.059 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.028 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09953488372093024},
-        &#39;statistics&#39;: array([325.85789589]),
-        &#39;running_time&#39;: &#39;0.063 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 1188,
-         &#39;bureau_score&#39;: 904,
-         &#39;spend_desire&#39;: 1140,
-         &#39;random_noise&#39;: 890,
-         &#39;monthly_spend&#39;: 746,
-         &#39;avg_last_2_months_spend&#39;: 1132},
-        &#39;training_samples&#39;: 27950,
-        &#39;running_time&#39;: &#39;8.701 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd1e80&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}},
-  {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.075 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.023 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09937041227841123},
-    &#39;statistics&#39;: array([323.82578921]),
-    &#39;running_time&#39;: &#39;0.076 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 1143,
-     &#39;bureau_score&#39;: 882,
-     &#39;spend_desire&#39;: 1106,
-     &#39;random_noise&#39;: 860,
-     &#39;monthly_spend&#39;: 905,
-     &#39;avg_last_2_months_spend&#39;: 1104},
-    &#39;training_samples&#39;: 34467,
-    &#39;running_time&#39;: &#39;8.932 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd19b0&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.075 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.023 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09937041227841123},
-        &#39;statistics&#39;: array([323.82578921]),
-        &#39;running_time&#39;: &#39;0.076 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 1143,
-         &#39;bureau_score&#39;: 882,
-         &#39;spend_desire&#39;: 1106,
-         &#39;random_noise&#39;: 860,
-         &#39;monthly_spend&#39;: 905,
-         &#39;avg_last_2_months_spend&#39;: 1104},
-        &#39;training_samples&#39;: 34467,
-        &#39;running_time&#39;: &#39;8.932 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd19b0&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}},
-  {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-    &#39;replace_unseen&#39;: nan,
-    &#39;running_time&#39;: &#39;0.103 s&#39;},
-   &#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;transformed_column&#39;: [&#39;income&#39;],
-    &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-    &#39;running_time&#39;: &#39;0.029 s&#39;},
-   &#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-    &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-    &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09937684486716956},
-    &#39;statistics&#39;: array([323.36552227]),
-    &#39;running_time&#39;: &#39;0.058 s&#39;},
-   &#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;avg_last_2_months_spend&#39;],
-    &#39;target&#39;: &#39;target&#39;,
-    &#39;prediction_column&#39;: &#39;prediction&#39;,
-    &#39;package&#39;: &#39;lightgbm&#39;,
-    &#39;package_version&#39;: &#39;2.2.3&#39;,
-    &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-     &#39;objective&#39;: &#39;regression&#39;,
-     &#39;num_estimators&#39;: 200},
-    &#39;feature_importance&#39;: {&#39;income&#39;: 1059,
-     &#39;bureau_score&#39;: 897,
-     &#39;spend_desire&#39;: 1161,
-     &#39;random_noise&#39;: 903,
-     &#39;monthly_spend&#39;: 867,
-     &#39;avg_last_2_months_spend&#39;: 1113},
-    &#39;training_samples&#39;: 36588,
-    &#39;running_time&#39;: &#39;8.955 s&#39;},
-   &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd9c50&gt;,
-   &#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-    &#39;prediction_max&#39;: 100000.0,
-    &#39;transformed_column&#39;: [&#39;prediction&#39;]},
-   &#39;__fkml__&#39;: {&#39;pipeline&#39;: [&#39;label_categorizer&#39;,
-     &#39;capper&#39;,
-     &#39;imputer&#39;,
-     &#39;lgbm_regression_learner&#39;,
-     &#39;prediction_ranger&#39;],
-    &#39;output_columns&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;,
-     &#39;prediction&#39;],
-    &#39;features&#39;: [&#39;id&#39;,
-     &#39;month&#39;,
-     &#39;income&#39;,
-     &#39;created_at&#39;,
-     &#39;phone_type&#39;,
-     &#39;bureau_score&#39;,
-     &#39;spend_desire&#39;,
-     &#39;random_noise&#39;,
-     &#39;monthly_spend&#39;,
-     &#39;month_date&#39;,
-     &#39;avg_last_2_months_spend&#39;,
-     &#39;target&#39;],
-    &#39;learners&#39;: {&#39;label_categorizer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.label_categorizer.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;label_categorizer&#39;: {&#39;transformed_column&#39;: [&#39;phone_type&#39;],
-        &#39;replace_unseen&#39;: nan,
-        &#39;running_time&#39;: &#39;0.103 s&#39;}}},
-     &#39;capper&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.capper.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;capper&#39;: {&#39;caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;transformed_column&#39;: [&#39;income&#39;],
-        &#39;precomputed_caps&#39;: {&#39;income&#39;: 20000.0},
-        &#39;running_time&#39;: &#39;0.029 s&#39;}}},
-     &#39;imputer&#39;: {&#39;fn&#39;: &lt;function fklearn.training.imputation.imputer.&lt;locals&gt;.p(new_data_set:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;imputer&#39;: {&#39;impute_strategy&#39;: &#39;median&#39;,
-        &#39;columns_to_impute&#39;: [&#39;bureau_score&#39;],
-        &#39;training_proportion_of_nulls&#39;: {&#39;bureau_score&#39;: 0.09937684486716956},
-        &#39;statistics&#39;: array([323.36552227]),
-        &#39;running_time&#39;: &#39;0.058 s&#39;}}},
-     &#39;lgbm_regression_learner&#39;: {&#39;fn&#39;: &lt;function fklearn.training.regression.lgbm_regression_learner.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame, apply_shap:bool=False) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;lgbm_regression_learner&#39;: {&#39;features&#39;: [&#39;income&#39;,
-         &#39;bureau_score&#39;,
-         &#39;spend_desire&#39;,
-         &#39;random_noise&#39;,
-         &#39;monthly_spend&#39;,
-         &#39;avg_last_2_months_spend&#39;],
-        &#39;target&#39;: &#39;target&#39;,
-        &#39;prediction_column&#39;: &#39;prediction&#39;,
-        &#39;package&#39;: &#39;lightgbm&#39;,
-        &#39;package_version&#39;: &#39;2.2.3&#39;,
-        &#39;parameters&#39;: {&#39;eta&#39;: 0.1,
-         &#39;objective&#39;: &#39;regression&#39;,
-         &#39;num_estimators&#39;: 200},
-        &#39;feature_importance&#39;: {&#39;income&#39;: 1059,
-         &#39;bureau_score&#39;: 897,
-         &#39;spend_desire&#39;: 1161,
-         &#39;random_noise&#39;: 903,
-         &#39;monthly_spend&#39;: 867,
-         &#39;avg_last_2_months_spend&#39;: 1113},
-        &#39;training_samples&#39;: 36588,
-        &#39;running_time&#39;: &#39;8.955 s&#39;},
-       &#39;object&#39;: &lt;lightgbm.basic.Booster at 0x1a27fd9c50&gt;}},
-     &#39;prediction_ranger&#39;: {&#39;fn&#39;: &lt;function fklearn.training.transformation.prediction_ranger.&lt;locals&gt;.p(new_df:pandas.core.frame.DataFrame) -&gt; pandas.core.frame.DataFrame&gt;,
-      &#39;log&#39;: {&#39;prediction_ranger&#39;: {&#39;prediction_min&#39;: 0.0,
-        &#39;prediction_max&#39;: 100000.0,
-        &#39;transformed_column&#39;: [&#39;prediction&#39;]}}}}}}],
- &#39;validator_log&#39;: [{&#39;fold_num&#39;: 0,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.12155139389429781,
-     &#39;spearman_evaluator__target&#39;: 0.3763809759696408}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 5190,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 0.1}},
-  {&#39;fold_num&#39;: 1,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.16661649338432083,
-     &#39;spearman_evaluator__target&#39;: 0.4102656885532355}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 10149,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 0.2}},
-  {&#39;fold_num&#39;: 2,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.19235477366451204,
-     &#39;spearman_evaluator__target&#39;: 0.435897703718786}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 19572,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 0.4}},
-  {&#39;fold_num&#39;: 3,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.19958426712769162,
-     &#39;spearman_evaluator__target&#39;: 0.44344758290319186}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 27950,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 0.6}},
-  {&#39;fold_num&#39;: 4,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.2061070304784689,
-     &#39;spearman_evaluator__target&#39;: 0.4469619671005015}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 34467,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 0.8}},
-  {&#39;fold_num&#39;: 5,
-   &#39;eval_results&#39;: [{&#39;r2_evaluator__target&#39;: 0.20530618561004577,
-     &#39;spearman_evaluator__target&#39;: 0.44620326046260683}],
-   &#39;split_log&#39;: {&#39;train_start&#39;: Timestamp(&#39;2017-02-01 00:00:00&#39;),
-    &#39;train_end&#39;: Timestamp(&#39;2018-03-11 00:00:00&#39;),
-    &#39;train_size&#39;: 36588,
-    &#39;test_start&#39;: Timestamp(&#39;2018-04-11 00:00:00&#39;),
-    &#39;test_end&#39;: Timestamp(&#39;2018-06-12 00:00:00&#39;),
-    &#39;test_size&#39;: 16717,
-    &#39;percentage&#39;: 1.0}}]}</pre>
-</div>
-
 </div>
 
 </div>
@@ -16035,7 +15375,7 @@ dtype: int64</pre>
 </div>
 </div>
 
-</div><div class="fragment">
+</div></section></section><section><section>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[40]:</div>
@@ -16048,7 +15388,7 @@ dtype: int64</pre>
 </div>
 </div>
 
-</div></div></section></section><section><section>
+</div><div class="fragment">
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[41]:</div>
@@ -16366,7 +15706,7 @@ dtype: int64</pre>
 </div>
 </div>
 
-</div></section></section><section><section>
+</div></div></section></section><section><section>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[53]:</div>
