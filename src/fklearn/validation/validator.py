@@ -83,9 +83,9 @@ def validator(train_data: pd.DataFrame,
               split_fn: SplitterFnType,
               train_fn: LearnerFnType,
               eval_fn: EvalFnType,
-              predict_oof: bool = False,
               perturb_fn_train: PerturbFnType = identity,
-              perturb_fn_test: PerturbFnType = identity) -> ValidatorReturnType:
+              perturb_fn_test: PerturbFnType = identity,
+              predict_oof: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold by calling
