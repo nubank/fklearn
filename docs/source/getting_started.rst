@@ -44,16 +44,16 @@ The **log** is a dictionary, and can include any information that is relevant fo
 
 Learner functions are usually partially initialized (curried) before being passed to pipelines or applied to data::
 
-   from fklearn.training.regression import linear_regression_learner
-   from fklearn.training.transformation import capper, floorer, prediction_ranger
+    from fklearn.training.regression import linear_regression_learner
+    from fklearn.training.transformation import capper, floorer, prediction_ranger
 
-   # initialize several learner functions
-   capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50,000})
-   regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
-   ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
+    # initialize several learner functions
+    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50,000})
+    regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
+    ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
 
-   # apply one individually to some data
-   p, df, log = regression_fn(training_data)
+    # apply one individually to some data
+    p, df, log = regression_fn(training_data)
 
 Available learner functions in fklearn can be found inside the ``fklearn.training`` module.
 
