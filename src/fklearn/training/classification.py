@@ -9,7 +9,7 @@ from sklearn import __version__ as sk_version
 
 from fklearn.types import LearnerReturnType, LogType
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
-from fklearn.training.utils import log_learner_time
+from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
@@ -98,7 +98,9 @@ def xgb_classification_learner(df: pd.DataFrame,
                                num_estimators: int = 100,
                                extra_params: LogType = None,
                                prediction_column: str = "prediction",
-                               weight_column: str = None) -> LearnerReturnType:
+                               weight_column: str = None,
+                               encode_extra_cols: bool = False,
+                               encode_name_pat: str = "==") -> LeanerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
@@ -147,6 +149,12 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: False)
+        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
+
+    encode_name_pat : str (default: "==")
+        Pattern defining the names of encoded columns.
     """
     import xgboost as xgb
 
@@ -155,6 +163,8 @@ def xgb_classification_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'binary:logistic')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, feature_names=map(str, features), weight=weights)
 

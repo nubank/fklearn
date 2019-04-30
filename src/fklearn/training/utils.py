@@ -1,7 +1,8 @@
 from functools import wraps
 from time import time
-from typing import Any
+from typing import Any, List
 
+import pandas as pd
 from toolz import curry
 import toolz as fp
 
@@ -27,3 +28,12 @@ def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> Unc
         return learner(*args, **kwargs)
 
     return printed_learner
+
+
+def expand_features_encoded(df: pd.DataFrame,
+                           features: List[str],
+                           encode_name_pat: str) -> List[str]:
+    encoded_features = df.columns[df.columns.str.contains(encode_name_pat)].tolist()
+    pre_encoded_names = set([f.split(encode_name_pat)[0] for f in encoded_features])
+    not_encoded_features = [f for f in features if f not in pre_encoded_names]
+    return not_encoded_features + encoded_features

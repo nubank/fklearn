@@ -667,7 +667,8 @@ def onehot_categorizer(df: pd.DataFrame,
                        columns_to_categorize: List[str],
                        hardcode_nans: bool = False,
                        drop_first_column: bool = False,
-                       store_mapping: bool = False) -> LearnerReturnType:
+                       store_mapping: bool = False,
+                       encode_name_pat: str = "==") -> LearnerReturnType:
     """
     Onehot encoding on categorical columns.
 
@@ -688,17 +689,22 @@ def onehot_categorizer(df: pd.DataFrame,
 
     store_mapping : bool (default: False)
         Whether to store the feature value -> integer dictionary in the log
+
+    encode_name_pat : str (default: "==")
+        Pattern with which to name new columns.
+        E.g. if a column "A" has the value "x", new column "A"+encode_name_pat+"x" will be created
     """
 
     categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique())[int(drop_first_column):])
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: (col + "==" + str(categ), (new_df[col] == categ).astype(int)),
+        make_dummies = lambda col: dict(map(lambda categ: (col + encode_name_pat + str(categ),
+                                                           (new_df[col] == categ).astype(int)),
                                             vec[col]))
 
         oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {col + "==nan": (~new_df[col].isin(vec[col])).astype(
+                                                {col + encode_name_pat + "nan": (~new_df[col].isin(vec[col])).astype(
                                                     int)} if hardcode_nans
                                                 else {}).items(),
                               columns_to_categorize))
