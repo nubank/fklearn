@@ -305,9 +305,9 @@ def catboost_classification_learner(df: pd.DataFrame,
 
         return new_df.assign(**col_dict)
 
-    p.__doc__ = learner_pred_fn_docstring("CatBoostClassifier", shap=True)
+    p.__doc__ = learner_pred_fn_docstring("catboost_classification_learner", shap=True)
 
-    log = {'CatBoostClassifier': {
+    log = {'catboost_classification_learner': {
         'features': features,
         'target': target,
         'prediction_column': prediction_column,
