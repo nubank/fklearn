@@ -272,20 +272,24 @@ def catboost_classification_learner(df: pd.DataFrame,
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "loss_function", 'Logloss')
+    params = params if "objective" in params else assoc(params, "objective", 'Logloss')
 
-    dtrain = Pool(df[features].values, df[target].values, weight=weights, feature_names=list(map(str, features)))
+    cat_features = params["cat_features"] if "cat_features" in params else None
+
+    dtrain = Pool(df[features].values, df[target].values, weight=weights,
+                  feature_names=list(map(str, features)), cat_features=cat_features)
 
     cat_boost_classifier = CatBoostClassifier(iterations=num_estimators, **params)
     cbr = cat_boost_classifier.fit(dtrain, verbose=0)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
 
-        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)))
+        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)),
+                     cat_features=cat_features)
 
         pred = cbr.predict_proba(dtest)[:, 1]
-
-        if params["loss_function"] == "MultiClass":
+        if params["objective"] == "MultiClass":
+            pred = cbr.predict_proba(dtest)
             col_dict = {prediction_column + "_" + str(key): value
                         for (key, value) in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
@@ -295,7 +299,7 @@ def catboost_classification_learner(df: pd.DataFrame,
         if apply_shap:
             import shap
             explainer = shap.TreeExplainer(cbr)
-            shap_values = list(explainer.shap_values(new_df[features]))
+            shap_values = list(explainer.shap_values(dtest))
             shap_expected_value = explainer.expected_value
 
             shap_output = {"shap_values": shap_values,

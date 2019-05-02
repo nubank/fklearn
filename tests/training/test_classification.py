@@ -203,6 +203,30 @@ def test_catboost_classification_learner():
         'y': [1, 2, 0, 1, 2, 0]
     })
 
+    df_train_categorical = pd.DataFrame({
+        'id': ["id4", "id4", "id5"],
+        "x1": ["a", "a", "c"],
+        "x2": ["b", "b", "d"],
+        "x3": [1, 4, 30],
+        "x4": [1, 5, 40],
+        "x5": [5, 6, 50],
+        "x6": [6, 7, 60],
+        "y": [1, 1, 0],
+        "w": [1, 1, 1]
+    })
+
+    df_test_categorical = pd.DataFrame({
+        'id': ["id4", "id4"],
+        "x1": ["a", "a"],
+        "x2": ["b", "b"],
+        "x3": [2, 5],
+        "x4": [2, 6],
+        "x5": [5, 6],
+        "x6": [6, 7],
+        "y": [1, 1],
+        "w": [1, 1]
+    })
+
     features = ["x1", "x2"]
 
     learner_binary = catboost_classification_learner(features=features,
@@ -233,26 +257,51 @@ def test_catboost_classification_learner():
     assert np.vstack(pred_shap["shap_values"]).shape == (4, 2)
 
     # test multinomial case
-    learner_multinomial = lgbm_classification_learner(features=features,
-                                                      target="y",
-                                                      learning_rate=0.1,
-                                                      num_estimators=20,
-                                                      extra_params={"max_depth": 2,
-                                                                    "seed": 42,
-                                                                    "objective": 'multiclass',
-                                                                    "num_class": 3},
-                                                      prediction_column="prediction")
+    learner_multinomial = catboost_classification_learner(features=features,
+                                                          target="y",
+                                                          learning_rate=0.1,
+                                                          num_estimators=20,
+                                                          extra_params={"max_depth": 2,
+                                                                        "random_seed": 42,
+                                                                        "objective": 'MultiClass'},
+                                                          prediction_column="prediction")
 
     predict_fn_multinomial, pred_train_multinomial, log = learner_multinomial(df_train_multinomial)
 
     pred_test_multinomial = predict_fn_multinomial(df_test_multinomial)
 
-    expected_col_train = df_train_binary.columns.tolist() + ["prediction_0", "prediction_1", "prediction_2"]
-    expected_col_test = df_test_binary.columns.tolist() + ["prediction_0", "prediction_1", "prediction_2"]
+    expected_col_train = df_train_binary.columns.tolist(
+    ) + ["prediction_0", "prediction_1", "prediction_2", "prediction"]
+    expected_col_test = df_test_binary.columns.tolist() + ["prediction_0", "prediction_1", "prediction_2", "prediction"]
 
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
+
+    # test categorical case
+    features = ["x1", "x2", "x3", "x4", "x5", "x6"]
+
+    learner_binary = catboost_classification_learner(features=features,
+                                                     target="y",
+                                                     learning_rate=0.1,
+                                                     num_estimators=20,
+                                                     extra_params={"max_depth": 2,
+                                                                   "random_seed": 42, 'cat_features': [0, 1]},
+                                                     prediction_column="prediction",
+                                                     weight_column="w")
+
+    predict_fn_categorical, pred_train_categorical, log = learner_binary(df_train_categorical)
+
+    pred_test_categorical = predict_fn_categorical(df_train_categorical)
+
+    expected_col_train = df_train_categorical.columns.tolist() + ["prediction"]
+    expected_col_test = df_test_categorical.columns.tolist() + ["prediction"]
+
+    assert Counter(expected_col_train) == Counter(pred_train_categorical.columns.tolist())
+    assert Counter(expected_col_test) == Counter(pred_test_categorical.columns.tolist())
+    assert pred_test_categorical.prediction.max() < 1
+    assert pred_test_categorical.prediction.min() > 0
+    assert (pred_test_binary.columns == pred_train_binary.columns).all()
 
 
 def test_nlp_logistic_classification_learner():
