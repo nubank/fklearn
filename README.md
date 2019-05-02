@@ -22,6 +22,7 @@ The name is a reference to the widely known [scikit-learn](https://scikit-learn.
 [Documentation](https://fklearn.readthedocs.io/en/latest/) |
 [Getting Started](https://fklearn.readthedocs.io/en/latest/getting_started.html) |
 [API Docs](https://fklearn.readthedocs.io/en/latest/api.html) |
+[Contributing](https://fklearn.readthedocs.io/en/latest/contributing.html) |
 
 
 ## Installation
@@ -40,10 +41,6 @@ cd fklearn
 git checkout master
 pip install -e .
 ```
-
-## Contribution guidelines
-
-Please review our [contribution guidelines](CONTRIBUTING.md) and [code of conduct](CODE-OF-CONDUCT.md) when contributing.
 
 ## License
 
