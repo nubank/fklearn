@@ -28,6 +28,13 @@ def split_evaluator_extractor(result, split_col, split_values, base_extractor):
 
 
 @curry
+def temporal_split_evaluator_extractor(result, time_col, base_extractor):
+    keys = result.keys()
+    split_values = [k.split(time_col)[1][1:] for k in keys if 'split_evaluator__' in k]
+    return split_evaluator_extractor(result, time_col, split_values, base_extractor)
+
+
+@curry
 def learning_curve_evaluator_extractor(result, base_extractor):
     return base_extractor(result).assign(lc_period_end=result['lc_period_end'])
 
