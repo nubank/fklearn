@@ -22,3 +22,4 @@ Contents
    getting_started
    examples/index
    api
+   contributing

@@ -1,13 +1,17 @@
 import gc
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 import warnings
+import inspect
 
 import cloudpickle
 from joblib import Parallel, delayed
 import pandas as pd
+from toolz import compose
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
+from toolz.functoolz import identity
 
-from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType
+from fklearn.types import EvalFnType, LearnerFnType, LogType
+from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
 
 
 def validator_iteration(data: pd.DataFrame,
@@ -78,7 +82,10 @@ def validator_iteration(data: pd.DataFrame,
 def validator(train_data: pd.DataFrame,
               split_fn: SplitterFnType,
               train_fn: LearnerFnType,
-              eval_fn: EvalFnType) -> ValidatorReturnType:
+              eval_fn: EvalFnType,
+              perturb_fn_train: PerturbFnType = identity,
+              perturb_fn_test: PerturbFnType = identity,
+              predict_oof: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold by calling
@@ -104,6 +111,14 @@ def validator(train_data: pd.DataFrame,
         A partially defined evaluation function that takes a dataset with prediction and
         returns the evaluation logs.
 
+    perturb_fn_train : PerturbFnType
+        A partially defined corruption function that takes a dataset and returns
+        a corrupted dataset. Perturbation applied at train-time.
+
+    perturb_fn_test : PerturbFnType
+        A partially defined corruption function that takes a dataset and returns
+        a corrupted dataset. Perturbation applied at test-time.
+
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
@@ -114,9 +129,12 @@ def validator(train_data: pd.DataFrame,
 
     folds, logs = split_fn(train_data)
 
+    train_fn = compose(train_fn, perturb_fn_train)
+    eval_fn = compose(eval_fn, perturb_fn_test)
+
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn)
+        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof)
 
     zipped_logs = pipe(folds,
                        enumerate,
@@ -129,8 +147,20 @@ def validator(train_data: pd.DataFrame,
         train_log["train_log"] = validator_log["train_log"]
         return train_log, assoc(dissoc(validator_log, "train_log"), "split_log", split_log)
 
+    def get_perturbed_columns(perturbator: PerturbFnType) -> List[str]:
+        args = inspect.getfullargspec(perturbator).kwonlydefaults
+        return args['cols']
+
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     first_train_log = first(train_logs)
+
+    perturbator_log = {'perturbated_train': [], 'perturbated_test': []}  # type: LogType
+    if perturb_fn_train != identity:
+        perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
+    if perturb_fn_test != identity:
+        perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
+    first_train_log = assoc(first_train_log, "perturbator_log", perturbator_log)
+
     return assoc(first_train_log, "validator_log", list(validator_logs))
 
 
