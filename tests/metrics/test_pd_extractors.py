@@ -36,10 +36,12 @@ def test_extract():
     ])
 
     splitter = split_evaluator(eval_fn=base_evaluator, split_col='RAD', split_values=[4.0, 5.0, 24.0])
-    temporal_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y-%W')
+    temporal_week_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y-%W')
+    temporal_year_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y')
 
     eval_fn = combined_evaluators(evaluators=[base_evaluator, splitter])
-    temporal_eval_fn = combined_evaluators(evaluators=[base_evaluator, temporal_splitter])
+    temporal_week_eval_fn = combined_evaluators(evaluators=[base_evaluator, temporal_week_splitter])
+    temporal_year_eval_fn = combined_evaluators(evaluators=[base_evaluator, temporal_year_splitter])
 
     # Define splitters
     cv_split_fn = out_of_time_and_space_splitter(
@@ -67,7 +69,8 @@ def test_extract():
 
     # temporal evaluation results
     predict_fn, _, _ = train_fn(df)
-    temporal_results = temporal_eval_fn(predict_fn(df))
+    temporal_week_results = temporal_week_eval_fn(predict_fn(df))
+    temporal_year_results = temporal_year_eval_fn(predict_fn(df))
 
     # Define extractors
     base_extractors = combined_evaluator_extractor(base_extractors=[
@@ -78,8 +81,11 @@ def test_extract():
     splitter_extractor = split_evaluator_extractor(split_col='RAD', split_values=[4.0, 5.0, 24.0],
                                                    base_extractor=base_extractors)
 
-    temporal_splitter_extractor = temporal_split_evaluator_extractor(
+    temporal_week_splitter_extractor = temporal_split_evaluator_extractor(
         time_col='time', time_format='%Y-%W', base_extractor=base_extractors)
+
+    temporal_year_splitter_extractor = temporal_split_evaluator_extractor(
+        time_col='time', time_format='%Y', base_extractor=base_extractors)
 
     assert extract(cv_results, base_extractors).shape == (5, 9)
     assert extract(cv_results, splitter_extractor).shape == (15, 10)
@@ -93,5 +99,7 @@ def test_extract():
     assert extract(fw_sc_results, base_extractors).shape == (3, 9)
     assert extract(fw_sc_results, splitter_extractor).shape == (9, 10)
 
-    n_time_folds = len(df['time'].dt.strftime('%Y-%W').unique())
-    assert temporal_splitter_extractor(temporal_results).shape == (n_time_folds, 3)
+    n_time_week_folds = len(df['time'].dt.strftime('%Y-%W').unique())
+    n_time_year_folds = len(df['time'].dt.strftime('%Y').unique())
+    assert temporal_week_splitter_extractor(temporal_week_results).shape == (n_time_week_folds, 3)
+    assert temporal_year_splitter_extractor(temporal_year_results).shape == (n_time_year_folds, 3)

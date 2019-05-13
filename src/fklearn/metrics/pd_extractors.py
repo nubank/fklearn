@@ -37,16 +37,14 @@ def temporal_split_evaluator_extractor(result, time_col, base_extractor, time_fo
     split_keys = [key for key in result.keys() if eval_name in key]
     split_values = []
     for key in split_keys:
-        split_value = key.split(eval_name)
-        if len(split_value) > 1:
-            date = split_value[1][1:]
-            try:
-                # just check time format
-                datetime.strptime(date, time_format)
-            except ValueError:
-                # this might happen if result has temporal splitters using different data formats
-                pass
+        date = key.split(eval_name)[1][1:]
+        try:
+            # just check time format
+            datetime.strptime(date, time_format)
             split_values.append(date)
+        except ValueError:
+            # this might happen if result has temporal splitters using different data formats
+            pass
 
     return split_evaluator_extractor(result, time_col, split_values, base_extractor)
 
