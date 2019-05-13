@@ -1,15 +1,21 @@
+from datetime import timedelta
+
 import numpy as np
 import pandas as pd
-from datetime import timedelta
 from sklearn.datasets import load_boston
 
+from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
+                                           evaluator_extractor, extract,
+                                           split_evaluator_extractor,
+                                           temporal_split_evaluator_extractor)
 from fklearn.training.regression import linear_regression_learner
-from fklearn.validation.splitters import time_learning_curve_splitter, stability_curve_time_splitter, \
-    forward_stability_curve_time_splitter, out_of_time_and_space_splitter
-from fklearn.validation.evaluators import r2_evaluator, spearman_evaluator, combined_evaluators, split_evaluator
+from fklearn.validation.evaluators import (combined_evaluators, r2_evaluator,
+                                           spearman_evaluator, split_evaluator,
+                                           temporal_split_evaluator)
+from fklearn.validation.splitters import (
+    forward_stability_curve_time_splitter, out_of_time_and_space_splitter,
+    stability_curve_time_splitter, time_learning_curve_splitter)
 from fklearn.validation.validator import validator
-from fklearn.metrics.pd_extractors import combined_evaluator_extractor, split_evaluator_extractor, \
-    evaluator_extractor, extract
 
 
 def test_extract():
@@ -30,8 +36,10 @@ def test_extract():
     ])
 
     splitter = split_evaluator(eval_fn=base_evaluator, split_col='RAD', split_values=[4.0, 5.0, 24.0])
+    temporal_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y-%W')
 
     eval_fn = combined_evaluators(evaluators=[base_evaluator, splitter])
+    temporal_eval_fn = combined_evaluators(evaluators=[base_evaluator, temporal_splitter])
 
     # Define splitters
     cv_split_fn = out_of_time_and_space_splitter(
@@ -57,6 +65,10 @@ def test_extract():
     sc_results = validator(df, sc_split_fn, train_fn, eval_fn)['validator_log']
     fw_sc_results = validator(df, fw_sc_split_fn, train_fn, eval_fn)['validator_log']
 
+    # temporal evaluation results
+    predict_fn, _, _ = train_fn(df)
+    temporal_results = temporal_eval_fn(predict_fn(df))
+
     # Define extractors
     base_extractors = combined_evaluator_extractor(base_extractors=[
         evaluator_extractor(evaluator_name="r2_evaluator__target"),
@@ -65,6 +77,9 @@ def test_extract():
 
     splitter_extractor = split_evaluator_extractor(split_col='RAD', split_values=[4.0, 5.0, 24.0],
                                                    base_extractor=base_extractors)
+
+    temporal_splitter_extractor = temporal_split_evaluator_extractor(
+        time_col='time', time_format='%Y-%W', base_extractor=base_extractors)
 
     assert extract(cv_results, base_extractors).shape == (5, 9)
     assert extract(cv_results, splitter_extractor).shape == (15, 10)
@@ -77,3 +92,6 @@ def test_extract():
 
     assert extract(fw_sc_results, base_extractors).shape == (3, 9)
     assert extract(fw_sc_results, splitter_extractor).shape == (9, 10)
+
+    n_time_folds = len(df['time'].dt.strftime('%Y-%W').unique())
+    assert temporal_splitter_extractor(temporal_results).shape == (n_time_folds, 3)

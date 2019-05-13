@@ -1,7 +1,9 @@
-from toolz import curry
-import pandas as pd
-from itertools import chain, repeat
 import collections
+from datetime import datetime
+from itertools import chain, repeat
+
+import pandas as pd
+from toolz import curry
 
 
 @curry
@@ -24,13 +26,28 @@ def split_evaluator_extractor_iteration(split_value, result, split_col, base_ext
 def split_evaluator_extractor(result, split_col, split_values, base_extractor):
     return pd.concat(
         list(map(split_evaluator_extractor_iteration(result=result, split_col=split_col, base_extractor=base_extractor),
-             split_values)))
+                 split_values)))
 
 
 @curry
-def temporal_split_evaluator_extractor(result, time_col, base_extractor):
-    keys = result.keys()
-    split_values = [k.split(time_col)[1][1:] for k in keys if 'split_evaluator__' in k]
+def temporal_split_evaluator_extractor(result, time_col, base_extractor, time_format="%Y-%m", eval_name=None):
+    if eval_name is None:
+        eval_name = 'split_evaluator__' + time_col
+
+    split_keys = [key for key in result.keys() if eval_name in key]
+    split_values = []
+    for key in split_keys:
+        split_value = key.split(eval_name)
+        if len(split_value) > 1:
+            date = split_value[1][1:]
+            try:
+                # just check time format
+                datetime.strptime(date, time_format)
+            except ValueError:
+                # this might happen if result has temporal splitters using different data formats
+                pass
+            split_values.append(date)
+
     return split_evaluator_extractor(result, time_col, split_values, base_extractor)
 
 
