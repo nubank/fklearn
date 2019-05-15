@@ -187,17 +187,21 @@ xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
 
 @curry
-@log_learner_time(learner_name='gp_regression_learner')
-def gp_regression_learner(df: pd.DataFrame,
-                          features: List[str],
-                          target: str,
-                          kernel: kernels.Kernel = None,
-                          alpha: float = 0.1,
-                          extra_variance: Union[str, float] = "fit",
-                          return_std: bool = False,
-                          extra_params: Dict[str, Any] = None,
-                          prediction_column: str = "prediction") -> LearnerReturnType:
+@log_learner_time(learner_name='catboost_regressor_learner')
+def catboost_regressor_learner(df: pd.DataFrame,
+                               features: List[str],
+                               target: str,
+                               learning_rate: float = 0.1,
+                               num_estimators: int = 100,
+                               extra_params: Dict[str, Any] = None,
+                               prediction_column: str = "prediction",
+                               weight_column: str = None) -> LearnerReturnType:
     """
+    Fits an CatBoost regressor to the dataset. It first generates a Pool
+    with the specified features and labels from `df`. Then it fits a CatBoost
+    model to this Pool. Return the predict function for the model and the
+    predictions for the input dataset.
+
     Parameters
     ----------
 
@@ -214,31 +218,135 @@ def gp_regression_learner(df: pd.DataFrame,
         The name of the column in `df` that should be used as target for the model.
         This column should be numerical and continuous, since this is a regression model.
 
-    kernel : sklearn.gaussian_process.kernels
+    learning_rate : float
+        Float in range [0,1].
+        Step size shrinkage used in update to prevents overfitting. After each boosting step,
+        we can directly get the weights of new features. and eta actually shrinks the
+        feature weights to make the boosting process more conservative.
+        See the eta hyper-parameter in:
+        https://catboost.ai/docs/concepts/python-reference_parameters-list.html
+
+    num_estimators : int
+        Int in range [0, inf]
+        Number of boosted trees to fit.
+        See the n_estimators hyper-parameter in:
+        https://catboost.ai/docs/concepts/python-reference_parameters-list.html
+
+    extra_params : dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
+        Other parameters for the CatBoost model. See the list in:
+        https://catboost.ai/docs/concepts/python-reference_catboostregressor.html
+        If not passed, the default will be used.
+
+    prediction_column : str
+        The name of the column with the predictions from the model.
+
+    weight_column : str, optional
+        The name of the column with scores to weight the data.
+    """
+    from catboost import Pool, CatBoostRegressor
+    import catboost
+
+    weights = df[weight_column].values if weight_column else None
+    params = extra_params if extra_params else {}
+    params = assoc(params, "eta", learning_rate)
+
+    dtrain = Pool(df[features].values, df[target].values, weight=weights, feature_names=list(map(str, features)))
+    cat_boost_regressor = CatBoostRegressor(iterations=num_estimators, **params)
+    cbr = cat_boost_regressor.fit(dtrain, verbose=0)
+
+    def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
+        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)))
+        col_dict = {prediction_column: cbr.predict(dtest)}
+
+        if apply_shap:
+            import shap
+            explainer = shap.TreeExplainer(cbr)
+            shap_values = list(explainer.shap_values(new_df[features]))
+            shap_expected_value = explainer.expected_value
+
+            shap_output = {"shap_values": shap_values,
+                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+
+            col_dict = merge(col_dict, shap_output)
+
+        return new_df.assign(**col_dict)
+
+    p.__doc__ = learner_pred_fn_docstring("CatBoostRegressor", shap=False)
+
+    log = {'catboost_regression_learner': {
+        'features': features,
+        'target': target,
+        'prediction_column': prediction_column,
+        'package': "catboost",
+        'package_version': catboost.__version__,
+        'parameters': assoc(params, "num_estimators", num_estimators),
+        'feature_importance': cbr.feature_importances_,
+        'training_samples': len(df)
+    }}
+
+    return p, p(df), log
+
+
+catboost_regressor_learner.__doc__ += learner_return_docstring("CatBoostRegressor")
+
+
+@curry
+@log_learner_time(learner_name='gp_regression_learner')
+def gp_regression_learner(df: pd.DataFrame,
+                          features: List[str],
+                          target: str,
+                          kernel: kernels.Kernel = None,
+                          alpha: float = 0.1,
+                          extra_variance: Union[str, float] = "fit",
+                          return_std: bool = False,
+                          extra_params: Dict[str, Any] = None,
+                          prediction_column: str = "prediction") -> LearnerReturnType:
+    """
+    Fits an gaussian process regressor to the dataset.
+
+    Parameters
+    ----------
+
+    df: pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    features: list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target: str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be numerical and continuous, since this is a regression model.
+
+    kernel: sklearn.gaussian_process.kernels
         The kernel specifying the covariance function of the GP. If None is passed,
         the kernel "1.0 * RBF(1.0)" is used as default. Note that the kernel's hyperparameters
         are optimized during fitting.
 
-    alpha : float
+    alpha: float
         Value added to the diagonal of the kernel matrix during fitting. Larger values correspond to increased
         noise level in the observations. This can also prevent a potential numerical issue during fitting,
         by ensuring that the calculated values form a positive definite matrix.
 
-    extra_variance : float
+    extra_variance: float
         The amount of extra variance to scale to the predictions in standard deviations. If left as the default "fit",
         Uses the standard deviation of the target.
 
-    return_std : bool
+    return_std: bool
         If True, the standard-deviation of the predictive distribution at the query points is returned
         along with the mean.
 
-    extra_params : dict {"hyperparameter_name" : hyperparameter_value}, optional
+    extra_params: dict {"hyperparameter_name" : hyperparameter_value}, optional
         Other parameters for the GaussianProcessRegressor model. See the list in:
         http://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
         If not passed, the default will be used.
 
     prediction_column : str
         The name of the column with the predictions from the model.
+
     """
 
     params = extra_params if extra_params else {}
@@ -289,52 +397,53 @@ def lgbm_regression_learner(df: pd.DataFrame,
                             prediction_column: str = "prediction",
                             weight_column: str = None) -> LearnerReturnType:
     """
-     Fits an LGBM regressor to the dataset. It first generates a Dataset
-     with the specified features and labels from `df`. Then, it fits a LGBM
-     model to this Dataset. Return the predict function for the model and the
-     predictions for the input dataset.
+    Fits an LGBM regressor to the dataset.
 
-     Parameters
-     ----------
+    It first generates a Dataset with the specified features and labels
+    from `df`. Then, it fits a LGBM model to this Dataset. Return the predict
+    function for the model and the predictions for the input dataset.
 
-     df : pandas.DataFrame
-         A Pandas' DataFrame with features and target columns.
-         The model will be trained to predict the target column
-         from the features.
+    Parameters
+    ----------
 
-     features : list of str
-         A list os column names that are used as features for the model. All this names
-         should be in `df`.
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
 
-     target : str
-         The name of the column in `df` that should be used as target for the model.
-         This column should be binary, since this is a classification model.
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
 
-     learning_rate : float
-         Float in the range (0, 1]
-         Step size shrinkage used in update to prevents overfitting. After each boosting step,
-         we can directly get the weights of new features. and eta actually shrinks the
-         feature weights to make the boosting process more conservative.
-         See the learning_rate hyper-parameter in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be binary, since this is a classification model.
 
-     num_estimators : int
-         Int in the range (0, inf)
-         Number of boosted trees to fit.
-         See the num_iterations hyper-parameter in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+    learning_rate : float
+        Float in the range (0, 1]
+        Step size shrinkage used in update to prevents overfitting. After each boosting step,
+        we can directly get the weights of new features. and eta actually shrinks the
+        feature weights to make the boosting process more conservative.
+        See the learning_rate hyper-parameter in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
 
-     extra_params : dict, optional
-         Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
-         Other parameters for the LGBM model. See the list in:
-         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
-         If not passed, the default will be used.
+    num_estimators : int
+        Int in the range (0, inf)
+        Number of boosted trees to fit.
+        See the num_iterations hyper-parameter in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
 
-     prediction_column : str
-         The name of the column with the predictions from the model.
+    extra_params : dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
+        Other parameters for the LGBM model. See the list in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+        If not passed, the default will be used.
 
-     weight_column : str, optional
-         The name of the column with scores to weight the data.
+    prediction_column : str
+        The name of the column with the predictions from the model.
+
+    weight_column : str, optional
+        The name of the column with scores to weight the data.
      """
     import lightgbm as lgbm
 

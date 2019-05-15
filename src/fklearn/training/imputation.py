@@ -1,7 +1,7 @@
 from typing import Any, List
 
 import pandas as pd
-from sklearn.preprocessing import Imputer
+from sklearn.impute import SimpleImputer
 from toolz import curry
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
@@ -34,7 +34,7 @@ def imputer(df: pd.DataFrame,
         - If "most_frequent", then replace missing using the most frequent value along the axis.
     """
 
-    imp = Imputer(strategy=impute_strategy)
+    imp = SimpleImputer(strategy=impute_strategy)
 
     imp.fit(df[columns_to_impute].values)
 
@@ -53,7 +53,7 @@ def imputer(df: pd.DataFrame,
     return p, p(df), log
 
 
-imputer.__doc__ += learner_return_docstring("Imputer")
+imputer.__doc__ += learner_return_docstring("SimpleImputer")
 
 
 @curry
@@ -95,4 +95,4 @@ def placeholder_imputer(df: pd.DataFrame,
     return p, p(df), log
 
 
-placeholder_imputer.__doc__ += learner_return_docstring("Placeholder Imputer")
+placeholder_imputer.__doc__ += learner_return_docstring("Placeholder SimpleImputer")

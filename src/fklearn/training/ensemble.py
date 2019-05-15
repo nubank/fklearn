@@ -25,7 +25,6 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
                                        prediction_column: str = "prediction") -> LearnerReturnType:
 
     """
-
     Octopus ensemble allows you to inject domain specific knowledge to force a split in an initial feature, instead of
     assuming the tree model will do that intelligent split on its own. It works by first defining a split on your
     dataset and then training one individual model in each separated dataset.
@@ -38,62 +37,64 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
     learning_rate_by_bin: dict
         A dictionary of learning rate in the XGBoost model to use in each model split. Ex: if you want to
         split your training by tenure and you have a tenure column with integer values [1,2,3,...,12], you have to
-        specify a list of learning rates for each split:
-        {
-            1: 0.08,
-            2: 0.08,
-            ...
-            12: 0.1
-        }
+        specify a list of learning rates for each split::
+
+            {
+                1: 0.08,
+                2: 0.08,
+                ...
+                12: 0.1
+            }
 
     num_estimators_by_bin: dict
         A dictionary of number of tree estimators in the XGBoost model to use in each model split. Ex: if you want to
         split your training by tenure and you have a tenure column with integer values [1,2,3,...,12], you have to
-        specify a list of estimators for each split:
-        {
-            1: 300,
-            2: 250,
-            ...
-            12: 300
-        }
+        specify a list of estimators for each split::
 
+            {
+                1: 300,
+                2: 250,
+                ...
+                12: 300
+            }
 
     extra_params_by_bin: dict
         A dictionary of extra parameters dictionaries in the XGBoost model to use in each model split. Ex: if you want
         to split your training by tenure and you have a tenure column with integer values [1,2,3,...,12], you have to
-        specify a list of extra parameters for each split:
-        {
-            1: {
-                'reg_alpha': 0.0,
-                'colsample_bytree': 0.4,
+        specify a list of extra parameters for each split::
+
+            {
+                1: {
+                    'reg_alpha': 0.0,
+                    'colsample_bytree': 0.4,
+                    ...
+                    'colsample_bylevel': 0.8
+                    }
+                2: {
+                    'reg_alpha': 0.1,
+                    'colsample_bytree': 0.6,
+                    ...
+                    'colsample_bylevel': 0.4
+                    }
                 ...
-                'colsample_bylevel': 0.8
-                }
-            2: {
-                'reg_alpha': 0.1,
-                'colsample_bytree': 0.6,
-                ...
-                'colsample_bylevel': 0.4
-                }
-            ...
-            12: {
-                'reg_alpha': 0.0,
-                'colsample_bytree': 0.7,
-                ...
-                'colsample_bylevel': 1.0
-                }
-        }
+                12: {
+                    'reg_alpha': 0.0,
+                    'colsample_bytree': 0.7,
+                    ...
+                    'colsample_bylevel': 1.0
+                    }
+            }
 
     features_by_bin: dict
         A dictionary of features to use in each model split. Ex: if you want to split your training by tenure and you
-        have a tenure column with integer values [1,2,3,...,12], you have to specify a list of features for each split:
-        {
-            1: [feature-1, feature-2, feature-3, ...],
-            2: [feature-1, feature-3, feature-5, ...],
-            ...
-            12: [feature-2, feature-4, feature-8, ...]
-        }
+        have a tenure column with integer values [1,2,3,...,12], you have to specify a list of features for each split::
 
+            {
+                1: [feature-1, feature-2, feature-3, ...],
+                2: [feature-1, feature-3, feature-5, ...],
+                ...
+                12: [feature-2, feature-4, feature-8, ...]
+            }
 
     train_split_col: str
         The name of the categorical column where the model will make the splits. Ex: if you want to split your training
@@ -108,15 +109,10 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
         Number of threads for the XGBoost learners.
 
     target_column: str
-        The name of the target column
+        The name of the target column.
 
     prediction_column: str
         The name of the column with the predictions from the model.
-
-
-    Returns
-    -------
-
     """
 
     train_fns = {b: xgb_classification_learner(features=features_by_bin[b],
