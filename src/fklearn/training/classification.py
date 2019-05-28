@@ -20,8 +20,7 @@ def logistic_classification_learner(df: pd.DataFrame,
                                     params: LogType = None,
                                     prediction_column: str = "prediction",
                                     weight_column: str = None,
-                                    encode_extra_cols: bool = False,
-                                    encode_name_pat: str = "==") -> LearnerReturnType:
+                                    encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an logistic regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -109,8 +108,7 @@ def xgb_classification_learner(df: pd.DataFrame,
                                extra_params: LogType = None,
                                prediction_column: str = "prediction",
                                weight_column: str = None,
-                               encode_extra_cols: bool = False,
-                               encode_name_pat: str = "==") -> LearnerReturnType:
+                               encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
@@ -448,8 +446,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 extra_params: LogType = None,
                                 prediction_column: str = "prediction",
                                 weight_column: str = None,
-                                encode_extra_cols: bool = False,
-                                encode_name_pat: str = "==") -> LearnerReturnType:
+                                encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
