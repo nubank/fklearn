@@ -45,7 +45,7 @@ def isolation_forest_learner(df: pd.DataFrame,
     default_params = {"n_jobs": -1, "random_state": 1729}
     params = default_params if not params else merge(default_params, params)
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     model = IsolationForest()
     model.set_params(**params)

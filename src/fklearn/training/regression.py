@@ -60,7 +60,7 @@ def linear_regression_learner(df: pd.DataFrame,
 
     weights = df[weight_column].values if weight_column else None
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     regr = LinearRegression(**params)
     regr.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -157,7 +157,7 @@ def xgb_regression_learner(df: pd.DataFrame,
     params = assoc(params, "eta", learning_rate)
     params = params if "objective" in params else assoc(params, "objective", 'reg:linear')
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, weight=weights, feature_names=map(str, features))
 
@@ -370,7 +370,7 @@ def gp_regression_learner(df: pd.DataFrame,
     params['alpha'] = alpha
     params['kernel'] = kernel
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     gp = GaussianProcessRegressor(**params)
     gp.fit(df[features], df[target])
@@ -476,7 +476,7 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     weights = df[weight_column].values if weight_column else None
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)

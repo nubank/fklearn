@@ -61,7 +61,7 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     weights = df[weight_column].values if weight_column else None
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     clf = LogisticRegression(**merged_params)
     clf.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -167,7 +167,7 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     weights = df[weight_column].values if weight_column else None
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, feature_names=map(str, features), weight=weights)
 
@@ -503,7 +503,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     weights = df[weight_column].values if weight_column else None
 
-    features = features if not encode_extra_cols else expand_features_encoded(df, features, encode_name_pat)
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)
