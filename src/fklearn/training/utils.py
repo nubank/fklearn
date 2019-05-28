@@ -41,7 +41,7 @@ def expand_features_encoded(df: pd.DataFrame,
         possible_prefixes = ["fklearn_feat__" + f for f in features]
         return [f for f in features_from_encoding if f.split("==")[0] in possible_prefixes]
 
-    encode_name_pat = "fklearn_feat_"
+    encode_name_pat = r"fklearn_feat__.*=="
     features_from_encoding = df.columns[df.columns.str.contains(encode_name_pat)].tolist()
     filtered_features_from_encoding = filter_non_features(features_from_encoding, features)
     if len(filtered_features_from_encoding):
