@@ -51,11 +51,8 @@ def linear_regression_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     def_params = {"fit_intercept": True}
@@ -149,11 +146,8 @@ def xgb_regression_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     import xgboost as xgb
@@ -367,11 +361,8 @@ def gp_regression_learner(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the predictions from the model.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     params = extra_params if extra_params else {}
@@ -473,11 +464,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     import lightgbm as lgbm

@@ -52,11 +52,8 @@ def logistic_classification_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     def_params = {"C": 0.1, "multi_class": "ovr"}
@@ -158,11 +155,8 @@ def xgb_classification_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     import xgboost as xgb
@@ -497,11 +491,8 @@ def lgbm_classification_learner(df: pd.DataFrame,
     weight_column : str, optional
         The name of the column with scores to weight the data.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     import lightgbm as lgbm

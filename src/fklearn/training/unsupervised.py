@@ -38,11 +38,8 @@ def isolation_forest_learner(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the predictions from the model.
 
-    encode_extra_cols : bool (default: False)
-        If True, treats all columns in `df` which contain `encode_name_pat` as feature columns.
-
-    encode_name_pat : str (default: "==")
-        Pattern defining the names of encoded columns.
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     default_params = {"n_jobs": -1, "random_state": 1729}
