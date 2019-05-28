@@ -16,8 +16,7 @@ def isolation_forest_learner(df: pd.DataFrame,
                              features: List[str],
                              params: Dict[str, Any] = None,
                              prediction_column: str = "prediction",
-                             encode_extra_cols: bool = False,
-                             encode_name_pat: str = "==") -> LearnerReturnType:
+                             encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an anomaly detection algorithm (Isolation Forest) to the dataset
 
