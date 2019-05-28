@@ -8,7 +8,7 @@ import toolz as fp
 from fklearn.training.imputation import placeholder_imputer
 from fklearn.training.pipeline import build_pipeline
 from fklearn.training.regression import xgb_regression_learner
-from fklearn.training.transformation import count_categorizer
+from fklearn.training.transformation import count_categorizer, onehot_categorizer
 
 
 def test_build_pipeline():
@@ -163,3 +163,41 @@ def test_build_pipeline_serialisation():
 
     assert log["__fkml__"] == fkml
     assert "obj" not in log.keys()
+
+
+def test_build_pipeline_with_onehotencoder():
+    df_train = pd.DataFrame({
+        'id': ["id1", "id2", "id3", "id4", "id3", "id4"],
+        'x1': [10.0, 13.0, 10.0, 13.0, None, 13.0],
+        "x2": [0, 1, 1, 0, 1, 0],
+        "cat": ["c1", "c1", "c2", None, "c2", "c4"],
+        'y': [2.3, 4.0, 100.0, -3.9, 100.0, -3.9]
+    })
+
+    df_test = pd.DataFrame({
+        'id': ["id4", "id4", "id5", "id6", "id5", "id6"],
+        'x1': [12.0, 1000.0, -4.0, 0.0, -4.0, 0.0],
+        "x2": [1, 1, 0, None, 0, 1],
+        "cat": ["c1", "c2", "c5", None, "c2", "c3"],
+        'y': [1.3, -4.0, 0.0, 49, 0.0, 49]
+    })
+
+    features = ["x1", "x2", "cat"]
+    target = "y"
+
+    train_fn = build_pipeline(
+        placeholder_imputer(columns_to_impute=["x1", "x2"], placeholder_value=-999),
+        onehot_categorizer(columns_to_categorize=["cat"], hardcode_nans=True),
+        xgb_regression_learner(features=features,
+                               target=target,
+                               num_estimators=20,
+                               extra_params={"seed": 42}))
+
+    predict_fn, pred_train, log = train_fn(df_train)
+
+    pred_test = predict_fn(df_test)
+
+    expected_feature_columns_after_encoding = ["x1", "x2", "fklearn_feat__cat==c1", "fklearn_feat__cat==c2",
+                                               "fklearn_feat__cat==c4", "fklearn_feat__cat==nan"]
+
+    assert set(pred_test.columns) == set(expected_feature_columns_after_encoding + ["id", target, "prediction"])
