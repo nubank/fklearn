@@ -33,7 +33,7 @@ def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> Unc
 
 def expand_features_encoded(df: pd.DataFrame,
                             features: List[str]) -> List[str]:
-    def extract_original_name(encoded_name):
+    def extract_original_name(encoded_name: str) -> str:
         return re.search("fklearn_feat__(.*)==", encoded_name).group(1)
 
     encode_name_pat = "fklearn_feat_"
