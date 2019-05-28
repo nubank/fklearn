@@ -1,5 +1,6 @@
 from functools import wraps
 from time import time
+import re
 from typing import Any, List
 
 import pandas as pd
@@ -31,9 +32,15 @@ def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> Unc
 
 
 def expand_features_encoded(df: pd.DataFrame,
-                            features: List[str],
-                            encode_name_pat: str) -> List[str]:
-    encoded_features = df.columns[df.columns.str.contains(encode_name_pat)].tolist()
-    pre_encoded_names = set([f.split(encode_name_pat)[0] for f in encoded_features])
-    not_encoded_features = [f for f in features if f not in pre_encoded_names]
-    return not_encoded_features + encoded_features
+                            features: List[str]) -> List[str]:
+    def extract_original_name(encoded_name):
+        return re.search("fklearn_feat__(.*)==", encoded_name).group(1)
+
+    encode_name_pat = "fklearn_feat_"
+    features_from_encoding = df.columns[df.columns.str.contains(encode_name_pat)].tolist()
+    if len(features_from_encoding):
+        original_encoded_feature_names = set([extract_original_name(f) for f in features_from_encoding])
+        not_encoded_features = [f for f in features if f not in original_encoded_feature_names]
+        return not_encoded_features + features_from_encoding
+    else:
+        return features
