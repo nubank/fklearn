@@ -20,8 +20,7 @@ def linear_regression_learner(df: pd.DataFrame,
                               params: Dict[str, Any] = None,
                               prediction_column: str = "prediction",
                               weight_column: str = None,
-                              encode_extra_cols: bool = False,
-                              encode_name_pat: str = "==") -> LearnerReturnType:
+                              encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an linear regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -101,8 +100,7 @@ def xgb_regression_learner(df: pd.DataFrame,
                            extra_params: Dict[str, Any] = None,
                            prediction_column: str = "prediction",
                            weight_column: str = None,
-                           encode_extra_cols: bool = False,
-                           encode_name_pat: str = "==") -> LearnerReturnType:
+                           encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an XGBoost regressor to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then it fits a XGBoost
@@ -323,8 +321,7 @@ def gp_regression_learner(df: pd.DataFrame,
                           return_std: bool = False,
                           extra_params: Dict[str, Any] = None,
                           prediction_column: str = "prediction",
-                          encode_extra_cols: bool = False,
-                          encode_name_pat: str = "==") -> LearnerReturnType:
+                          encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an gaussian process regressor to the dataset.
 
@@ -426,8 +423,7 @@ def lgbm_regression_learner(df: pd.DataFrame,
                             extra_params: Dict[str, Any] = None,
                             prediction_column: str = "prediction",
                             weight_column: str = None,
-                            encode_extra_cols: bool = False,
-                            encode_name_pat: str = "==") -> LearnerReturnType:
+                            encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
 
