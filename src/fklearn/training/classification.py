@@ -229,7 +229,8 @@ def catboost_classification_learner(df: pd.DataFrame,
                                     num_estimators: int = 100,
                                     extra_params: LogType = None,
                                     prediction_column: str = "prediction",
-                                    weight_column: str = None) -> LearnerReturnType:
+                                    weight_column: str = None,
+                                    encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an CatBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a CatBoost
@@ -278,6 +279,9 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
     from catboost import Pool, CatBoostClassifier
     import catboost
@@ -286,6 +290,8 @@ def catboost_classification_learner(df: pd.DataFrame,
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
     params = params if "objective" in params else assoc(params, "objective", 'Logloss')
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     cat_features = params["cat_features"] if "cat_features" in params else None
 
