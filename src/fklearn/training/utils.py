@@ -33,20 +33,52 @@ def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> Unc
 
 def expand_features_encoded(df: pd.DataFrame,
                             features: List[str]) -> List[str]:
-    def extract_original_name(encoded_name: str) -> str:
-        return re.search("fklearn_feat__(.*)==", encoded_name).group(1)
 
-    def filter_non_features(features_from_encoding: List[str],
-                            features: List[str]) -> List[str]:
-        possible_prefixes = ["fklearn_feat__" + f for f in features]
-        return [f for f in features_from_encoding if f.split("==")[0] in possible_prefixes]
+    """
+    Expand the list of features to include features created automatically
+    by fklearn in encoders such as Onehot-encoder.
+    All features created by fklearn have the naming pattern `fklearn_feat__col==val`.
+    This function looks for these names in the DataFrame columns, checks if they can
+    be derivative of any of the features listed in `features`, adds them to the new
+    list of features and removes the original names from the list.
 
-    encode_name_pat = r"fklearn_feat__.*=="
-    features_from_encoding = df.columns[df.columns.str.contains(encode_name_pat)].tolist()
-    filtered_features_from_encoding = filter_non_features(features_from_encoding, features)
-    if len(filtered_features_from_encoding):
-        original_encoded_feature_names = set([extract_original_name(f) for f in filtered_features_from_encoding])
-        not_encoded_features = [f for f in features if f not in original_encoded_feature_names]
-        return not_encoded_features + filtered_features_from_encoding
-    else:
-        return features
+    E.g. df has columns `col1` with values 0 and 1 and `col2`. After Onehot-encoding
+    `col1` df will have columns `fklearn_feat_col1==0`, `fklearn_feat_col1==1`, `col2`.
+    This function will then add `fklearn_feat_col1==0` and `fklearn_feat_col1==1` to
+    the list of features and remove `col1`. If for some reason df also has another
+    column `fklearn_feat_col3==x` but `col3` is not on the list of features, this
+    column will not be added.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        A Pandas' DataFrame with all features.
+
+    features : list of str
+        The original list of features.
+    """
+
+    def fklearn_features(df: pd.DataFrame) -> List[str]:
+        feature_naming_pat = r"fklearn_feat__.*=="
+        return df.columns[df.columns.str.contains(feature_naming_pat)].tolist()
+
+    def feature_prefix(feature: str) -> str:
+        return feature.split("==")[0]
+
+    def filter_non_listed_features(fklearn_features: List[str], features: List[str]) -> List[str]:
+        possible_prefixes_with_listed_features = ["fklearn_feat__" + f for f in features]
+        return [f for f in fklearn_features if feature_prefix(f) in possible_prefixes_with_listed_features]
+
+    def extract_original_names(encoded_features: List[str]) -> List[str]:
+        return [re.search("fklearn_feat__(.*)==", name).group(1) for name in encoded_features]
+
+    def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
+        if not len(encoded_features):
+            return features
+        original_preencoded_features = extract_original_names(encoded_features)
+        return [f for f in features if f not in original_preencoded_features]
+
+    all_fklearn_features = fklearn_features(df)
+    encoded_features = filter_non_listed_features(all_fklearn_features, features)
+    not_encoded_features = remove_original_pre_encoded_features(features, encoded_features)
+    return not_encoded_features + encoded_features
