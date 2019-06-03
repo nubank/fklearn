@@ -71,7 +71,10 @@ def expand_features_encoded(df: pd.DataFrame,
 
     def remove_original_pre_encoded_features(features, encoded_features):
         expr = r"fklearn_feat__(.*)=="
-        original_preencoded_features = set(reduce(lambda x, y: x + y, (map(lambda x: re.findall(expr, x), encoded_features)), []))
+        original_preencoded_features = set(reduce(lambda x, y: x + y,
+                                                  (map(lambda x: re.findall(expr, x),
+                                                       encoded_features)),
+                                                  []))
         return [f for f in features if f not in original_preencoded_features]
 
     all_fklearn_features = fklearn_features(df)
