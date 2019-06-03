@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import reduce, wraps
 from time import time
 import re
 from typing import Any, List
@@ -69,13 +69,9 @@ def expand_features_encoded(df: pd.DataFrame,
         possible_prefixes_with_listed_features = ["fklearn_feat__" + f for f in features]
         return [f for f in fklearn_features if feature_prefix(f) in possible_prefixes_with_listed_features]
 
-    def extract_original_names(encoded_features: List[str]) -> List[str]:
-        return [re.search("fklearn_feat__(.*)==", name).group(1) for name in encoded_features]
-
-    def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
-        if not len(encoded_features):
-            return features
-        original_preencoded_features = extract_original_names(encoded_features)
+    def remove_original_pre_encoded_features(features, encoded_features):
+        expr = r"fklearn_feat__(.*)=="
+        original_preencoded_features = set(reduce(lambda x, y: x + y, (map(lambda x: re.findall(expr, x), encoded_features)), []))
         return [f for f in features if f not in original_preencoded_features]
 
     all_fklearn_features = fklearn_features(df)
