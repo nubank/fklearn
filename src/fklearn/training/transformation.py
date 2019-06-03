@@ -693,7 +693,7 @@ def onehot_categorizer(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique())[int(drop_first_column):])
+    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique()))
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:

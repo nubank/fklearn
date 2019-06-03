@@ -168,7 +168,7 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
                           target_column: str = "target",
                           eval_name: str = None) -> EvalReturnType:
     """
-    Computes the recall score, given true label and prediction scores.
+    Computes the F-beta score, given true label and prediction scores.
 
     Parameters
     ----------
