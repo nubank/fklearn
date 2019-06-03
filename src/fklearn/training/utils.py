@@ -59,15 +59,14 @@ def expand_features_encoded(df: pd.DataFrame,
     """
 
     def fklearn_features(df: pd.DataFrame) -> List[str]:
-        feature_naming_pat = r"fklearn_feat__.*=="
-        return df.columns[df.columns.str.contains(feature_naming_pat)].tolist()
+        return list(filter(lambda col: col.startswith("fklearn_feat__"), df.columns))
 
     def feature_prefix(feature: str) -> str:
         return feature.split("==")[0]
 
     def filter_non_listed_features(fklearn_features: List[str], features: List[str]) -> List[str]:
         possible_prefixes_with_listed_features = ["fklearn_feat__" + f for f in features]
-        return [f for f in fklearn_features if feature_prefix(f) in possible_prefixes_with_listed_features]
+        return list(filter(lambda col: feature_prefix(col) in possible_prefixes_with_listed_features, fklearn_features))
 
     def remove_original_pre_encoded_features(features, encoded_features):
         expr = r"fklearn_feat__(.*)=="
@@ -75,7 +74,7 @@ def expand_features_encoded(df: pd.DataFrame,
                                                   (map(lambda x: re.findall(expr, x),
                                                        encoded_features)),
                                                   []))
-        return [f for f in features if f not in original_preencoded_features]
+        return list(filter(lambda col: col not in original_preencoded_features, features))
 
     all_fklearn_features = fklearn_features(df)
     encoded_features = filter_non_listed_features(all_fklearn_features, features)
