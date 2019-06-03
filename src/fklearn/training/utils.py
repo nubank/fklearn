@@ -68,7 +68,7 @@ def expand_features_encoded(df: pd.DataFrame,
         possible_prefixes_with_listed_features = ["fklearn_feat__" + f for f in features]
         return list(filter(lambda col: feature_prefix(col) in possible_prefixes_with_listed_features, fklearn_features))
 
-    def remove_original_pre_encoded_features(features, encoded_features):
+    def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
         expr = r"fklearn_feat__(.*)=="
         original_preencoded_features = set(reduce(lambda x, y: x + y,
                                                   (map(lambda x: re.findall(expr, x),
