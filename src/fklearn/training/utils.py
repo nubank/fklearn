@@ -1,7 +1,7 @@
 from functools import reduce, wraps
 from time import time
 import re
-from typing import Any, List, Set
+from typing import Any, List
 
 import pandas as pd
 from toolz import curry
@@ -70,10 +70,10 @@ def expand_features_encoded(df: pd.DataFrame,
 
     def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
         expr = r"fklearn_feat__(.*)=="
-        original_preencoded_features: Set[str] = set(reduce(lambda x, y: x + y,
-                                                            (map(lambda x: re.findall(expr, x),
-                                                                 encoded_features)),
-                                                            []))
+        original_preencoded_features = reduce(lambda x, y: x + y,
+                                              (map(lambda x: re.findall(expr, x),
+                                                   encoded_features)),
+                                              [])
         return list(filter(lambda col: col not in original_preencoded_features, features))
 
     all_fklearn_features = fklearn_features(df)
