@@ -74,7 +74,7 @@ def expand_features_encoded(df: pd.DataFrame,
                                                          (map(lambda x: re.findall(expr, x),
                                                               encoded_features)),
                                                          [])
-        return list(filter(lambda col: col not in original_preencoded_features, features))
+        return list(filter(lambda col: col not in set(original_preencoded_features), features))
 
     all_fklearn_features = fklearn_features(df)
     encoded_features = filter_non_listed_features(all_fklearn_features, features)
