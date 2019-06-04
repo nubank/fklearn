@@ -115,7 +115,7 @@ In order to check if your code follow our style, you can run from the repo root 
   python -m pip install -q flake8
   python -m flake8 \
   --ignore=E731,W503 \
-  --filename=*.py \
+  --filename=\*.py \
   --exclude=__init__.py \
   --show-source \
   --statistics \
