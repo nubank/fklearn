@@ -9,7 +9,7 @@ from sklearn import __version__ as sk_version
 
 from fklearn.types import LearnerReturnType, LogType
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
-from fklearn.training.utils import log_learner_time
+from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
@@ -19,7 +19,8 @@ def logistic_classification_learner(df: pd.DataFrame,
                                     target: str,
                                     params: LogType = None,
                                     prediction_column: str = "prediction",
-                                    weight_column: str = None) -> LearnerReturnType:
+                                    weight_column: str = None,
+                                    encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an logistic regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -50,12 +51,17 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     def_params = {"C": 0.1, "multi_class": "ovr"}
     merged_params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     clf = LogisticRegression(**merged_params)
     clf.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -98,7 +104,8 @@ def xgb_classification_learner(df: pd.DataFrame,
                                num_estimators: int = 100,
                                extra_params: LogType = None,
                                prediction_column: str = "prediction",
-                               weight_column: str = None) -> LearnerReturnType:
+                               weight_column: str = None,
+                               encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
@@ -147,7 +154,11 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
+
     import xgboost as xgb
 
     params = extra_params if extra_params else {}
@@ -155,6 +166,8 @@ def xgb_classification_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'binary:logistic')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, feature_names=map(str, features), weight=weights)
 
@@ -216,7 +229,8 @@ def catboost_classification_learner(df: pd.DataFrame,
                                     num_estimators: int = 100,
                                     extra_params: LogType = None,
                                     prediction_column: str = "prediction",
-                                    weight_column: str = None) -> LearnerReturnType:
+                                    weight_column: str = None,
+                                    encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an CatBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a CatBoost
@@ -265,6 +279,9 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
     from catboost import Pool, CatBoostClassifier
     import catboost
@@ -273,6 +290,8 @@ def catboost_classification_learner(df: pd.DataFrame,
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
     params = params if "objective" in params else assoc(params, "objective", 'Logloss')
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     cat_features = params["cat_features"] if "cat_features" in params else None
 
@@ -426,7 +445,8 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 num_estimators: int = 100,
                                 extra_params: LogType = None,
                                 prediction_column: str = "prediction",
-                                weight_column: str = None) -> LearnerReturnType:
+                                weight_column: str = None,
+                                encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -476,7 +496,11 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
+
     import lightgbm as lgbm
 
     params = extra_params if extra_params else {}
@@ -484,6 +508,8 @@ def lgbm_classification_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'binary')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)
