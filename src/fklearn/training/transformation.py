@@ -722,7 +722,7 @@ def onehot_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-quantile_biner.__doc__ += learner_return_docstring("Onehot Categorizer")
+onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
 @curry
