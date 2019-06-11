@@ -301,29 +301,29 @@ def test_onehot_categorizer():
 
     expected_output_train_no_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==female", [1, 0, 0, 0]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("region==MG", [0, 0, 1, 0]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0])
+        ("fklearn_feat__sex==female", [1, 0, 0, 0]),
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__region==MG", [0, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0])
     )))
 
     expected_output_train_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==female", [1, 0, 0, 0]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("sex==nan", [0, 0, 0, 0]),
-        ("region==MG", [0, 0, 1, 0]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0]),
-        ("region==nan", [0, 0, 0, 1])
+        ("fklearn_feat__sex==female", [1, 0, 0, 0]),
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 0]),
+        ("fklearn_feat__region==MG", [0, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0]),
+        ("fklearn_feat__region==nan", [0, 0, 0, 1])
     )))
 
     expected_output_train_drop_first = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0])
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0])
     )))
 
     input_df_test = pd.DataFrame({
@@ -334,29 +334,29 @@ def test_onehot_categorizer():
 
     expected_output_test_no_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==female", [0, 1, 0, 0]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("region==MG", [0, 0, 0, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0])
+        ("fklearn_feat__sex==female", [0, 1, 0, 0]),
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__region==MG", [0, 0, 0, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0])
     )))
 
     expected_output_test_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==female", [0, 1, 0, 0]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("sex==nan", [0, 0, 0, 1]),
-        ("region==MG", [0, 0, 0, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0]),
-        ("region==nan", [1, 1, 0, 0])
+        ("fklearn_feat__sex==female", [0, 1, 0, 0]),
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 1]),
+        ("fklearn_feat__region==MG", [0, 0, 0, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0]),
+        ("fklearn_feat__region==nan", [1, 1, 0, 0])
     )))
 
     expected_output_test_drop_first = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0])
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0])
     )))
 
     # Test without hardcoding NaNs

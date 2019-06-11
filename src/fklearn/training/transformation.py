@@ -670,6 +670,9 @@ def onehot_categorizer(df: pd.DataFrame,
                        store_mapping: bool = False) -> LearnerReturnType:
     """
     Onehot encoding on categorical columns.
+    Encoded columns are removed and substituted by columns named
+    `fklearn_feat__col==val`, where `col` is the name of the column
+    and `val` is one of the values the feature can assume.
 
     Parameters
     ----------
@@ -690,16 +693,17 @@ def onehot_categorizer(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique())[int(drop_first_column):])
+    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique()))
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: (col + "==" + str(categ), (new_df[col] == categ).astype(int)),
+        make_dummies = lambda col: dict(map(lambda categ: ("fklearn_feat__" + col + "==" + str(categ),
+                                                           (new_df[col] == categ).astype(int)),
                                             vec[col]))
 
         oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {col + "==nan": (~new_df[col].isin(vec[col])).astype(
-                                                    int)} if hardcode_nans
+                                                {"fklearn_feat__" + col + "==" + "nan":
+                                                    (~new_df[col].isin(vec[col])).astype(int)} if hardcode_nans
                                                 else {}).items(),
                               columns_to_categorize))
 
@@ -718,7 +722,7 @@ def onehot_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-quantile_biner.__doc__ += learner_return_docstring("Onehot Categorizer")
+onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
 @curry

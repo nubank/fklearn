@@ -9,7 +9,7 @@ from sklearn import __version__ as sk_version
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
 from fklearn.types import LearnerReturnType
-from fklearn.training.utils import log_learner_time
+from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
@@ -19,7 +19,8 @@ def linear_regression_learner(df: pd.DataFrame,
                               target: str,
                               params: Dict[str, Any] = None,
                               prediction_column: str = "prediction",
-                              weight_column: str = None) -> LearnerReturnType:
+                              weight_column: str = None,
+                              encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an linear regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -49,12 +50,17 @@ def linear_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     def_params = {"fit_intercept": True}
     params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     regr = LinearRegression(**params)
     regr.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -90,7 +96,8 @@ def xgb_regression_learner(df: pd.DataFrame,
                            num_estimators: int = 100,
                            extra_params: Dict[str, Any] = None,
                            prediction_column: str = "prediction",
-                           weight_column: str = None) -> LearnerReturnType:
+                           weight_column: str = None,
+                           encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an XGBoost regressor to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then it fits a XGBoost
@@ -138,13 +145,19 @@ def xgb_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
+
     import xgboost as xgb
 
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
     params = params if "objective" in params else assoc(params, "objective", 'reg:linear')
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, weight=weights, feature_names=map(str, features))
 
@@ -301,7 +314,8 @@ def gp_regression_learner(df: pd.DataFrame,
                           extra_variance: Union[str, float] = "fit",
                           return_std: bool = False,
                           extra_params: Dict[str, Any] = None,
-                          prediction_column: str = "prediction") -> LearnerReturnType:
+                          prediction_column: str = "prediction",
+                          encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an gaussian process regressor to the dataset.
 
@@ -347,12 +361,16 @@ def gp_regression_learner(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the predictions from the model.
 
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     params = extra_params if extra_params else {}
 
     params['alpha'] = alpha
     params['kernel'] = kernel
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     gp = GaussianProcessRegressor(**params)
     gp.fit(df[features], df[target])
@@ -395,7 +413,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
                             num_estimators: int = 100,
                             extra_params: Dict[str, Any] = None,
                             prediction_column: str = "prediction",
-                            weight_column: str = None) -> LearnerReturnType:
+                            weight_column: str = None,
+                            encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
 
@@ -444,7 +463,11 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
-     """
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+    """
+
     import lightgbm as lgbm
 
     params = extra_params if extra_params else {}
@@ -452,6 +475,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'regression')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)
