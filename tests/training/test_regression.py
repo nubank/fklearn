@@ -227,7 +227,7 @@ def test_catboost_regressor_learner():
 def test_custom_supervised_model_learner():
     from sklearn import tree
     from sklearn.gaussian_process import GaussianProcessRegressor
-    
+
     df_train_classification = pd.DataFrame({
         'id': ["id1", "id2", "id3", "id4"],
         'x1': [10.0, 13.0, 10.0, 13.0],
@@ -252,32 +252,32 @@ def test_custom_supervised_model_learner():
         "x2": [1, 1, 0, 1],
         'y': [1.3, -4.0, 0.0, 49]
     })
-    
+
     features = ["x1", "x2"]
     custom_classifier_learner = custom_supervised_model_learner(
-        features = features, 
-        target = 'y', 
-        model = tree.DecisionTreeClassifier(), 
-        supervised_type = 'classification',
-        log = {'DecisionTreeClassifier': None})
+        features=features,
+        target='y',
+        model=tree.DecisionTreeClassifier(),
+        supervised_type='classification',
+        log={'DecisionTreeClassifier': None})
     predict_fn_classification, pred_train_classification, log = custom_classifier_learner(df_train_classification)
     pred_test_classification = predict_fn_classification(df_test_classification)
 
-    expected_col_train = df_train_classification.columns.tolist() + ["prediction_0","prediction_1"]
-    expected_col_test = df_test_classification.columns.tolist() + ["prediction_0","prediction_1"]
+    expected_col_train = df_train_classification.columns.tolist() + ["prediction_0", "prediction_1"]
+    expected_col_test = df_test_classification.columns.tolist() + ["prediction_0", "prediction_1"]
     assert(Counter(expected_col_train) == Counter(pred_train_classification.columns.tolist()))
     assert(Counter(expected_col_test) == Counter(pred_test_classification.columns.tolist()))
     assert(pred_test_classification.prediction_0.max() <= 1)
     assert(pred_test_classification.prediction_0.min() >= 0)
     assert(pred_test_classification.prediction_1.max() <= 1)
-    assert(pred_test_classification.prediction_1.min() >= 0)    
-    
+    assert(pred_test_classification.prediction_1.min() >= 0)
+
     custom_regression_learner = custom_supervised_model_learner(
-        features = features, 
-        target = 'y', 
-        model = GaussianProcessRegressor(), 
-        supervised_type = 'regression',
-        log = {'GaussianProcessRegressor': None})
+        features=features,
+        target='y',
+        model=GaussianProcessRegressor(),
+        supervised_type='regression',
+        log={'GaussianProcessRegressor': None})
     predict_fn, pred_train, log = custom_regression_learner(df_train_regression)
     pred_test = predict_fn(df_test_regression)
 
@@ -287,6 +287,3 @@ def test_custom_supervised_model_learner():
     assert(Counter(expected_col_test) == Counter(pred_test.columns.tolist()))
     assert((pred_test.columns == pred_train.columns).all())
     assert("prediction" in pred_test.columns)
-    
-
-
