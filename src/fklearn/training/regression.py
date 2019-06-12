@@ -516,3 +516,83 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
 
 lgbm_regression_learner.__doc__ += learner_return_docstring("LGBM Regressor")
+
+
+@curry
+@log_learner_time(learner_name='custom_supervised_model_learner')
+def custom_supervised_model_learner(df: pd.DataFrame,
+                         features: List[str],
+                         target: str,
+                         model: Any,
+                         supervised_type: str,
+                         log: Dict[str,Dict],
+                         prediction_column: str = "prediction") -> LearnerReturnType:
+    """
+    Fits a custom model to the dataset. 
+    Return the predict function, the predictions for the input dataset and a log describing the model.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from features.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+
+    model: Object
+        Machine learning model to be used for regression or clasisfication
+        model object must have ".fit" attribute to train the data.
+        For classification problems, it also needs ".predict_proba" attribute
+        For regression problemsm it needs ".predict" attribute
+
+    supervised_type: str
+        Type of supervised learning to be used
+        The options are: 'classification' or 'regression'
+
+    log : Dict[str,Dict]
+        Log with additional information of the custom model used.
+        It must start with just one element with the model name.
+            
+    prediction_column : str
+        The name of the column with the predictions from the model.
+        For classification problems, all probabilities wiill be added: for i in range(0,n_classes).
+        For regression just prediction_column will be added.
+        
+    """
+    assert(len(log) == 1), "\'log\' dictionary must start with model name"
+    assert(supervised_type == 'classification' or supervised_type == 'regression') , "supervised_type options are: \'classification\' or \'regression\'"
+    assert(hasattr(model,'fit')) , "\'model\' object must have \'fit\' attribute"
+    if supervised_type == 'classification':
+        assert(hasattr(model,'predict_proba')), "\'model\' object for classification must have \'predict_proba\' attribute"
+    elif supervised_type == 'regression':
+        assert(hasattr(model,'predict')), "\'model\' object for regression must have \'predict\' attribute"
+
+    model.fit(df[features].values, df[target].values)
+    modelName = list(log.keys())[0]
+    
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        if supervised_type == 'classification':
+            pred = model.predict_proba(new_df[features].values)
+            col_dict = {}
+            for (key, value) in enumerate(pred.T):
+                col_dict.update({prediction_column + "_" + str(key): value})
+        elif supervised_type == 'regression':
+            col_dict = {prediction_column: model.predict(new_df[features].values)}
+        
+        return new_df.assign(**col_dict)
+
+    p.__doc__ = learner_pred_fn_docstring("custom_supervised_model_learner")
+
+    return p, p(df), log
+
+custom_supervised_model_learner.__doc__ += learner_return_docstring("Custom Supervised Model Learner")
+
+
+
