@@ -39,7 +39,7 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     params : dict
         The LogisticRegression parameters in the format {"par_name": param}. See:
@@ -126,7 +126,7 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -259,7 +259,7 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -392,7 +392,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     vectorizer_params : dict
         The TfidfVectorizer parameters in the format {"par_name": param}. See:
@@ -488,7 +488,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
