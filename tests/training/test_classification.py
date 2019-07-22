@@ -173,7 +173,7 @@ def test_xgb_classification_learner():
     pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
 
     expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
-                        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
     assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
     assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
 
@@ -290,7 +290,7 @@ def test_catboost_classification_learner():
     pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
 
     expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
-                        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
     assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
     assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
 
@@ -479,6 +479,6 @@ def test_lgbm_classification_learner():
     pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
 
     expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
-                        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
     assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
     assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
