@@ -192,9 +192,9 @@ def xgb_classification_learner(df: pd.DataFrame,
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "multi:softprob":
-                shap_values_multiclass = {"shap_values_" + str(class_index): list(value)
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {"shap_expected_value_" + str(class_index):
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
                                                   np.repeat(expected_value, len(class_shap_values))
                                                   for (class_index, (expected_value, class_shap_values))
                                                   in enumerate(zip(shap_expected_value, shap_values))}
@@ -330,9 +330,9 @@ def catboost_classification_learner(df: pd.DataFrame,
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "MultiClass":
-                shap_values_multiclass = {"shap_values_" + str(class_index): list(value)
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {"shap_expected_value_" + str(class_index):
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
                                                   np.repeat(expected_value, len(class_shap_values))
                                                   for (class_index, (expected_value, class_shap_values))
                                                   in enumerate(zip(shap_expected_value, shap_values))}
@@ -549,9 +549,9 @@ def lgbm_classification_learner(df: pd.DataFrame,
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "multiclass":
-                shap_values_multiclass = {"shap_values_" + str(class_index): list(value)
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {"shap_expected_value_" + str(class_index):
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
                                                   np.repeat(expected_value, len(class_shap_values))
                                                   for (class_index, (expected_value, class_shap_values))
                                                   in enumerate(zip(shap_expected_value, shap_values))}
