@@ -213,3 +213,6 @@ Temporary Items
 
 .pytest_cache/
 .iml
+
+# Vim swap files
+*.swp

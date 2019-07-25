@@ -1,7 +1,8 @@
 from collections import OrderedDict
 
+import math
 import pandas as pd
-from numpy import nan, round, sqrt
+from numpy import nan, round, sqrt, floor, log as ln
 from numpy.testing import assert_almost_equal
 
 from fklearn.training.transformation import \
@@ -497,17 +498,23 @@ def test_discrete_ecdfer():
 def test_custom_transformer():
     input_df = pd.DataFrame({
         'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
         'target': [1, 4, 9]
     })
 
     expected = pd.DataFrame({
         'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
         'target': [1.0, 2.0, 3.0]
     })
 
     expected2 = pd.DataFrame({
         'feat1': [1, 4, 9],
-        'target': [1.0, 2.0, 3.0]
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
+        'target': [1, 4, 9]
     })
 
     transformer_fn, data, log = custom_transformer(input_df, ["target"], sqrt)
@@ -519,6 +526,30 @@ def test_custom_transformer():
 
     # the transformed input df should contain the squared value of the feat1 column
     assert expected2.equals(data)
+
+    expected3 = pd.DataFrame({
+        'feat1': [1, 2, 3],
+        'feat2': [1.0, 2.0, 3.0],
+        'feat3': [1.5, 2.5, 3.5],
+        'target': [1, 4, 9]
+    })
+
+    expected4 = pd.DataFrame({
+        'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.0, 2.0, 3.0],
+        'target': [1, 4, 9]
+    })
+
+    transformer_fn, data, log = custom_transformer(input_df, ["feat2"], ln, is_vectorized=True)
+
+    # the transformed input df should contain the square root of the target column
+    assert expected3.equals(data)
+
+    transformer_fn, data, log = custom_transformer(input_df, ["feat3"], floor, is_vectorized=True)
+
+    # the transformed input df should contain the squared value of the feat1 column
+    assert expected4.equals(data)
 
 
 def test_null_injector():
