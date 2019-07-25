@@ -768,7 +768,8 @@ standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 @log_learner_time(learner_name='custom_transformer')
 def custom_transformer(df: pd.DataFrame,
                        columns_to_transform: List[str],
-                       transformation_function: Callable[[pd.DataFrame], pd.DataFrame]) -> LearnerReturnType:
+                       transformation_function: Callable[[pd.DataFrame], pd.DataFrame],
+                       is_vectorized: bool = False) -> LearnerReturnType:
     """
     Applies a custom function to the desired columns.
 
@@ -786,10 +787,11 @@ def custom_transformer(df: pd.DataFrame,
 
     """
 
-    def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
-        new_data_set[columns_to_transform] = new_data_set[columns_to_transform].swifter.apply(transformation_function)
+    def p(df: pd.DataFrame) -> pd.DataFrame:
+        if is_vectorized:
+            return df.assign(**{col: transformation_function(df[col]) for col in columns_to_transform})
 
-        return new_data_set
+        return df.assign(**{col: df[col].swifter.apply(transformation_function) for col in columns_to_transform})
 
     p.__doc__ = learner_pred_fn_docstring("custom_transformer")
 
