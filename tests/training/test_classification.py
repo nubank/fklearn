@@ -139,7 +139,7 @@ def test_xgb_classification_learner():
     assert pred_test_binary.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
 
-    # SHAP test (binary only)
+    # SHAP test
     pred_shap = predict_fn_binary(df_test_binary, apply_shap=True)
     assert "shap_values" in pred_shap.columns
     assert "shap_expected_value" in pred_shap.columns
@@ -168,6 +168,14 @@ def test_xgb_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
+
+    # SHAP test multinomial
+    pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
+
+    expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+    assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
+    assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
 
 
 def test_catboost_classification_learner():
@@ -250,7 +258,7 @@ def test_catboost_classification_learner():
     assert pred_test_binary.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
 
-    # SHAP test (binary only)
+    # SHAP test
     pred_shap = predict_fn_binary(df_test_binary, apply_shap=True)
     assert "shap_values" in pred_shap.columns
     assert "shap_expected_value" in pred_shap.columns
@@ -277,6 +285,14 @@ def test_catboost_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
+
+    # SHAP test multinomial
+    pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
+
+    expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+    assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
+    assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
 
     # test categorical case
     features = ["x1", "x2", "x3", "x4", "x5", "x6"]
@@ -431,7 +447,7 @@ def test_lgbm_classification_learner():
     assert pred_test_binary.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
 
-    # SHAP test (binary only)
+    # SHAP test
     pred_shap = predict_fn_binary(df_test_binary, apply_shap=True)
     assert "shap_values" in pred_shap.columns
     assert "shap_expected_value" in pred_shap.columns
@@ -458,3 +474,11 @@ def test_lgbm_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
+
+    # SHAP test multinomial
+    pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
+
+    expected_col_shap = expected_col_test + ["shap_values_0", "shap_values_1", "shap_values_2"] + \
+        ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
+    assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
+    assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)

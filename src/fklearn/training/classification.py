@@ -39,7 +39,7 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     params : dict
         The LogisticRegression parameters in the format {"par_name": param}. See:
@@ -126,7 +126,7 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -188,16 +188,24 @@ def xgb_classification_learner(df: pd.DataFrame,
         if apply_shap:
             import shap
             explainer = shap.TreeExplainer(bst)
-            shap_values = list(explainer.shap_values(new_df[features]))
+            shap_values = explainer.shap_values(new_df[features])
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
-
             if params["objective"] == "multi:softprob":
-                raise NotImplementedError("SHAP values are not implemented for multiclass XGBoost in fklearn")
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
+                                          for (class_index, value) in enumerate(shap_values)}
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
+                                                  np.repeat(expected_value, len(class_shap_values))
+                                                  for (class_index, (expected_value, class_shap_values))
+                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
+
             else:
-                col_dict = merge(col_dict, shap_output)
+                shap_values = list(shap_values)
+                shap_output = {"shap_values": shap_values,
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+
+            col_dict = merge(col_dict, shap_output)
 
         return new_df.assign(**col_dict)
 
@@ -251,7 +259,7 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -318,11 +326,22 @@ def catboost_classification_learner(df: pd.DataFrame,
         if apply_shap:
             import shap
             explainer = shap.TreeExplainer(cbr)
-            shap_values = list(explainer.shap_values(dtest))
+            shap_values = explainer.shap_values(dtest)
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+            if params["objective"] == "MultiClass":
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
+                                          for (class_index, value) in enumerate(shap_values)}
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
+                                                  np.repeat(expected_value, len(class_shap_values))
+                                                  for (class_index, (expected_value, class_shap_values))
+                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
+
+            else:
+                shap_values = list(shap_values)
+                shap_output = {"shap_values": shap_values,
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
 
             col_dict = merge(col_dict, shap_output)
 
@@ -373,7 +392,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     vectorizer_params : dict
         The TfidfVectorizer parameters in the format {"par_name": param}. See:
@@ -469,7 +488,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be discrete, since this is a classification model.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -526,16 +545,24 @@ def lgbm_classification_learner(df: pd.DataFrame,
         if apply_shap:
             import shap
             explainer = shap.TreeExplainer(bst)
-            shap_values = list(explainer.shap_values(new_df[features]))
+            shap_values = explainer.shap_values(new_df[features])
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
-
             if params["objective"] == "multiclass":
-                raise NotImplementedError("SHAP values are not implemented for multiclass LGBM in fkit-learn")
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
+                                          for (class_index, value) in enumerate(shap_values)}
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
+                                                  np.repeat(expected_value, len(class_shap_values))
+                                                  for (class_index, (expected_value, class_shap_values))
+                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
+
             else:
-                col_dict = merge(col_dict, shap_output)
+                shap_values = list(shap_values)
+                shap_output = {"shap_values": shap_values,
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+
+            col_dict = merge(col_dict, shap_output)
 
         return new_df.assign(**col_dict)
 
