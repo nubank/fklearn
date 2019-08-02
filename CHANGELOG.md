@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.14.2] - 2019-08-02
+- **Bug**
+    - Remove unused package
+    
 ## [1.14.0] - 2019-04-30
 - **Enhancement**
     - Validator accepts predict_oof as argument
