@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.13.5] - 2019-08-02
+- **Bug Fix**
+    - Remove unused package
+    
 ## [1.13.3] - 2019-04-24
 - **Bug Fix**
     - Fix warning in `placeholder_imputer`
