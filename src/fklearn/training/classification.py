@@ -86,8 +86,8 @@ def logistic_classification_learner(df: pd.DataFrame,
         'package': "sklearn",
         'package_version': sk_version,
         'feature_importance': dict(zip(features, clf.coef_.flatten())),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': clf}
 
     return p, p(df), log
 
@@ -219,8 +219,8 @@ def xgb_classification_learner(df: pd.DataFrame,
         'package_version': xgb.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': bst.get_score(),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': bst}
 
     return p, p(df), log
 
@@ -357,8 +357,8 @@ def catboost_classification_learner(df: pd.DataFrame,
         'package_version': catboost.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': cbr}
 
     return p, p(df), log
 
@@ -446,8 +446,8 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
         'parameters': assoc(params, "vocab_size", sparse_vect.shape[1]),
         'package': "sklearn",
         'package_version': sk_version,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': clf}
 
     return p, p(df), log
 

@@ -51,8 +51,8 @@ def isotonic_calibration_learner(df: pd.DataFrame,
         'prediction_column': prediction_column,
         'package': "sklearn",
         'package_version': sklearn.__version__,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': clf}
 
     return p, p(df), log
 
