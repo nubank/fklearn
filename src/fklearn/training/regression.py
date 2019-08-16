@@ -78,8 +78,8 @@ def linear_regression_learner(df: pd.DataFrame,
         'package': "sklearn",
         'package_version': sk_version,
         'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': regr}
 
     return p, p(df), log
 
@@ -190,8 +190,8 @@ def xgb_regression_learner(df: pd.DataFrame,
         'package_version': xgb.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': bst.get_score(),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': bst}
 
     return p, p(df), log
 
@@ -295,8 +295,8 @@ def catboost_regressor_learner(df: pd.DataFrame,
         'package_version': catboost.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': cbr}
 
     return p, p(df), log
 
@@ -395,8 +395,8 @@ def gp_regression_learner(df: pd.DataFrame,
         'prediction_column': prediction_column,
         'package': "sklearn",
         'package_version': sk_version,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': gp}
 
     return p, p(df), log
 
@@ -591,6 +591,8 @@ def custom_supervised_model_learner(df: pd.DataFrame,
         return new_df.assign(**col_dict)
 
     p.__doc__ = learner_pred_fn_docstring("custom_supervised_model_learner")
+
+    log["object"] = model
 
     return p, p(df), log
 
