@@ -124,14 +124,14 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         The out of ID sample and in time hold out set.
 
     outime_inspace_hdout : pandas.DataFrame
-        The out of ID sample and in time hold out set.
+        The in ID sample and out of time hold out set.
 
-    holdout_space : pandas.DataFrame
-        The out of ID sample and in time hold out set.
+    outime_outspace_hdout : pandas.DataFrame
+        The out of ID sample and out of time hold out set.
     """
     train_period = dataset[
         (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
-    outime_inspace_hdout = dataset[
+    outime_hdout = dataset[
         (dataset[time_column] >= train_end_date) & (dataset[time_column] < holdout_end_date)]
 
     if holdout_space is None:
@@ -149,6 +149,7 @@ def space_time_split_dataset(dataset: pd.DataFrame,
 
     train_set = train_period[~train_period[space_column].isin(holdout_space)]
     intime_outspace_hdout = train_period[train_period[space_column].isin(holdout_space)]
-    outime_outspace_hdout = outime_inspace_hdout[outime_inspace_hdout[space_column].isin(holdout_space)]
+    outime_outspace_hdout = outime_hdout[outime_hdout[space_column].isin(holdout_space)]
+    outime_inspace_hdout = outime_hdout[~outime_hdout[space_column].isin(holdout_space)]
 
     return train_set, intime_outspace_hdout, outime_inspace_hdout, outime_outspace_hdout
