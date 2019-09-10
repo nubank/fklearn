@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.15.1] - 2019-08-16
+- **Enhancement**
+    - Now learners that have a model exposes it in the logs as `object` key
+
+## [1.15.0] - 2019-08-12
+- **Enhancement**
+    - Make `custom_transformer` a pure function
+    - Remove unused requirements
+- **New**
+    - Now features created by one hot enconding can be used in the next steps of pipeline
+    - Shap multiclass support
+    - Custom model pipeline
+- **Bug Fix**
+    - Fix the way one hot encoding handle nans
+- **Documentation**
+    - Minor fix flake8 documentation to make it work in other shells
+    - Fix fbeta_score_evaluator docstring
+    - Fix typo on onehot_categorizer
+    - New tutorial from meetup presentation
+
 ## [1.14.0] - 2019-04-30
 - **Enhancement**
     - Validator accepts predict_oof as argument
