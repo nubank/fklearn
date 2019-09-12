@@ -734,7 +734,8 @@ def target_categorizer(df: pd.DataFrame,
                        ignore_unseen: bool = True,
                        store_mapping: bool = False) -> LearnerReturnType:
     """
-    Replaces categorical variables with the mean target value by category
+    Replaces categorical variables with the smoothed mean of the target variable by category.
+    Uses a weighted average with the overall mean of the target variable for smoothing.
 
     Parameters
     ----------
@@ -747,10 +748,11 @@ def target_categorizer(df: pd.DataFrame,
     target_column : str
         Target column name. Target can be binary or continuous.
 
-    smoothing: float
-        Weight given to overall target mean against category target mean.
+    smoothing : float
+        Weight given to overall target mean against target mean by category.
+        The value must be greater than or equal to 0
 
-    ignore_unseen : bool (default: True)
+    ignore_unseen : bool
         If True, unseen values will be encoded as nan
         If False, these will be replaced by target mean.
 
