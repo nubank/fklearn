@@ -480,6 +480,7 @@ def test_target_categorizer():
     assert_almost_equal(data[expected_output_train_continuous_target.columns].values,
                         expected_output_train_continuous_target.values, decimal=5)
 
+
 def test_standard_scaler():
     input_df_train = pd.DataFrame({
         "feat1_num": [1.0, 0.5, 100.0],
