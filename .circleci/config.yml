@@ -22,7 +22,7 @@
     name: Install package
     command: |
       . scripts/helpers.sh
-      install_package [test_deps]
+      install_package [devel]
 
   install-pandoc: &install-pandoc
     name: Install pandoc
