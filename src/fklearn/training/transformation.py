@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, List, Union, Optional
 import numpy as np
 import pandas as pd
 from numpy import nan
-import swifter  # NOQA
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
@@ -786,6 +785,7 @@ def custom_transformer(df: pd.DataFrame,
         and returns another DataFrame.
 
     """
+    import swifter  # NOQA
 
     def p(df: pd.DataFrame) -> pd.DataFrame:
         if is_vectorized:
