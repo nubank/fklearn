@@ -725,6 +725,77 @@ onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
 @curry
+@log_learner_time(learner_name='target_categorizer')
+def target_categorizer(df: pd.DataFrame,
+                       columns_to_categorize: List[str],
+                       target_column: str,
+                       smoothing: float = 1.0,
+                       ignore_unseen: bool = True,
+                       store_mapping: bool = False) -> LearnerReturnType:
+    """
+    Replaces categorical variables with the smoothed mean of the target variable by category.
+    Uses a weighted average with the overall mean of the target variable for smoothing.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        A Pandas' DataFrame that must contain `columns_to_categorize` and `target_column` columns.
+
+    columns_to_categorize : list of str
+        A list of categorical column names.
+
+    target_column : str
+        Target column name. Target can be binary or continuous.
+
+    smoothing : float
+        Weight given to overall target mean against target mean by category.
+        The value must be greater than or equal to 0
+
+    ignore_unseen : bool
+        If True, unseen values will be encoded as nan
+        If False, these will be replaced by target mean.
+
+    store_mapping : bool (default: False)
+        Whether to store the feature value -> float dictionary in the log.
+    """
+
+    target_mean = df[target_column].mean()
+    replace_unseen = nan if ignore_unseen else target_mean
+
+    def categ_target_dict(column: str) -> Dict:
+        column_agg = df.groupby(column)[target_column].agg(['count', 'mean'])
+        column_target_mean = column_agg['mean']
+        column_target_count = column_agg['count']
+
+        smoothed_target_mean = (column_target_count * column_target_mean + smoothing * target_mean) / \
+                               (column_target_count + smoothing)
+
+        return smoothed_target_mean.to_dict()
+
+    vec = {column: categ_target_dict(column) for column in columns_to_categorize}
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        return apply_replacements(new_df, columns_to_categorize, vec, replace_unseen)
+
+    p.__doc__ = learner_pred_fn_docstring("target_categorizer")
+
+    log = {'target_categorizer': {
+        'transformed_columns': columns_to_categorize,
+        'target_column': target_column,
+        'smoothing': smoothing,
+        'ignore_unseen': ignore_unseen}
+    }
+
+    if store_mapping:
+        log['target_categorizer']['mapping'] = vec
+
+    return p, p(df), log
+
+
+target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
+
+
+@curry
 @log_learner_time(learner_name='standard_scaler')
 def standard_scaler(df: pd.DataFrame,
                     columns_to_scale: List[str]) -> LearnerReturnType:
