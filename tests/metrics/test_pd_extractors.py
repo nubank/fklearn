@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_boston
 
+from fklearn.data.datasets import make_tutorial_data
 from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
                                            evaluator_extractor, extract,
                                            split_evaluator_extractor,
@@ -16,6 +17,81 @@ from fklearn.validation.splitters import (
     forward_stability_curve_time_splitter, out_of_time_and_space_splitter,
     stability_curve_time_splitter, time_learning_curve_splitter)
 from fklearn.validation.validator import validator
+
+
+def test__split_evaluator_extractor__when_split_value_is_missing():
+    expected = [
+        {"r2_evaluator__target": np.nan,
+            "split_evaluator__feature3": "a",
+            "split_evaluator__date": pd.Timestamp("2015-01-06 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-01-06 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-01-14 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-01-14 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-01-22 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-01-22 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-01-30 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-01-30 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-03-08 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-03-08 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-03-09 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-03-09 00:00:00")},
+        {"r2_evaluator__target": np.nan,
+         "split_evaluator__feature3": "a",
+         "split_evaluator__date": pd.Timestamp("2015-04-04 00:00:00")},
+        {"r2_evaluator__target": 1.0,
+         "split_evaluator__feature3": "b",
+         "split_evaluator__date": pd.Timestamp("2015-04-04 00:00:00")}
+    ]
+    expected_df = pd.DataFrame.from_dict(expected)
+    data = make_tutorial_data(50).dropna(subset=["feature3"]).assign(prediction=lambda d: d.target)
+
+    feature3_evaluator = split_evaluator(eval_fn=r2_evaluator, split_col="feature3")
+    feature3_date_evaluator = split_evaluator(eval_fn=feature3_evaluator, split_col="date")
+
+    results = feature3_date_evaluator(data)
+
+    date_values = [
+        np.datetime64("2015-01-06T00:00:00.000000000"),
+        np.datetime64("2015-01-14T00:00:00.000000000"),
+        np.datetime64("2015-01-22T00:00:00.000000000"),
+        np.datetime64("2015-01-30T00:00:00.000000000"),
+        np.datetime64("2015-03-08T00:00:00.000000000"),
+        np.datetime64("2015-03-09T00:00:00.000000000"),
+        np.datetime64("2015-04-04T00:00:00.000000000"),
+    ]
+
+    base_evaluator = evaluator_extractor(evaluator_name="r2_evaluator__target")
+    feature3_extractor = split_evaluator_extractor(
+        base_extractor=base_evaluator, split_col="feature3", split_values=["a", "b"]
+    )
+    feature3_date_extractor = split_evaluator_extractor(
+        base_extractor=feature3_extractor, split_col="date", split_values=date_values
+    )
+
+    actual_df = feature3_date_extractor(results).reset_index(drop=True)
+    pd.testing.assert_frame_equal(actual_df, expected_df, check_like=True)
 
 
 def test_extract():
