@@ -1,14 +1,14 @@
+import pandas as pd
 import pytest
+from tests import LOGS, PARALLEL_LOGS
 from toolz.curried import first
 
 from fklearn.metrics.pd_extractors import evaluator_extractor
 from fklearn.training.classification import logistic_classification_learner
-from fklearn.tuning.samplers import \
-    remove_by_feature_importance, remove_features_subsets, remove_by_feature_shuffling
-from fklearn.validation.evaluators import auc_evaluator
-import pandas as pd
-
-from tests import LOGS, PARALLEL_LOGS
+from fklearn.tuning.samplers import (remove_by_feature_importance,
+                                     remove_by_feature_shuffling,
+                                     remove_features_subsets)
+from fklearn.validation.evaluators import roc_auc_evaluator
 
 
 @pytest.fixture()
@@ -23,12 +23,12 @@ def parallel_logs():
 
 @pytest.fixture()
 def base_extractor():
-    return evaluator_extractor(evaluator_name='auc_evaluator__target')
+    return evaluator_extractor(evaluator_name='roc_auc_evaluator__target')
 
 
 @pytest.fixture()
 def metric_name():
-    return 'auc_evaluator__target'
+    return 'roc_auc_evaluator__target'
 
 
 @pytest.fixture()
@@ -97,7 +97,7 @@ def train_fn():
 
 @pytest.fixture()
 def eval_fn():
-    return auc_evaluator
+    return roc_auc_evaluator
 
 
 def test_remove_by_feature_importance(logs):

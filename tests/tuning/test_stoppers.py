@@ -20,12 +20,12 @@ def parallel_logs():
 
 @pytest.fixture()
 def base_extractor():
-    return evaluator_extractor(evaluator_name='auc_evaluator__target')
+    return evaluator_extractor(evaluator_name='roc_auc_evaluator__target')
 
 
 @pytest.fixture()
 def metric_name():
-    return 'auc_evaluator__target'
+    return 'roc_auc_evaluator__target'
 
 
 def test_stop_by_iter_num(logs):

@@ -50,7 +50,7 @@ but receives as arguments the ones that were not passed previously.
                                                                    freq='M') # split month by month
 
   # define the metric that should be evaluated. For this example, we use AUC
-  eval_fn = evaluators.auc_evaluator(prediction_column=NAME_FOR_PREDICTION_COL,
+  eval_fn = evaluators.roc_auc_evaluator(prediction_column=NAME_FOR_PREDICTION_COL,
                                      target_column=NAME_FOR_TARGET_COL)
 
   # output training logs for the different training ends

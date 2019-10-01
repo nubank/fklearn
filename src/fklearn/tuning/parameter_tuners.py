@@ -65,7 +65,7 @@ def random_search_tuner(space: LogType,
 
     eval_fn : function(dataset) -> eval_log
         A base evaluation function that returns a simple evaluation log. Can't be a spited or the extractor won't work.
-        Example: auc_evaluator(target_column="target")
+        Example: roc_auc_evaluator(target_column="target")
 
     iterations : int
         The number of iterations to run the parameter tuner
@@ -156,7 +156,7 @@ def grid_search_cv(space: LogType,
 
     eval_fn : function(dataset) -> eval_log
         A base evaluation function that returns a simple evaluation log. Can't be a spited or the extractor won't work.
-        Example: auc_evaluator(target_column="target")
+        Example: roc_auc_evaluator(target_column="target")
 
     save_intermediary_fn : function(log) -> save to file
         Partially defined saver function that receives a log result from a

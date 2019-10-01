@@ -8,7 +8,7 @@ from fklearn.training.classification import logistic_classification_learner
 from fklearn.tuning.utils import get_used_features
 from fklearn.tuning.selectors import \
     feature_importance_backward_selection, poor_man_boruta_selection, backward_subset_feature_selection
-from fklearn.validation.evaluators import auc_evaluator
+from fklearn.validation.evaluators import roc_auc_evaluator
 from fklearn.validation.splitters import k_fold_splitter
 
 from tests import LOGS, PARALLEL_LOGS
@@ -26,12 +26,12 @@ def parallel_logs():
 
 @pytest.fixture()
 def base_extractor():
-    return evaluator_extractor(evaluator_name='auc_evaluator__target')
+    return evaluator_extractor(evaluator_name='roc_auc_evaluator__target')
 
 
 @pytest.fixture()
 def metric_name():
-    return 'auc_evaluator__target'
+    return 'roc_auc_evaluator__target'
 
 
 @pytest.fixture()
@@ -100,7 +100,7 @@ def train_fn():
 
 @pytest.fixture()
 def eval_fn():
-    return auc_evaluator
+    return roc_auc_evaluator
 
 
 @pytest.fixture()
