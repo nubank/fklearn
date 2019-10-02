@@ -1,9 +1,5 @@
 # Changelog
 
-## [1.15.2] - 2019-09-20
-- **Bug Fix**
-    - Fix KeyError in split_evaluator_extractor
-
 ## [1.15.1] - 2019-08-16
 - **Enhancement**
     - Now learners that have a model exposes it in the logs as `object` key
