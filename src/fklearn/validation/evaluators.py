@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Callable, Iterable, List
 
 import numpy as np
@@ -49,6 +50,41 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
         return {eval_name: score}
 
     return p
+
+
+@curry
+def auc_evaluator(test_data: pd.DataFrame,
+                  prediction_column: str = "prediction",
+                  target_column: str = "target",
+                  eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the ROC AUC score, given true label and prediction scores.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with target and prediction scores.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction scores.
+
+    target_column : String
+        The name of the column in `test_data` with the binary target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the ROC AUC Score
+    """
+
+    warnings.warn("The method `auc_evaluator` will be renamed to `roc_auc_evaluator` in the next major release 2.0.0."
+                  " Please use `roc_auc_evaluator` instead of `auc_evaluator` for Area Under the Curve of the"
+                  " Receiver Operating Characteristics curve.")
+
+    return roc_auc_evaluator(test_data, prediction_column, target_column, eval_name)
 
 
 @curry

@@ -5,12 +5,13 @@ import pandas as pd
 import pytest
 
 from fklearn.validation.evaluators import (
-    brier_score_evaluator, combined_evaluators, correlation_evaluator,
-    expected_calibration_error_evaluator, fbeta_score_evaluator,
-    hash_evaluator, logloss_evaluator, mean_prediction_evaluator,
-    mse_evaluator, permutation_evaluator, pr_auc_evaluator,
-    precision_evaluator, r2_evaluator, recall_evaluator, roc_auc_evaluator,
-    spearman_evaluator, split_evaluator, temporal_split_evaluator)
+    auc_evaluator, brier_score_evaluator, combined_evaluators,
+    correlation_evaluator, expected_calibration_error_evaluator,
+    fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
+    mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
+    pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
+    roc_auc_evaluator, spearman_evaluator, split_evaluator,
+    temporal_split_evaluator)
 
 
 def test_combined_evaluators():
@@ -43,6 +44,23 @@ def test_mean_prediction_evaluator():
     result = eval_fn(predictions)
 
     assert result["eval_name"] == (1 + 0.9 + 40) / 3
+
+
+def test_auc_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [0, 1, 0, 1],
+            'prediction': [.2, .9, .3, .3]
+        }
+    )
+
+    eval_fn = auc_evaluator(prediction_column="prediction",
+                            target_column="target",
+                            eval_name="eval_name")
+
+    result = eval_fn(predictions)
+
+    assert result["eval_name"] == 0.875
 
 
 def test_roc_auc_evaluator():
