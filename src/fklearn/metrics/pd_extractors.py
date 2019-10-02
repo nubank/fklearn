@@ -4,11 +4,13 @@ from itertools import chain, repeat
 
 import pandas as pd
 from toolz import curry
+from numpy import nan
 
 
 @curry
 def evaluator_extractor(result, evaluator_name):
-    return pd.DataFrame({evaluator_name: [result[evaluator_name]]})
+    metric_value = result[evaluator_name] if result else nan
+    return pd.DataFrame({evaluator_name: [metric_value]})
 
 
 @curry
@@ -18,7 +20,8 @@ def combined_evaluator_extractor(result, base_extractors):
 
 @curry
 def split_evaluator_extractor_iteration(split_value, result, split_col, base_extractor):
-    return (base_extractor(result['split_evaluator__' + split_col + '_' + str(split_value)])
+    key = 'split_evaluator__' + split_col + '_' + str(split_value)
+    return (base_extractor(result.get(key, {}))
             .assign(**{'split_evaluator__' + split_col: split_value}))
 
 
