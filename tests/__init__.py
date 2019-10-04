@@ -12,9 +12,9 @@ LOGS = [
             }
         },
         'validator_log': [
-            {'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.6}],
+            {'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
              'split_log': {'train_size': 8, 'test_size': 8}},
-            {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.6}],
+            {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
              'split_log': {'train_size': 8, 'test_size': 8}}],
         'used_subsets': ['first', 'third']},
     {'train_log':
@@ -27,9 +27,9 @@ LOGS = [
                                            'feature_importance': {'x1': 8, 'x5': 2, 'x3': 3, 'x6': 1, 'x2': 1},
                                            'training_samples': 8, 'running_time': '0.019 s'}
         },
-        'validator_log': [{'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 1.0}],
+        'validator_log': [{'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 1.0}],
                            'split_log': {'train_size': 8, 'test_size': 8}},
-                          {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.8}],
+                          {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.8}],
                            'split_log': {'train_size': 8, 'test_size': 8}}],
         'used_subsets': ['first', 'second']
      }
@@ -48,9 +48,9 @@ PARALLEL_LOGS = [
                                            'training_samples': 8, 'running_time': '0.019 s'}
         },
         'validator_log': [
-            {'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.5}],
+            {'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.5}],
              'split_log': {'train_size': 8, 'test_size': 8}},
-            {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.5}],
+            {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.5}],
              'split_log': {'train_size': 8, 'test_size': 8}}],
         'used_subsets': ['first', 'second', 'third']},
         {'train_log':
@@ -63,9 +63,9 @@ PARALLEL_LOGS = [
                                                'feature_importance': {'x1': 8, 'x5': 2, 'x3': 3, 'x6': 1, 'x2': 1},
                                                'training_samples': 8, 'running_time': '0.019 s'}
             },
-            'validator_log': [{'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.7}],
+            'validator_log': [{'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.7}],
                                'split_log': {'train_size': 8, 'test_size': 8}},
-                              {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.7}],
+                              {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.7}],
                                'split_log': {'train_size': 8, 'test_size': 8}}],
             'used_subsets': ['first', 'second', 'third']}
      ],
@@ -80,9 +80,9 @@ PARALLEL_LOGS = [
                                            'training_samples': 8, 'running_time': '0.019 s'}
         },
         'validator_log': [
-            {'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.6}],
+            {'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
              'split_log': {'train_size': 8, 'test_size': 8}},
-            {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.6}],
+            {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
              'split_log': {'train_size': 8, 'test_size': 8}}],
         'used_subsets': ['first', 'second', 'third']},
         {'train_log': {
@@ -93,9 +93,9 @@ PARALLEL_LOGS = [
                                                           'min_child_weight': 0, 'lambda': 0, 'eta': 1},
                                            'feature_importance': {'x1': 8, 'x5': 2, 'x3': 3, 'x6': 1, 'x2': 1},
                                            'training_samples': 8, 'running_time': '0.019 s'}},
-            'validator_log': [{'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 1.0}],
+            'validator_log': [{'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 1.0}],
                                'split_log': {'train_size': 8, 'test_size': 8}},
-                              {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.8}],
+                              {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.8}],
                                'split_log': {'train_size': 8, 'test_size': 8}}],
             'used_subsets': ['first', 'second', 'third']}
      ]
