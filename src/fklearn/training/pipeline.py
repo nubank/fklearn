@@ -42,24 +42,18 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
     def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
         no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
         if len(no_default_list) > 1:
-            raise ValueError("Learner {0} has more than one unfilled argument: {1}\n" \
-                                          "Make sure all learners are curried properly and only require one argument," \
-                                          " which is the dataset (usually `df`).".format(
-            learner.__name__,
-            ', '.join(no_default_list)
-        )
-            )
+            raise ValueError("Learner {0} has more than one unfilled argument: {1}\n"
+                             "Make sure all learners are curried properly and only require one argument,"
+                             " which is the dataset (usually `df`)."
+                             .format(learner.__name__, ', '.join(no_default_list)))
 
     def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None:
         invalid_parameter_kinds = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
         var_args = [p for p, a in signature(predict_fn).parameters.items() if a.kind in invalid_parameter_kinds]
         if len(var_args) != 0:
-            raise ValueError("Predict function of learner {0} contains variable length arguments: {1}\n" \
-                                   "Make sure no predict function uses arguments like *args or **kwargs.".format(
-            learner.__name__,
-            ', '.join(var_args)
-        )
-            )
+            raise ValueError("Predict function of learner {0} contains variable length arguments: {1}\n"
+                             "Make sure no predict function uses arguments like *args or **kwargs."
+                             .format(learner.__name__, ', '.join(var_args)))
 
     # Check for unfilled arguments of learners
     for l in learners:

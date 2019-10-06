@@ -568,7 +568,7 @@ def custom_supervised_model_learner(df: pd.DataFrame,
 
     if len(log) != 1:
         raise ValueError("\'log\' dictionary must start with model name")
-    if  supervised_type not in ('classification','regression'):
+    if supervised_type not in ('classification', 'regression'):
         raise TypeError("supervised_type options are: \'classification\' or \'regression\'")
     if not hasattr(model, 'fit'):
         raise AttributeError("\'model\' object must have \'fit\' attribute")
