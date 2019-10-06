@@ -104,7 +104,7 @@ def test_build_pipeline_learner_assertion():
 
     learner_fn = learner(b=2)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         build_pipeline(learner_fn)
 
     learner_fn = learner(a=1, b=2)
@@ -122,7 +122,7 @@ def test_build_pipeline_predict_arguments_assertion():
 
         return p, df, {}
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         build_pipeline(invalid_learner)(test_df)
 
 
