@@ -2,7 +2,7 @@
 
 ## [1.16.0] - 2019-10-07
 - **Enhancement**
-    - Improve spli evaluator to avoid unexpected errors
+    - Improve split evaluator to avoid unexpected errors
 - **New**
     - Now users can install only the set of requirements they need
     - Add Target encoding learner
