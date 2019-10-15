@@ -13,7 +13,8 @@ def time_split_dataset(dataset: pd.DataFrame,
                        train_start_date: DateType,
                        train_end_date: DateType,
                        holdout_end_date: DateType,
-                       time_column: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+                       time_column: str,
+                       holdout_start_date: DateType = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Splits temporal data into a training and testing datasets such that
     all training data comes before the testings one.
@@ -31,7 +32,7 @@ def time_split_dataset(dataset: pd.DataFrame,
 
     train_end_date : str
         A date string representing a the ending time of the training data.
-        This will also be used as the start date of the holdout period.
+        This will also be used as the start date of the holdout period if no `holdout_start_date` is given.
         It should be in the same format as the Date Column in `dataset`.
 
     holdout_end_date : str
@@ -41,6 +42,10 @@ def time_split_dataset(dataset: pd.DataFrame,
     time_column : str
         The name of the Date column of `dataset`.
 
+    holdout_start_date: str
+        A date string representing the starting time of the holdout data.
+        If `None` is given it will be equal to `train_end_date`.
+        It should be in the same format as the Date Column in `dataset`.
 
     Returns
     ----------
@@ -51,11 +56,13 @@ def time_split_dataset(dataset: pd.DataFrame,
         The out of ID sample and in time hold out set.
     """
 
+    holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
+
     train_set = dataset[
         (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
 
     test_set = dataset[
-        (dataset[time_column] >= train_end_date) & (dataset[time_column] < holdout_end_date)]
+        (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
 
     return train_set, test_set
 
@@ -69,7 +76,8 @@ def space_time_split_dataset(dataset: pd.DataFrame,
                              space_holdout_percentage: float,
                              space_column: str,
                              time_column: str,
-                             holdout_space: np.ndarray = None) -> Tuple[pd.DataFrame, ...]:
+                             holdout_space: np.ndarray = None,
+                             holdout_start_date: DateType = None) -> Tuple[pd.DataFrame, ...]:
     """
     Splits panel data using both ID and Time columns, resulting in four datasets
 
@@ -91,7 +99,7 @@ def space_time_split_dataset(dataset: pd.DataFrame,
 
     train_end_date : str
         A date string representing a the ending time of the training data.
-        This will also be used as the start date of the holdout period.
+        This will also be used as the start date of the holdout period if no `holdout_start_date` is given.
         It should be in the same format as the Date Column in `dataset`.
 
     holdout_end_date : str
@@ -115,6 +123,11 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         An array containing the hold out IDs. If not specified,
         A random subset of IDs will be selected for holdout.
 
+    holdout_start_date: str
+        A date string representing the starting time of the holdout data.
+        If `None` is given it will be equal to `train_end_date`.
+        It should be in the same format as the Date Column in `dataset`.
+
     Returns
     ----------
     train_set : pandas.DataFrame
@@ -129,10 +142,12 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     outime_outspace_hdout : pandas.DataFrame
         The out of ID sample and out of time hold out set.
     """
+    holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
+
     train_period = dataset[
         (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
     outime_hdout = dataset[
-        (dataset[time_column] >= train_end_date) & (dataset[time_column] < holdout_end_date)]
+        (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
 
     if holdout_space is None:
         train_period_space = train_period[space_column].unique()
