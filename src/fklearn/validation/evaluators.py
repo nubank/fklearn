@@ -719,8 +719,8 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
     if split_values is None:
         split_values = unique_values
     else:
-        assert all(sv in unique_values for sv in split_values), (
-            "All split values must be present in the column (after date formatting it)")
+        if not (all(sv in unique_values for sv in split_values)):
+            raise ValueError('All split values must be present in the column (after date formatting it')
 
     return {eval_name + "_" + str(value): eval_fn(test_data.loc[lambda df: formatted_time_col == value])
             for value in split_values}

@@ -904,8 +904,10 @@ def null_injector(df: pd.DataFrame,
     seed : int
         Random seed for consistency.
     """
-    assert (proportion > 0.0) & (proportion < 1.0), "proportions must be between 0 and 1"
-    assert (columns_to_inject is None) ^ (groups is None), "Either columns_to_inject or groups must be None."
+    if proportion < 0 or proportion > 1:
+        raise ValueError('proportions must be between 0 and 1.')
+    if not ((columns_to_inject is None) ^ (groups is None)):
+        raise ValueError('Either columns_to_inject or groups must be None.')
 
     n_rows = df.shape[0]
 
@@ -959,9 +961,9 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
         Name of the column created to alert the existence of missing values
     """
 
-    assert ((detailed_warning and detailed_column_name) or ((not detailed_warning) and (
-        not detailed_column_name))), "Either detailed_warning and detailed_column_name " \
-                                     "should be defined or both should be False."
+    if (detailed_warning is False and detailed_column_name is not None) or \
+            (detailed_warning is True and detailed_column_name is None):
+        raise ValueError('Either detailed_warning and detailed_column_name should be defined or both should be False.')
 
     df_selected = df[cols_list]
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
