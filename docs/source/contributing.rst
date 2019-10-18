@@ -64,7 +64,7 @@ This command will install all the test dependencies. To install the package itse
 
 .. code-block:: none
 
-  pip install -qe .[test_deps]
+  make requirements-dev
 
 Run tests
 ~~~~~~~~~
@@ -73,7 +73,7 @@ The following command should run all tests, if every test pass, you should be re
 
 .. code-block:: none
 
-  python -m pytest tests/
+  make test
 
 Creating a development branch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
