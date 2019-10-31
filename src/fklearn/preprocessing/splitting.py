@@ -148,7 +148,7 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     out_time_mask = (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)
 
     all_space_in_time = dataset[in_time_mask][space_column].unique()
-    
+
     if holdout_space is None:
         # for repeatability
         state = RandomState(split_seed)
@@ -158,12 +158,12 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         in_space = state.choice(train_period_space,
                                 int((1 - space_holdout_percentage) * len(train_period_space)),
                                 replace=False)
-    
+
     else:
         in_space = all_space_in_time[~all_space_in_time.isin(holdout_space)]
-    
+
     in_space_mask = dataset[space_column].isin(in_space)
-    
+
     train_set = dataset[in_space_mask & in_time_mask]
     intime_outspace_hdout = dataset[~in_space_mask & in_time_mask]
     outtime_outspace_hdout = dataset[~in_space_mask & out_time_mask]
