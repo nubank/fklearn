@@ -144,27 +144,29 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     """
     holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
 
-    train_period = dataset[
-        (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
-    outime_hdout = dataset[
-        (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
+    in_time_mask = (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)
+    out_time_mask = (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)
 
+    all_space_in_time = dataset[in_time_mask][space_column].unique() # 
+    
     if holdout_space is None:
-        train_period_space = train_period[space_column].unique()
-
         # for repeatability
         state = RandomState(split_seed)
-
-        train_period_space = np.sort(train_period_space)
+        train_period_space = np.sort(all_space_in_time)
 
         # randomly sample accounts from the train period to hold out
-        holdout_space = state.choice(train_period_space,
-                                     int(space_holdout_percentage * len(train_period_space)),
-                                     replace=False)
+        in_space = state.choice(train_period_space,
+                                int((1 - space_holdout_percentage) * len(train_period_space)),
+                                replace=False)
+    
+    else:
+        in_space = all_space_in_time[~all_space_in_time.isin(holdout_space)]
+    
+    in_space_mask = dataset[space_column].isin(in_space)
+    
+    train_set = dataset[in_space_mask & in_time_mask]
+    intime_outspace_hdout = dataset[~in_space_mask & in_time_mask]
+    outtime_outspace_hdout = dataset[~in_space_mask & out_time_mask]
+    outtime_inspace_hdout = dataset[in_space_mask & out_time_mask]
 
-    train_set = train_period[~train_period[space_column].isin(holdout_space)]
-    intime_outspace_hdout = train_period[train_period[space_column].isin(holdout_space)]
-    outime_outspace_hdout = outime_hdout[outime_hdout[space_column].isin(holdout_space)]
-    outime_inspace_hdout = outime_hdout[~outime_hdout[space_column].isin(holdout_space)]
-
-    return train_set, intime_outspace_hdout, outime_inspace_hdout, outime_outspace_hdout
+    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout
