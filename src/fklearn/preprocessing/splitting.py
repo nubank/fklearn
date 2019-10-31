@@ -147,7 +147,7 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     in_time_mask = (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)
     out_time_mask = (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)
 
-    all_space_in_time = dataset[in_time_mask][space_column].unique() # 
+    all_space_in_time = dataset[in_time_mask][space_column].unique()
     
     if holdout_space is None:
         # for repeatability
