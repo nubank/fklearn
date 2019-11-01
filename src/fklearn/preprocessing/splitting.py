@@ -170,4 +170,4 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     outtime_outspace_hdout = dataset[~in_space_mask & out_time_mask]
     outtime_inspace_hdout = dataset[in_space_mask & out_time_mask]
 
-    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout, in_space_mask
+    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout
