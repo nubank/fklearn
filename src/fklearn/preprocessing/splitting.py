@@ -155,12 +155,13 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         train_period_space = np.sort(all_space_in_time)
 
         # randomly sample accounts from the train period to hold out
-        in_space = state.choice(train_period_space,
-                                int((1 - space_holdout_percentage) * len(train_period_space)),
-                                replace=False)
+        partial_holdout_space = state.choice(train_period_space,
+                                             int(space_holdout_percentage * len(train_period_space)),
+                                             replace=False)
+        in_space = all_space_in_time[~np.isin(all_space_in_time, partial_holdout_space)]
 
     else:
-        in_space = all_space_in_time[~all_space_in_time.isin(holdout_space)]
+        in_space = all_space_in_time[~np.isin(all_space_in_time, holdout_space)]
 
     in_space_mask = dataset[space_column].isin(in_space)
 
@@ -169,4 +170,4 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     outtime_outspace_hdout = dataset[~in_space_mask & out_time_mask]
     outtime_inspace_hdout = dataset[in_space_mask & out_time_mask]
 
-    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout
+    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout, in_space_mask
