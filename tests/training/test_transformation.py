@@ -1,13 +1,14 @@
 from collections import OrderedDict
 
+import math
 import pandas as pd
-from numpy import nan, round, sqrt
+from numpy import nan, round, sqrt, floor, log as ln
 from numpy.testing import assert_almost_equal
 
 from fklearn.training.transformation import \
     selector, capper, floorer, prediction_ranger, count_categorizer, label_categorizer, quantile_biner, \
-    truncate_categorical, rank_categorical, onehot_categorizer, standard_scaler, ecdfer, discrete_ecdfer, \
-    custom_transformer, value_mapper, null_injector, missing_warner
+    truncate_categorical, rank_categorical, onehot_categorizer, target_categorizer, standard_scaler, ecdfer, \
+    discrete_ecdfer, custom_transformer, value_mapper, null_injector, missing_warner
 
 
 def test_selector():
@@ -301,29 +302,29 @@ def test_onehot_categorizer():
 
     expected_output_train_no_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==female", [1, 0, 0, 0]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("region==MG", [0, 0, 1, 0]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0])
+        ("fklearn_feat__sex==female", [1, 0, 0, 0]),
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__region==MG", [0, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0])
     )))
 
     expected_output_train_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==female", [1, 0, 0, 0]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("sex==nan", [0, 0, 0, 0]),
-        ("region==MG", [0, 0, 1, 0]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0]),
-        ("region==nan", [0, 0, 0, 1])
+        ("fklearn_feat__sex==female", [1, 0, 0, 0]),
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 0]),
+        ("fklearn_feat__region==MG", [0, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0]),
+        ("fklearn_feat__region==nan", [0, 0, 0, 1])
     )))
 
     expected_output_train_drop_first = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
-        ("sex==male", [0, 1, 1, 1]),
-        ("region==RG", [0, 1, 0, 0]),
-        ("region==SP", [1, 0, 0, 0])
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0])
     )))
 
     input_df_test = pd.DataFrame({
@@ -334,29 +335,29 @@ def test_onehot_categorizer():
 
     expected_output_test_no_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==female", [0, 1, 0, 0]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("region==MG", [0, 0, 0, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0])
+        ("fklearn_feat__sex==female", [0, 1, 0, 0]),
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__region==MG", [0, 0, 0, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0])
     )))
 
     expected_output_test_hardcode = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==female", [0, 1, 0, 0]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("sex==nan", [0, 0, 0, 1]),
-        ("region==MG", [0, 0, 0, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0]),
-        ("region==nan", [1, 1, 0, 0])
+        ("fklearn_feat__sex==female", [0, 1, 0, 0]),
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 1]),
+        ("fklearn_feat__region==MG", [0, 0, 0, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0]),
+        ("fklearn_feat__region==nan", [1, 1, 0, 0])
     )))
 
     expected_output_test_drop_first = pd.DataFrame(OrderedDict((
         ("feat1_num", [2, 20, 200, 2000]),
-        ("sex==male", [1, 0, 1, 0]),
-        ("region==RG", [0, 0, 0, 1]),
-        ("region==SP", [0, 0, 1, 0])
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0])
     )))
 
     # Test without hardcoding NaNs
@@ -400,6 +401,84 @@ def test_onehot_categorizer():
             .equals(expected_output_test_drop_first))
     assert (data[expected_output_train_drop_first.columns]
             .equals(expected_output_train_drop_first))
+
+
+def test_target_categorizer():
+    input_df_train_binary_target = pd.DataFrame({
+        "feat1_num": [1, 0.5, nan, 100, 10, 0.7],
+        "feat2_cat": ["a", "a", "a", "b", "c", "c"],
+        "feat3_cat": ["c", "c", "c", "a", "a", "a"],
+        "target": [1, 0, 0, 1, 0, 1]
+    })
+
+    expected_output_train_binary_target = pd.DataFrame(OrderedDict((
+        ("feat1_num", [1, 0.5, nan, 100, 10, 0.7]),
+        ("feat2_cat", [0.375, 0.375, 0.375, 0.75, 0.5, 0.5]),
+        ("feat3_cat", [0.375, 0.375, 0.375, 0.625, 0.625, 0.625]),
+        ("target", [1, 0, 0, 1, 0, 1])
+    )))
+
+    input_df_test_binary_target = pd.DataFrame({
+        "feat1_num": [2.0, 4.0, 8.0],
+        "feat2_cat": ["b", "a", "c"],
+        "feat3_cat": ["c", "b", "a"]
+    })
+
+    expected_output_test_binary_target = pd.DataFrame(OrderedDict((
+        ("feat1_num", [2.0, 4.0, 8.0]),
+        ("feat2_cat", [0.75, 0.375, 0.5]),
+        ("feat3_cat", [0.375, nan, 0.625])
+    )))
+
+    input_df_train_continuous_target = pd.DataFrame({
+        "feat1_num": [1, 0.5, nan, 100, 10, 0.7],
+        "feat2_cat": ["a", "a", "a", nan, "c", "c"],
+        "target": [41., 10.5, 23., 4., 5.5, 60.]
+    })
+
+    expected_output_train_continuous_target = pd.DataFrame(OrderedDict((
+        ("feat1_num", [1, 0.5, nan, 100, 10, 0.7]),
+        ("feat2_cat", [24.625, 24.625, 24.625, nan, 29.83333, 29.83333]),
+        ("target", [41., 10.5, 23., 4., 5.5, 60.])
+    )))
+
+    input_df_test_continuous_target = pd.DataFrame({
+        "feat1_num": [2.0, 4.0, 8.0],
+        "feat2_cat": ["b", "a", "c"],
+    })
+
+    expected_output_test_continuous_target = pd.DataFrame(OrderedDict((
+        ("feat1_num", [2.0, 4.0, 8.0]),
+        ("feat2_cat", [24., 24.625, 29.83333]),
+    )))
+
+    # Test with binary target
+    categorizer_learner = target_categorizer(
+        columns_to_categorize=["feat2_cat", "feat3_cat"], target_column="target")
+
+    pred_fn, data, log = categorizer_learner(input_df_train_binary_target)
+
+    test_result = pred_fn(input_df_test_binary_target)
+
+    assert (test_result[expected_output_test_binary_target.columns].  # we don't care about output order
+            equals(expected_output_test_binary_target))
+
+    assert (data[expected_output_train_binary_target.columns].  # we don't care about output order
+            equals(expected_output_train_binary_target))
+
+    # Test with continuous target
+    categorizer_learner = target_categorizer(
+        columns_to_categorize=["feat2_cat"], target_column="target", ignore_unseen=False)
+
+    pred_fn, data, log = categorizer_learner(input_df_train_continuous_target)
+
+    test_result = pred_fn(input_df_test_continuous_target)
+
+    assert_almost_equal(test_result[expected_output_test_continuous_target.columns].values,
+                        expected_output_test_continuous_target.values, decimal=5)
+
+    assert_almost_equal(data[expected_output_train_continuous_target.columns].values,
+                        expected_output_train_continuous_target.values, decimal=5)
 
 
 def test_standard_scaler():
@@ -497,17 +576,23 @@ def test_discrete_ecdfer():
 def test_custom_transformer():
     input_df = pd.DataFrame({
         'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
         'target': [1, 4, 9]
     })
 
     expected = pd.DataFrame({
         'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
         'target': [1.0, 2.0, 3.0]
     })
 
     expected2 = pd.DataFrame({
         'feat1': [1, 4, 9],
-        'target': [1.0, 2.0, 3.0]
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.5, 2.5, 3.5],
+        'target': [1, 4, 9]
     })
 
     transformer_fn, data, log = custom_transformer(input_df, ["target"], sqrt)
@@ -519,6 +604,30 @@ def test_custom_transformer():
 
     # the transformed input df should contain the squared value of the feat1 column
     assert expected2.equals(data)
+
+    expected3 = pd.DataFrame({
+        'feat1': [1, 2, 3],
+        'feat2': [1.0, 2.0, 3.0],
+        'feat3': [1.5, 2.5, 3.5],
+        'target': [1, 4, 9]
+    })
+
+    expected4 = pd.DataFrame({
+        'feat1': [1, 2, 3],
+        'feat2': [math.e, math.e ** 2, math.e ** 3],
+        'feat3': [1.0, 2.0, 3.0],
+        'target': [1, 4, 9]
+    })
+
+    transformer_fn, data, log = custom_transformer(input_df, ["feat2"], ln, is_vectorized=True)
+
+    # the transformed input df should contain the square root of the target column
+    assert expected3.equals(data)
+
+    transformer_fn, data, log = custom_transformer(input_df, ["feat3"], floor, is_vectorized=True)
+
+    # the transformed input df should contain the squared value of the feat1 column
+    assert expected4.equals(data)
 
 
 def test_null_injector():

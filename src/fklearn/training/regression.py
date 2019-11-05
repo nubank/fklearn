@@ -9,7 +9,7 @@ from sklearn import __version__ as sk_version
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
 from fklearn.types import LearnerReturnType
-from fklearn.training.utils import log_learner_time
+from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
@@ -19,7 +19,8 @@ def linear_regression_learner(df: pd.DataFrame,
                               target: str,
                               params: Dict[str, Any] = None,
                               prediction_column: str = "prediction",
-                              weight_column: str = None) -> LearnerReturnType:
+                              weight_column: str = None,
+                              encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an linear regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -49,12 +50,17 @@ def linear_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     def_params = {"fit_intercept": True}
     params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     regr = LinearRegression(**params)
     regr.fit(df[features].values, df[target].values, sample_weight=weights)
@@ -72,8 +78,8 @@ def linear_regression_learner(df: pd.DataFrame,
         'package': "sklearn",
         'package_version': sk_version,
         'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': regr}
 
     return p, p(df), log
 
@@ -90,7 +96,8 @@ def xgb_regression_learner(df: pd.DataFrame,
                            num_estimators: int = 100,
                            extra_params: Dict[str, Any] = None,
                            prediction_column: str = "prediction",
-                           weight_column: str = None) -> LearnerReturnType:
+                           weight_column: str = None,
+                           encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an XGBoost regressor to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then it fits a XGBoost
@@ -138,13 +145,19 @@ def xgb_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
+
     import xgboost as xgb
 
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
     params = params if "objective" in params else assoc(params, "objective", 'reg:linear')
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = xgb.DMatrix(df[features].values, label=df[target].values, weight=weights, feature_names=map(str, features))
 
@@ -177,8 +190,8 @@ def xgb_regression_learner(df: pd.DataFrame,
         'package_version': xgb.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': bst.get_score(),
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': bst}
 
     return p, p(df), log
 
@@ -282,8 +295,8 @@ def catboost_regressor_learner(df: pd.DataFrame,
         'package_version': catboost.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
         'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': cbr}
 
     return p, p(df), log
 
@@ -301,7 +314,8 @@ def gp_regression_learner(df: pd.DataFrame,
                           extra_variance: Union[str, float] = "fit",
                           return_std: bool = False,
                           extra_params: Dict[str, Any] = None,
-                          prediction_column: str = "prediction") -> LearnerReturnType:
+                          prediction_column: str = "prediction",
+                          encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an gaussian process regressor to the dataset.
 
@@ -347,12 +361,16 @@ def gp_regression_learner(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the predictions from the model.
 
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
     params = extra_params if extra_params else {}
 
     params['alpha'] = alpha
     params['kernel'] = kernel
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     gp = GaussianProcessRegressor(**params)
     gp.fit(df[features], df[target])
@@ -377,8 +395,8 @@ def gp_regression_learner(df: pd.DataFrame,
         'prediction_column': prediction_column,
         'package': "sklearn",
         'package_version': sk_version,
-        'training_samples': len(df)
-    }}
+        'training_samples': len(df)},
+        'object': gp}
 
     return p, p(df), log
 
@@ -395,7 +413,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
                             num_estimators: int = 100,
                             extra_params: Dict[str, Any] = None,
                             prediction_column: str = "prediction",
-                            weight_column: str = None) -> LearnerReturnType:
+                            weight_column: str = None,
+                            encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
 
@@ -444,7 +463,11 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
-     """
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+    """
+
     import lightgbm as lgbm
 
     params = extra_params if extra_params else {}
@@ -452,6 +475,8 @@ def lgbm_regression_learner(df: pd.DataFrame,
     params = params if "objective" in params else assoc(params, "objective", 'regression')
 
     weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True)
@@ -491,3 +516,85 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
 
 lgbm_regression_learner.__doc__ += learner_return_docstring("LGBM Regressor")
+
+
+@curry
+@log_learner_time(learner_name='custom_supervised_model_learner')
+def custom_supervised_model_learner(df: pd.DataFrame,
+                                    features: List[str],
+                                    target: str,
+                                    model: Any,
+                                    supervised_type: str,
+                                    log: Dict[str, Dict],
+                                    prediction_column: str = "prediction") -> LearnerReturnType:
+    """
+    Fits a custom model to the dataset.
+    Return the predict function, the predictions for the input dataset and a log describing the model.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from features.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+
+    model: Object
+        Machine learning model to be used for regression or clasisfication.
+        model object must have ".fit" attribute to train the data.
+        For classification problems, it also needs ".predict_proba" attribute.
+        For regression problemsm it needs ".predict" attribute.
+
+    supervised_type: str
+        Type of supervised learning to be used
+        The options are: 'classification' or 'regression'
+
+    log : Dict[str, Dict]
+        Log with additional information of the custom model used.
+        It must start with just one element with the model name.
+
+    prediction_column : str
+        The name of the column with the predictions from the model.
+        For classification problems, all probabilities wiill be added: for i in range(0,n_classes).
+        For regression just prediction_column will be added.
+    """
+
+    if len(log) != 1:
+        raise ValueError("\'log\' dictionary must start with model name")
+    if supervised_type not in ('classification', 'regression'):
+        raise TypeError("supervised_type options are: \'classification\' or \'regression\'")
+    if not hasattr(model, 'fit'):
+        raise AttributeError("\'model\' object must have \'fit\' attribute")
+    if supervised_type == 'classification' and not hasattr(model, 'predict_proba'):
+        raise AttributeError("\'model\' object for classification must have \'predict_proba\' attribute")
+    if supervised_type == 'regression' and not hasattr(model, 'predict'):
+        raise AttributeError("\'model\' object for regression must have \'predict\' attribute")
+
+    model.fit(df[features].values, df[target].values)
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        if supervised_type == 'classification':
+            pred = model.predict_proba(new_df[features].values)
+            col_dict = {}
+            for (key, value) in enumerate(pred.T):
+                col_dict.update({prediction_column + "_" + str(key): value})
+        elif supervised_type == 'regression':
+            col_dict = {prediction_column: model.predict(new_df[features].values)}
+
+        return new_df.assign(**col_dict)
+
+    p.__doc__ = learner_pred_fn_docstring("custom_supervised_model_learner")
+
+    log["object"] = model
+
+    return p, p(df), log
+
+
+custom_supervised_model_learner.__doc__ += learner_return_docstring("Custom Supervised Model Learner")

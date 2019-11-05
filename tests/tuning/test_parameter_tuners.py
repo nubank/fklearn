@@ -4,7 +4,7 @@ from toolz import curry
 
 from fklearn.training.classification import xgb_classification_learner
 from fklearn.tuning.parameter_tuners import random_search_tuner, grid_search_cv
-from fklearn.validation.evaluators import auc_evaluator
+from fklearn.validation.evaluators import roc_auc_evaluator
 from fklearn.validation.splitters import out_of_time_and_space_splitter
 
 
@@ -16,7 +16,7 @@ def test_random_search_tuner(tmpdir):
         'target': [0, 1, 0, 1]
     })
 
-    eval_fn = auc_evaluator(target_column="target")
+    eval_fn = roc_auc_evaluator(target_column="target")
 
     space = {
         'learning_rate': lambda: np.random.choice([1e-3, 1e-2, 1e-1, 1, 10]),
@@ -51,7 +51,7 @@ def test_grid_search_tuner(tmpdir):
         'target': [0, 1, 0, 1]
     })
 
-    eval_fn = auc_evaluator(target_column="target")
+    eval_fn = roc_auc_evaluator(target_column="target")
 
     space = {
         'learning_rate': lambda: [1e-3, 1e-2, 1e-1],

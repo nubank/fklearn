@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, List, Union, Optional
 import numpy as np
 import pandas as pd
 from numpy import nan
-import swifter  # NOQA
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
@@ -670,6 +669,9 @@ def onehot_categorizer(df: pd.DataFrame,
                        store_mapping: bool = False) -> LearnerReturnType:
     """
     Onehot encoding on categorical columns.
+    Encoded columns are removed and substituted by columns named
+    `fklearn_feat__col==val`, where `col` is the name of the column
+    and `val` is one of the values the feature can assume.
 
     Parameters
     ----------
@@ -694,12 +696,14 @@ def onehot_categorizer(df: pd.DataFrame,
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: (col + "==" + str(categ), (new_df[col] == categ).astype(int)),
-                                            vec[col][int(drop_first_column):]))
+
+        make_dummies = lambda col: dict(map(lambda categ: ("fklearn_feat__" + col + "==" + str(categ),
+                                                           (new_df[col] == categ).astype(int)),
+                                            vec[col]))
 
         oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {col + "==nan": (~new_df[col].isin(vec[col])).astype(
-                                                    int)} if hardcode_nans
+                                                {"fklearn_feat__" + col + "==" + "nan":
+                                                    (~new_df[col].isin(vec[col])).astype(int)} if hardcode_nans
                                                 else {}).items(),
                               columns_to_categorize))
 
@@ -718,7 +722,78 @@ def onehot_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-quantile_biner.__doc__ += learner_return_docstring("Onehot Categorizer")
+onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
+
+
+@curry
+@log_learner_time(learner_name='target_categorizer')
+def target_categorizer(df: pd.DataFrame,
+                       columns_to_categorize: List[str],
+                       target_column: str,
+                       smoothing: float = 1.0,
+                       ignore_unseen: bool = True,
+                       store_mapping: bool = False) -> LearnerReturnType:
+    """
+    Replaces categorical variables with the smoothed mean of the target variable by category.
+    Uses a weighted average with the overall mean of the target variable for smoothing.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        A Pandas' DataFrame that must contain `columns_to_categorize` and `target_column` columns.
+
+    columns_to_categorize : list of str
+        A list of categorical column names.
+
+    target_column : str
+        Target column name. Target can be binary or continuous.
+
+    smoothing : float
+        Weight given to overall target mean against target mean by category.
+        The value must be greater than or equal to 0
+
+    ignore_unseen : bool
+        If True, unseen values will be encoded as nan
+        If False, these will be replaced by target mean.
+
+    store_mapping : bool (default: False)
+        Whether to store the feature value -> float dictionary in the log.
+    """
+
+    target_mean = df[target_column].mean()
+    replace_unseen = nan if ignore_unseen else target_mean
+
+    def categ_target_dict(column: str) -> Dict:
+        column_agg = df.groupby(column)[target_column].agg(['count', 'mean'])
+        column_target_mean = column_agg['mean']
+        column_target_count = column_agg['count']
+
+        smoothed_target_mean = (column_target_count * column_target_mean + smoothing * target_mean) / \
+                               (column_target_count + smoothing)
+
+        return smoothed_target_mean.to_dict()
+
+    vec = {column: categ_target_dict(column) for column in columns_to_categorize}
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        return apply_replacements(new_df, columns_to_categorize, vec, replace_unseen)
+
+    p.__doc__ = learner_pred_fn_docstring("target_categorizer")
+
+    log = {'target_categorizer': {
+        'transformed_columns': columns_to_categorize,
+        'target_column': target_column,
+        'smoothing': smoothing,
+        'ignore_unseen': ignore_unseen}
+    }
+
+    if store_mapping:
+        log['target_categorizer']['mapping'] = vec
+
+    return p, p(df), log
+
+
+target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
 
 
 @curry
@@ -764,7 +839,8 @@ standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 @log_learner_time(learner_name='custom_transformer')
 def custom_transformer(df: pd.DataFrame,
                        columns_to_transform: List[str],
-                       transformation_function: Callable[[pd.DataFrame], pd.DataFrame]) -> LearnerReturnType:
+                       transformation_function: Callable[[pd.DataFrame], pd.DataFrame],
+                       is_vectorized: bool = False) -> LearnerReturnType:
     """
     Applies a custom function to the desired columns.
 
@@ -781,11 +857,13 @@ def custom_transformer(df: pd.DataFrame,
         and returns another DataFrame.
 
     """
+    import swifter  # NOQA
 
-    def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
-        new_data_set[columns_to_transform] = new_data_set[columns_to_transform].swifter.apply(transformation_function)
+    def p(df: pd.DataFrame) -> pd.DataFrame:
+        if is_vectorized:
+            return df.assign(**{col: transformation_function(df[col]) for col in columns_to_transform})
 
-        return new_data_set
+        return df.assign(**{col: df[col].swifter.apply(transformation_function) for col in columns_to_transform})
 
     p.__doc__ = learner_pred_fn_docstring("custom_transformer")
 
@@ -827,8 +905,10 @@ def null_injector(df: pd.DataFrame,
     seed : int
         Random seed for consistency.
     """
-    assert (proportion > 0.0) & (proportion < 1.0), "proportions must be between 0 and 1"
-    assert (columns_to_inject is None) ^ (groups is None), "Either columns_to_inject or groups must be None."
+    if proportion < 0 or proportion > 1:
+        raise ValueError('proportions must be between 0 and 1.')
+    if not ((columns_to_inject is None) ^ (groups is None)):
+        raise ValueError('Either columns_to_inject or groups must be None.')
 
     n_rows = df.shape[0]
 
@@ -882,9 +962,9 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
         Name of the column created to alert the existence of missing values
     """
 
-    assert ((detailed_warning and detailed_column_name) or ((not detailed_warning) and (
-        not detailed_column_name))), "Either detailed_warning and detailed_column_name " \
-                                     "should be defined or both should be False."
+    if (detailed_warning is False and detailed_column_name is not None) or \
+            (detailed_warning is True and detailed_column_name is None):
+        raise ValueError('Either detailed_warning and detailed_column_name should be defined or both should be False.')
 
     df_selected = df[cols_list]
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()

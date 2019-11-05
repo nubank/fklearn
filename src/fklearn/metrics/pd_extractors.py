@@ -1,12 +1,16 @@
-from toolz import curry
-import pandas as pd
-from itertools import chain, repeat
 import collections
+from datetime import datetime
+from itertools import chain, repeat
+
+import pandas as pd
+from toolz import curry
+from numpy import nan
 
 
 @curry
 def evaluator_extractor(result, evaluator_name):
-    return pd.DataFrame({evaluator_name: [result[evaluator_name]]})
+    metric_value = result[evaluator_name] if result else nan
+    return pd.DataFrame({evaluator_name: [metric_value]})
 
 
 @curry
@@ -16,7 +20,8 @@ def combined_evaluator_extractor(result, base_extractors):
 
 @curry
 def split_evaluator_extractor_iteration(split_value, result, split_col, base_extractor):
-    return (base_extractor(result['split_evaluator__' + split_col + '_' + str(split_value)])
+    key = 'split_evaluator__' + split_col + '_' + str(split_value)
+    return (base_extractor(result.get(key, {}))
             .assign(**{'split_evaluator__' + split_col: split_value}))
 
 
@@ -24,7 +29,27 @@ def split_evaluator_extractor_iteration(split_value, result, split_col, base_ext
 def split_evaluator_extractor(result, split_col, split_values, base_extractor):
     return pd.concat(
         list(map(split_evaluator_extractor_iteration(result=result, split_col=split_col, base_extractor=base_extractor),
-             split_values)))
+                 split_values)))
+
+
+@curry
+def temporal_split_evaluator_extractor(result, time_col, base_extractor, time_format="%Y-%m", eval_name=None):
+    if eval_name is None:
+        eval_name = 'split_evaluator__' + time_col
+
+    split_keys = [key for key in result.keys() if eval_name in key]
+    split_values = []
+    for key in split_keys:
+        date = key.split(eval_name)[1][1:]
+        try:
+            # just check time format
+            datetime.strptime(date, time_format)
+            split_values.append(date)
+        except ValueError:
+            # this might happen if result has temporal splitters using different data formats
+            pass
+
+    return split_evaluator_extractor(result, time_col, split_values, base_extractor)
 
 
 @curry

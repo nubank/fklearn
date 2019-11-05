@@ -185,7 +185,8 @@ Evaluators (fklearn.validation.evaluators)
 .. currentmodule:: fklearn.validation.evaluators
 
 .. autosummary::
-   auc_evaluator
+   roc_auc_evaluator
+   pr_auc_evaluator
    brier_score_evaluator
    combined_evaluators
    correlation_evaluator
