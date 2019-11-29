@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.17.0] - 2019-11-29
+- **Bug Fix**
+    - Adapt classification learners to >=0.31.0 shap versions
+
 ## [1.16.0] - 2019-10-07
 - **Enhancement**
     - Improve split evaluator to avoid unexpected errors
