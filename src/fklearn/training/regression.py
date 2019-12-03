@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
+import pygam
+from pygam import LinearGAM
 from toolz import merge, curry, assoc
 from sklearn.linear_model import LinearRegression
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
@@ -516,6 +518,81 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
 
 lgbm_regression_learner.__doc__ += learner_return_docstring("LGBM Regressor")
+
+
+@curry
+def linear_gam_regression_learner(df: pd.DataFrame,
+                                  features: List[str],
+                                  target: str,
+                                  gam_terms: pygam.terms.TermList = None,
+                                  params: Dict[str, Any] = None,
+                                  prediction_column: str = "prediction",
+                                  encode_extra_cols: bool = True) -> LearnerReturnType:
+    """
+    Fits an linear generalized additive model to the dataset. Return the predict function
+    for the model and the predictions for the input dataset.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be continuous, since this is a regression model.
+
+    gam_terms : list of pygam terms
+        By default, "auto". Examples, see:
+        https://pygam.readthedocs.io/en/latest/api/terms.html
+
+    params : dict
+        The pygam LinearGAM parameters in the format {"par_name": param}. See:
+        https://pygam.readthedocs.io/en/latest/api/lineargam.html
+
+    prediction_column : str
+        The name of the column with the predictions from the model.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+    """
+
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
+
+    params = params if params else {}
+    gam_terms = gam_terms if gam_terms else "auto"
+
+    regr = LinearGAM(gam_terms, **params)
+    regr.fit(df[features].values, df[target].values)
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        return new_df.assign(**{prediction_column: regr.predict(new_df[features].values)})
+
+    p.__doc__ = learner_pred_fn_docstring("linear_gam_classification_learner")
+
+    log = {'linear_gam_classification_learner': {
+        'features': features,
+        'target': target,
+        'parameters': params,
+        'gam_terms': gam_terms,
+        'prediction_column': prediction_column,
+        'package': "pygam",
+        'package_version': pygam.__version__,
+        'feature_importance': dict(zip(features, regr.coef_.flatten())),
+        'training_samples': len(df)},
+        'object': regr}
+
+    return p, p(df), log
+
+
+linear_gam_regression_learner.__doc__ += learner_return_docstring("LinearGAM Regressor")
 
 
 @curry

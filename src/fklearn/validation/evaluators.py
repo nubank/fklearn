@@ -502,6 +502,33 @@ def mse_evaluator(test_data: pd.DataFrame,
 
 
 @curry
+def mae_evaluator(test_data: pd.DataFrame,
+                  prediction_column: str = "prediction",
+                  target_column: str = "target",
+                  eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the Mean Absolute Error, given true label and predictions.
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and predictions.
+    prediction_column : Strings
+        The name of the column in `test_data` with the predictions.
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the MAE Score
+    """
+    eval_fn = generic_sklearn_evaluator("mae_evaluator__", mean_absolute_error)
+
+    return eval_fn(test_data, prediction_column, target_column, eval_name)
+
+
+@curry
 def mean_prediction_evaluator(test_data: pd.DataFrame,
                               prediction_column: str = "prediction",
                               eval_name: str = None) -> EvalReturnType:
