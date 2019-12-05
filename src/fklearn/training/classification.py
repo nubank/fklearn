@@ -201,9 +201,13 @@ def xgb_classification_learner(df: pd.DataFrame,
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
-                shap_values = list(shap_values[1])
+                if isinstance(shap_expected_value, list):
+                    shap_expected_value = shap_expected_value[1]
+                if isinstance(shap_values, list):
+                    shap_values = shap_values[1]
+                shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values))}
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
 
             col_dict = merge(col_dict, shap_output)
 
@@ -339,9 +343,13 @@ def catboost_classification_learner(df: pd.DataFrame,
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
-                shap_values = list(shap_values[1])
+                if isinstance(shap_expected_value, list):
+                    shap_expected_value = shap_expected_value[1]
+                if isinstance(shap_values, list):
+                    shap_values = shap_values[1]
+                shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values))}
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
 
             col_dict = merge(col_dict, shap_output)
 
@@ -558,9 +566,13 @@ def lgbm_classification_learner(df: pd.DataFrame,
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
-                shap_values = list(shap_values[1])
+                if isinstance(shap_expected_value, list):
+                    shap_expected_value = shap_expected_value[1]
+                if isinstance(shap_values, list):
+                    shap_values = shap_values[1]
+                shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values))}
+                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
 
             col_dict = merge(col_dict, shap_output)
 
