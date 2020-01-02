@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.16.1] - 2020-01-02
+- **Enhancement**
+    - Increasing isotonic calibration regression by adding upper and lower bounds.
+
 ## [1.16.0] - 2019-10-07
 - **Enhancement**
     - Improve split evaluator to avoid unexpected errors
