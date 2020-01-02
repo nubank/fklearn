@@ -15,26 +15,34 @@ def isotonic_calibration_learner(df: pd.DataFrame,
                                  prediction_column: str = "prediction",
                                  output_column: str = "calibrated_prediction",
                                  y_min: float = 0,
-                                 y_max: float = 1) -> LearnáerReturnType:'
+                                 y_max: float = 1) -> LearnerReturnType:
     """
     Fits a single feature isotonic regression to the dataset.
+    
     Parameters
     ----------
+
     df : pandas.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column
         from the features.
+
     target_column : str
         The name of the column in `df` that should be used as target for the model.
         This column should be binary, since this is a classification model.
+
     prediction_column : str
         The name of the column with the uncalibrated predictions from the model.
+
     output_column : str
         The name of the column with the calibrated predictions from the model.
+
     y_min: float
         Lower bound of Isotonic Regression
+
     y_max: float
         Upper bound of Isotonic Regression
+
     """
 
     clf = IsotonicRegression(y_min=y_min, y_max=y_max, out_of_bounds='clip')
