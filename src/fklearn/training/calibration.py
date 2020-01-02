@@ -18,7 +18,7 @@ def isotonic_calibration_learner(df: pd.DataFrame,
                                  y_max: float = 1) -> LearnerReturnType:
     """
     Fits a single feature isotonic regression to the dataset.
-    
+
     Parameters
     ----------
 
@@ -46,6 +46,7 @@ def isotonic_calibration_learner(df: pd.DataFrame,
     """
 
     clf = IsotonicRegression(y_min=y_min, y_max=y_max, out_of_bounds='clip')
+
     clf.fit(df[prediction_column], df[target_column])
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
