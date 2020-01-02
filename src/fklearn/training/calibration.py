@@ -9,13 +9,13 @@ from fklearn.training.utils import log_learner_time
 
 
 @curry
-@log_learner_time(learner_name='isotonic_calibration_learner)
+@log_learner_time(learner_name='isotonic_calibration_learner')
 def isotonic_calibration_learner(df: pd.DataFrame,
                                  target_column: str = "target",
                                  prediction_column: str = "prediction",
                                  output_column: str = "calibrated_prediction",
                                  y_min: float = 0,
-                                 y_max: float = 1) -> LearnáerReturnType:
+                                 y_max: float = 1) -> LearnáerReturnType:'
     """
     Fits a single feature isotonic regression to the dataset.
     Parameters
