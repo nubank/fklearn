@@ -211,7 +211,7 @@ def catboost_regressor_learner(df: pd.DataFrame,
                                extra_params: Dict[str, Any] = None,
                                prediction_column: str = "prediction",
                                weight_column: str = None,
-                               fit_params: Dict[str, Any] = {'verbose: 0}) -> LearnerReturnType:
+                               fit_params: Dict[str, Any] = {'verbose': 0}) -> LearnerReturnType:
     """
     Fits an CatBoost regressor to the dataset. It first generates a Pool
     with the specified features and labels from `df`. Then it fits a CatBoost
