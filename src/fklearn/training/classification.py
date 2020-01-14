@@ -195,7 +195,7 @@ def xgb_classification_learner(df: pd.DataFrame,
                 shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
                 shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                      np.repeat(expected_value, len(class_shap_values))
+                                                  np.repeat(expected_value, len(class_shap_values))
                                                   for (class_index, (expected_value, class_shap_values))
                                                   in enumerate(zip(shap_expected_value, shap_values))}
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
@@ -560,7 +560,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                 shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
                 shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                      np.repeat(expected_value, len(class_shap_values))
+                                                  np.repeat(expected_value, len(class_shap_values))
                                                   for (class_index, (expected_value, class_shap_values))
                                                   in enumerate(zip(shap_expected_value, shap_values))}
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
