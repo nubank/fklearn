@@ -291,7 +291,7 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
-        
+
     fit_params: dict, optional
         Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
         Other parameters for the CatBoost model. See the list in:
