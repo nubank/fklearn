@@ -723,6 +723,73 @@ def onehot_categorizer(df: pd.DataFrame,
 
 onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
+@curry
+def feature_duplicator(df, columns_to_duplicate=None, columns_mapping=None, preffix=None, suffix=None):
+    """
+    """
+
+    import inspect
+
+    stackname = inspect.stack()[0].function
+
+    if columns_mapping is None:
+        columns_mapping = {
+            col: (preffix or '') + str(col) + (suffix or '')
+            for col in columns_to_duplicate
+        }
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        for src_col, dest_col in columns_mapping.items():
+            new_df.insert(len(new_df.columns), dest_col, df[src_col])
+        return new_df
+
+    p.__doc__ = learner_pred_fn_docstring(stackname)
+
+    log = {
+        stackname: {
+            'columns_to_duplicate': columns_to_duplicate,
+            'columns_mapping': columns_mapping,
+            'preffix': preffix,
+            'suffix': suffix
+        }
+    }
+
+    return p, p(df), log
+
+
+
+def column_duplicatable(child_fn):
+    """inject mixin"""
+    import inspect
+
+    from functools import wraps
+
+    from .pipeline import build_pipeline
+
+    mixin_fn = feature_duplicator
+
+    def callable_fn(*args, **kwargs):
+        mixin_spec  = inspect.getfullargspec(mixin_fn)
+        mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
+
+        child_spec  = inspect.getfullargspec(child_fn)
+        child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
+
+        print(kwargs)
+
+        pipe = build_pipeline(
+            mixin_fn(**{key: value for key, value in kwargs.items() if key in mixin_kargs}),
+            child_fn(**{key: value for key, value in kwargs.items() if key in child_kargs})
+        )
+        pipe.__doc__ = child_fn.__doc__
+
+        return pipe
+
+    callable_fn = wraps(child_fn)(callable_fn)
+    callable_fn.__doc__ = child_fn.__doc__
+
+    return callable_fn
+
 
 @curry
 @log_learner_time(learner_name='target_categorizer')
@@ -791,9 +858,7 @@ def target_categorizer(df: pd.DataFrame,
 
     return p, p(df), log
 
-
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
-
 
 @curry
 @log_learner_time(learner_name='standard_scaler')
