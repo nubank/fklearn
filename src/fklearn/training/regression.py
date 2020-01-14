@@ -198,8 +198,6 @@ def xgb_regression_learner(df: pd.DataFrame,
 
 xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
-assert isinstance(LearnerReturnType, object)
-
 
 @curry
 @log_learner_time(learner_name='catboost_regressor_learner')
