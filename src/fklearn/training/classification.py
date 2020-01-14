@@ -414,7 +414,6 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the predictions from the model.
     """
-
     # set default params
     default_vect_params = {"strip_accents": "unicode", "min_df": 20}
     merged_vect_params = default_vect_params if not vectorizer_params else merge(default_vect_params, vectorizer_params)
