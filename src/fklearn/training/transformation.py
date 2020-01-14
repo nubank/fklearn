@@ -723,11 +723,12 @@ def onehot_categorizer(df: pd.DataFrame,
 
 onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
+
 @curry
 def feature_duplicator(df, columns_to_duplicate=None, columns_mapping=None, preffix=None, suffix=None):
     """
+    #TODO
     """
-
     import inspect
 
     stackname = inspect.stack()[0].function
@@ -757,9 +758,10 @@ def feature_duplicator(df, columns_to_duplicate=None, columns_mapping=None, pref
     return p, p(df), log
 
 
-
 def column_duplicatable(child_fn):
-    """inject mixin"""
+    """
+    #TODO
+    """
     import inspect
 
     from functools import wraps
@@ -775,8 +777,7 @@ def column_duplicatable(child_fn):
         child_spec  = inspect.getfullargspec(child_fn)
         child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
 
-        print(kwargs)
-
+        #TODO: map columns_to_categorize trough columns_mapping
         pipe = build_pipeline(
             mixin_fn(**{key: value for key, value in kwargs.items() if key in mixin_kargs}),
             child_fn(**{key: value for key, value in kwargs.items() if key in child_kargs})
@@ -859,7 +860,9 @@ def target_categorizer(df: pd.DataFrame,
 
     return p, p(df), log
 
+
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
+
 
 @curry
 @log_learner_time(learner_name='standard_scaler')
