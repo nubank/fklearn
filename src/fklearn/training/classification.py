@@ -298,6 +298,7 @@ def catboost_classification_learner(df: pd.DataFrame,
         https://catboost.ai/docs/concepts/python-reference_catboostregressor_fit.html#python-reference_catboostregressor_fit
         If not passed, the default will be used.
     """
+
     from catboost import Pool, CatBoostClassifier
     import catboost
 
