@@ -797,13 +797,6 @@ def target_categorizer(df: pd.DataFrame,
 
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
 
-df2 = pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c'])
-
-pipe = target_categorizer(
-columns_to_categorize=['b', 'a'], target_column='c', columns_to_duplicate=['b', 'a'], suffix='____suffix')
-
-print(df2)
-print(pipe(df2.copy())[1])
 
 @curry
 @log_learner_time(learner_name='standard_scaler')

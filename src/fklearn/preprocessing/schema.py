@@ -65,7 +65,7 @@ def feature_duplicator(df: pd.DataFrame,
     return p, p(df), log
 
 
-def column_duplicatable(columns_to_bind):
+def column_duplicatable(columns_to_bind: str):
     """
     Decorator to duplicate some columns in the dataframe
 
@@ -75,16 +75,16 @@ def column_duplicatable(columns_to_bind):
         Duplicates these columns before applying an inplace learner
     """
 
-    def _decorator(child):
+    def _decorator(child: Callable):
         mixin = feature_duplicator
 
-        def _init(**kwargs):
-            mixin_spec  = inspect.getfullargspec(mixin)
+        def _init(**kwargs: Dict[str, Any]):
+            mixin_spec = inspect.getfullargspec(mixin)
             mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
-            child_spec  = inspect.getfullargspec(child)
+            child_spec = inspect.getfullargspec(child)
             child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
 
-            def _learn(df):
+            def _learn(df: pd.DataFrame):
                 mixin_fn, mixin_df, mixin_log = mixin(
                     df,
                     **{key: value for key, value in kwargs.items() if key in mixin_kargs})
