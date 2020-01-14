@@ -238,7 +238,8 @@ def catboost_classification_learner(df: pd.DataFrame,
                                     extra_params: LogType = None,
                                     prediction_column: str = "prediction",
                                     weight_column: str = None,
-                                    encode_extra_cols: bool = True) -> LearnerReturnType:
+                                    encode_extra_cols: bool = True,
+                                    fit_params: Dict[str, Any] = {'verbose: 0}) -> LearnerReturnType:
     """
     Fits an CatBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a CatBoost
@@ -290,6 +291,12 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+        
+    fit_params: dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
+        Other parameters for the CatBoost model. See the list in:
+        https://catboost.ai/docs/concepts/python-reference_catboostregressor_fit.html#python-reference_catboostregressor_fit
+        If not passed, the default will be used.
     """
     from catboost import Pool, CatBoostClassifier
     import catboost
@@ -307,7 +314,7 @@ def catboost_classification_learner(df: pd.DataFrame,
                   feature_names=list(map(str, features)), cat_features=cat_features)
 
     cat_boost_classifier = CatBoostClassifier(iterations=num_estimators, **params)
-    cbr = cat_boost_classifier.fit(dtrain, verbose=0)
+    cbr = cat_boost_classifier.fit(dtrain, **fit_params)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
 
@@ -356,6 +363,7 @@ def catboost_classification_learner(df: pd.DataFrame,
         'package': "catboost",
         'package_version': catboost.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
+        'fit_params': fit_params,
         'feature_importance': cbr.feature_importances_,
         'training_samples': len(df)},
         'object': cbr}
