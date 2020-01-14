@@ -725,7 +725,11 @@ onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
 @curry
-def feature_duplicator(df, columns_to_duplicate=None, columns_mapping=None, preffix=None, suffix=None):
+def feature_duplicator(df: pd.DataFrame,
+                       columns_to_duplicate: Optional[List[str]] = None,
+                       columns_mapping: Optional[Dict[str, str]] = None,
+                       preffix: Optional[str] = None,
+                       suffix: Optional[str] = None):
     """
     #TODO
     """
@@ -754,45 +758,65 @@ def feature_duplicator(df, columns_to_duplicate=None, columns_mapping=None, pref
             'suffix': suffix
         }
     }
+    eval(stackname).log = log[stackname]
 
     return p, p(df), log
 
 
-def column_duplicatable(child_fn):
+def column_duplicatable(columns_to_bind):
     """
     #TODO
     """
-    import inspect
 
-    from functools import wraps
+    def _decorator(child):
+        import functools
+        import inspect
+        import toolz
 
-    from .pipeline import build_pipeline
+        from functools import wraps
+        from toolz import compose
 
-    mixin_fn = feature_duplicator
+        from .pipeline import build_pipeline
 
-    def callable_fn(*args, **kwargs):
-        mixin_spec  = inspect.getfullargspec(mixin_fn)
-        mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
+        mixin = feature_duplicator
 
-        child_spec  = inspect.getfullargspec(child_fn)
-        child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
+        def _init(**kwargs):
+            mixin_spec  = inspect.getfullargspec(mixin)
+            mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
 
-        #TODO: map columns_to_categorize trough columns_mapping
-        pipe = build_pipeline(
-            mixin_fn(**{key: value for key, value in kwargs.items() if key in mixin_kargs}),
-            child_fn(**{key: value for key, value in kwargs.items() if key in child_kargs})
-        )
-        pipe.__doc__ = child_fn.__doc__
-
-        return pipe
-
-    callable_fn = wraps(child_fn)(callable_fn)
-    callable_fn.__doc__ = child_fn.__doc__
-
-    return callable_fn
+            child_spec  = inspect.getfullargspec(child)
+            child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
 
 
-@column_duplicatable
+            def _learn(df):
+                mixin_fn, mixin_df, mixin_log = mixin(
+                    df,
+                    **{key: value for key, value in kwargs.items() if key in mixin_kargs})
+                child_fn, child_df, child_log = child(
+                    mixin_df, 
+                    **{
+                        **{
+                            key: value 
+                            for key, value in kwargs.items() 
+                            if key in child_kargs
+                        },
+                        columns_to_bind: list(mixin_log['feature_duplicator']['columns_mapping'].values())})
+
+                return toolz.compose(child_fn, mixin_fn), child_df, {**mixin_log, **child_log}
+            
+            _learn.__doc__ = child.__doc__
+
+            return _learn
+
+        callable_fn = wraps(child)(_init)
+        callable_fn.__doc__ = child.__doc__
+
+        return callable_fn
+
+    return _decorator
+
+
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='target_categorizer')
 def target_categorizer(df: pd.DataFrame,
