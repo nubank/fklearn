@@ -149,7 +149,7 @@ def validator(train_data: pd.DataFrame,
 
     def get_perturbed_columns(perturbator: PerturbFnType) -> List[str]:
         args = inspect.getfullargspec(perturbator).kwonlydefaults
-        return args['cols']
+        return args['cols'] if args else []
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     first_train_log = first(train_logs)
