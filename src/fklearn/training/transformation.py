@@ -791,6 +791,7 @@ def column_duplicatable(child_fn):
     return callable_fn
 
 
+@column_duplicatable
 @curry
 @log_learner_time(learner_name='target_categorizer')
 def target_categorizer(df: pd.DataFrame,
