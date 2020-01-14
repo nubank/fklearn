@@ -329,9 +329,9 @@ def catboost_classification_learner(df: pd.DataFrame,
             import shap
             if params["objective"] == "MultiClass":
                 shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
+                # catboost shap returns a list for each row, we reformat it to return
+                # a list for each class
                 shap_values = shap_values.transpose(1, 0, 2)
-                print(shap_values.shape)
-                print(shap_values)
                 shap_values_multiclass = {f"shap_values_{class_index}": list(value[:, :-1])
                                           for (class_index, value) in enumerate(shap_values)}
                 shap_expected_value_multiclass = {f"shap_expected_value_{class_index}": value[:, -1]
