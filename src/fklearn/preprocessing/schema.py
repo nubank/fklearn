@@ -5,15 +5,38 @@ import toolz
 
 from typing import Any, Callable, Dict, List, Union, Optional
 
-@curry
+@toolz.curry
 def feature_duplicator(df: pd.DataFrame,
                        columns_to_duplicate: Optional[List[str]] = None,
                        columns_mapping: Optional[Dict[str, str]] = None,
                        preffix: Optional[str] = None,
                        suffix: Optional[str] = None):
     """
-    #TODO
+    Duplicates some columns in the dataframe
+
+    Parameters
+    ----------
+    df: pandas.DataFrame
+        A Pandas' DataFrame with columns_to_duplicate columns
+
+    columns_to_duplicate: list of str
+        List of columns names
+
+    columns_mapping: int (default None)
+        Mapping of source columns to destination columns
+
+    preffix: int (default None)
+        Preffix to add to columns to duplicate
+
+    suffix: int (default None)
+        Suffix to add to columns to duplicate
+
+    Returns
+    ----------
+    increased_dataset : pandas.DataFrame
+        A dataset with repeated columns
     """
+
     stackname = inspect.stack()[0].function
 
     if columns_mapping is None:
@@ -27,7 +50,7 @@ def feature_duplicator(df: pd.DataFrame,
             new_df.insert(len(new_df.columns), dest_col, df[src_col])
         return new_df
 
-    p.__doc__ = learner_pred_fn_docstring(stackname)
+    p.__doc__ = eval(inspect.stack()[0].function).__doc__
 
     log = {
         stackname: {
@@ -44,7 +67,12 @@ def feature_duplicator(df: pd.DataFrame,
 
 def column_duplicatable(columns_to_bind):
     """
-    #TODO
+    Decorator to duplicate some columns in the dataframe
+
+    Parameters
+    ----------
+    columns_to_bind: list of str
+        Duplicates these columns before applying an inplace learner
     """
 
     def _decorator(child):
@@ -53,7 +81,6 @@ def column_duplicatable(columns_to_bind):
         def _init(**kwargs):
             mixin_spec  = inspect.getfullargspec(mixin)
             mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
-
             child_spec  = inspect.getfullargspec(child)
             child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
 
@@ -62,17 +89,17 @@ def column_duplicatable(columns_to_bind):
                     df,
                     **{key: value for key, value in kwargs.items() if key in mixin_kargs})
                 child_fn, child_df, child_log = child(
-                    mixin_df, 
+                    mixin_df,
                     **{
                         **{
-                            key: value 
-                            for key, value in kwargs.items() 
+                            key: value
+                            for key, value in kwargs.items()
                             if key in child_kargs
                         },
                         columns_to_bind: list(mixin_log['feature_duplicator']['columns_mapping'].values())})
 
                 return toolz.compose(child_fn, mixin_fn), child_df, {**mixin_log, **child_log}
-            
+
             _learn.__doc__ = child.__doc__
 
             return _learn
