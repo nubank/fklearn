@@ -198,6 +198,8 @@ def xgb_regression_learner(df: pd.DataFrame,
 
 xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
+assert isinstance(LearnerReturnType, object)
+
 
 @curry
 @log_learner_time(learner_name='catboost_regressor_learner')
@@ -208,7 +210,8 @@ def catboost_regressor_learner(df: pd.DataFrame,
                                num_estimators: int = 100,
                                extra_params: Dict[str, Any] = None,
                                prediction_column: str = "prediction",
-                               weight_column: str = None) -> LearnerReturnType:
+                               weight_column: str = None,
+                               fit_params: Dict[str, Any] = {'verbose: 0}) -> LearnerReturnType:
     """
     Fits an CatBoost regressor to the dataset. It first generates a Pool
     with the specified features and labels from `df`. Then it fits a CatBoost
@@ -256,6 +259,12 @@ def catboost_regressor_learner(df: pd.DataFrame,
 
     weight_column : str, optional
         The name of the column with scores to weight the data.
+
+    fit_params: dict, optional
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
+        Other parameters for the CatBoost model. See the list in:
+        https://catboost.ai/docs/concepts/python-reference_catboostregressor_fit.html#python-reference_catboostregressor_fit
+        If not passed, the default will be used.
     """
     from catboost import Pool, CatBoostRegressor
     import catboost
@@ -266,7 +275,7 @@ def catboost_regressor_learner(df: pd.DataFrame,
 
     dtrain = Pool(df[features].values, df[target].values, weight=weights, feature_names=list(map(str, features)))
     cat_boost_regressor = CatBoostRegressor(iterations=num_estimators, **params)
-    cbr = cat_boost_regressor.fit(dtrain, verbose=0)
+    cbr = cat_boost_regressor.fit(dtrain, **fit_params)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         dtest = Pool(new_df[features].values, feature_names=list(map(str, features)))
@@ -294,6 +303,7 @@ def catboost_regressor_learner(df: pd.DataFrame,
         'package': "catboost",
         'package_version': catboost.__version__,
         'parameters': assoc(params, "num_estimators", num_estimators),
+        'fit_params': fit_params,
         'feature_importance': cbr.feature_importances_,
         'training_samples': len(df)},
         'object': cbr}
