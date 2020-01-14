@@ -315,20 +315,21 @@ def catboost_classification_learner(df: pd.DataFrame,
 
         if apply_shap:
             import shap
-            explainer = shap.TreeExplainer(cbr)
-            shap_values = explainer.shap_values(dtest)
-            shap_expected_value = explainer.expected_value
-
             if params["objective"] == "MultiClass":
-                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
+                shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
+                shap_values = shap_values.transpose(1, 0, 2)
+                print(shap_values.shape)
+                print(shap_values)
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value[:,:-1])
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                  np.repeat(expected_value, len(class_shap_values))
-                                                  for (class_index, (expected_value, class_shap_values))
-                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}": value[:, -1]
+                                                  for (class_index, value) in enumerate(shap_values)}
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
+                explainer = shap.TreeExplainer(cbr)
+                shap_values = explainer.shap_values(dtest)
+                shap_expected_value = explainer.expected_value
                 shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
                                "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
