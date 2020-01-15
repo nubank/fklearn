@@ -203,7 +203,8 @@ def test_catboost_regressor_learner():
                                          num_estimators=20,
                                          extra_params={"max_depth": 2, "random_seed": 42},
                                          prediction_column="prediction",
-                                         weight_column="w")
+                                         weight_column="w",
+                                         fit_params={'verbose': 0})
 
     predict_fn, pred_train, log = learner(df_train)
 
