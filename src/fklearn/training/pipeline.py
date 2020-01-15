@@ -7,7 +7,7 @@ import toolz as fp
 
 from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
-    
+
 def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
     no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
     if len(no_default_list) > 1:
@@ -15,6 +15,7 @@ def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
                          "Make sure all learners are curried properly and only require one argument,"
                          " which is the dataset (usually `df`)."
                          .format(learner.__name__, ', '.join(no_default_list)))
+
 
 def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None:
     invalid_parameter_kinds = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
