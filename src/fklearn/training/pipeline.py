@@ -1,6 +1,6 @@
 from collections import defaultdict
 from inspect import Parameter, signature
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 import toolz as fp
@@ -26,7 +26,7 @@ def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None
                          .format(learner.__name__, ', '.join(var_args)))
 
 
-def _check_unfilled_arg(learners: LearnerFnType) -> None:
+def _check_unfilled_arg(learners: List[LearnerFnType]) -> None:
     for l in learners:
         _has_one_unfilled_arg(l)
 
@@ -75,7 +75,7 @@ def build_pipeline_repeated_learners(*learners: LearnerFnType) -> LearnerFnType:
         fns = []
         logs = []
         pipeline = []
-        serialisation = defaultdict(list)
+        serialisation = defaultdict(list)  # type: dict
 
         for learner in learners:
             learner_fn, new_data, learner_log = learner(current_data)
