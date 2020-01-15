@@ -26,7 +26,7 @@ def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None
                          .format(learner.__name__, ', '.join(var_args)))
 
 
-def _check_unfilled_arg(learners: List[LearnerFnType]) -> None:
+def _check_unfilled_arg(*learners: LearnerFnType) -> None:
     for l in learners:
         _has_one_unfilled_arg(l)
 
@@ -67,7 +67,7 @@ def build_pipeline_repeated_learners(*learners: LearnerFnType) -> LearnerFnType:
     """
 
     # Check for unfilled arguments of learners
-    _check_unfilled_arg(learners)
+    _check_unfilled_arg(*learners)
 
     def pipeline(data: pd.DataFrame) -> LearnerReturnType:
         current_data = data.copy()
@@ -147,7 +147,7 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
     """
 
     # Check for unfilled arguments of learners
-    _check_unfilled_arg(learners)
+    _check_unfilled_arg(*learners)
 
     def pipeline(data: pd.DataFrame) -> LearnerReturnType:
         current_data = data.copy()
