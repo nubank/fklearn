@@ -1,6 +1,6 @@
 from collections import defaultdict
 from inspect import Parameter, signature
-from typing import Dict, List
+from typing import Dict
 
 import pandas as pd
 import toolz as fp
