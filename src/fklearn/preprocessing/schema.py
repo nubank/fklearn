@@ -3,7 +3,8 @@ import inspect
 import pandas as pd
 import toolz
 
-from typing import Any, Callable, Dict, List, Union, Optional
+from typing import Any, Callable, Dict, List, Optional
+
 
 @toolz.curry
 def feature_duplicator(df: pd.DataFrame,
