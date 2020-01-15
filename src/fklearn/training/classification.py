@@ -293,7 +293,7 @@ def catboost_classification_learner(df: pd.DataFrame,
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
 
     fit_params: dict, optional
-        Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
         Other parameters for the CatBoost model. See the list in:
         https://catboost.ai/docs/concepts/python-reference_catboostregressor_fit.html#python-reference_catboostregressor_fit
         If not passed, the default will be used.

@@ -259,7 +259,7 @@ def catboost_regressor_learner(df: pd.DataFrame,
         The name of the column with scores to weight the data.
 
     fit_params: dict, optional
-        Dictionary in the format {"hyperparameter_name" : hyperparameter_value.
+        Dictionary in the format {"hyperparameter_name" : hyperparameter_value}.
         Other parameters for the CatBoost model. See the list in:
         https://catboost.ai/docs/concepts/python-reference_catboostregressor_fit.html#python-reference_catboostregressor_fit
         If not passed, the default will be used.
