@@ -22,9 +22,9 @@ def logs():
                                                'training_samples': 8, 'running_time': '0.019 s'}
             },
          'validator_log': [
-             {'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.8}],
+             {'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.8}],
               'split_log': {'train_size': 8, 'test_size': 8}},
-             {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.8}],
+             {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.8}],
               'split_log': {'train_size': 8, 'test_size': 8}}],
          'used_subsets': ['first', 'second']},
         {'train_log':
@@ -38,9 +38,9 @@ def logs():
                                                'training_samples': 8, 'running_time': '0.019 s'}
             },
          'validator_log': [
-             {'fold_num': 0, 'eval_results': [{'auc_evaluator__target': 0.6}],
+             {'fold_num': 0, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
               'split_log': {'train_size': 8, 'test_size': 8}},
-             {'fold_num': 1, 'eval_results': [{'auc_evaluator__target': 0.6}],
+             {'fold_num': 1, 'eval_results': [{'roc_auc_evaluator__target': 0.6}],
               'split_log': {'train_size': 8, 'test_size': 8}}],
          'used_subsets': ['first', 'third']}
     ]
@@ -48,12 +48,12 @@ def logs():
 
 @pytest.fixture()
 def base_extractor():
-    return evaluator_extractor(evaluator_name='auc_evaluator__target')
+    return evaluator_extractor(evaluator_name='roc_auc_evaluator__target')
 
 
 @pytest.fixture()
 def metric_name():
-    return 'auc_evaluator__target'
+    return 'roc_auc_evaluator__target'
 
 
 @pytest.fixture()

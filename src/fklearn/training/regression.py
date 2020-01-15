@@ -566,16 +566,16 @@ def custom_supervised_model_learner(df: pd.DataFrame,
         For regression just prediction_column will be added.
     """
 
-    assert(len(log) == 1), "\'log\' dictionary must start with model name"
-    TYPE_ERROR_MESSAGE = "supervised_type options are: \'classification\' or \'regression\'"
-    assert(supervised_type == 'classification' or supervised_type == 'regression'), TYPE_ERROR_MESSAGE
-    assert(hasattr(model, 'fit')), "\'model\' object must have \'fit\' attribute"
-    if supervised_type == 'classification':
-        PROBA_ERROR_MESSAGE = "\'model\' object for classification must have \'predict_proba\' attribute"
-        assert(hasattr(model, 'predict_proba')), PROBA_ERROR_MESSAGE
-    elif supervised_type == 'regression':
-        PREDICT_ERROR_MESSAGE = "\'model\' object for regression must have \'predict\' attribute"
-        assert(hasattr(model, 'predict')), PREDICT_ERROR_MESSAGE
+    if len(log) != 1:
+        raise ValueError("\'log\' dictionary must start with model name")
+    if supervised_type not in ('classification', 'regression'):
+        raise TypeError("supervised_type options are: \'classification\' or \'regression\'")
+    if not hasattr(model, 'fit'):
+        raise AttributeError("\'model\' object must have \'fit\' attribute")
+    if supervised_type == 'classification' and not hasattr(model, 'predict_proba'):
+        raise AttributeError("\'model\' object for classification must have \'predict_proba\' attribute")
+    if supervised_type == 'regression' and not hasattr(model, 'predict'):
+        raise AttributeError("\'model\' object for regression must have \'predict\' attribute")
 
     model.fit(df[features].values, df[target].values)
 

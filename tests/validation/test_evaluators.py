@@ -2,12 +2,16 @@ import string
 
 import numpy as np
 import pandas as pd
+import pytest
 
-from fklearn.validation.evaluators import \
-    r2_evaluator, mse_evaluator, combined_evaluators, mean_prediction_evaluator, auc_evaluator, \
-    precision_evaluator, recall_evaluator, fbeta_score_evaluator, logloss_evaluator, brier_score_evaluator, \
-    expected_calibration_error_evaluator, correlation_evaluator, spearman_evaluator, split_evaluator, \
-    temporal_split_evaluator, permutation_evaluator, hash_evaluator
+from fklearn.validation.evaluators import (
+    auc_evaluator, brier_score_evaluator, combined_evaluators,
+    correlation_evaluator, expected_calibration_error_evaluator,
+    fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
+    mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
+    pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
+    roc_auc_evaluator, spearman_evaluator, split_evaluator,
+    temporal_split_evaluator)
 
 
 def test_combined_evaluators():
@@ -57,6 +61,40 @@ def test_auc_evaluator():
     result = eval_fn(predictions)
 
     assert result["eval_name"] == 0.875
+
+
+def test_roc_auc_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [0, 1, 0, 1],
+            'prediction': [.2, .9, .3, .3]
+        }
+    )
+
+    eval_fn = roc_auc_evaluator(prediction_column="prediction",
+                                target_column="target",
+                                eval_name="eval_name")
+
+    result = eval_fn(predictions)
+
+    assert result["eval_name"] == 0.875
+
+
+def test_pr_auc_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [0, 1, 0, 1],
+            'prediction': [.2, .9, .3, .3]
+        }
+    )
+
+    eval_fn = pr_auc_evaluator(prediction_column="prediction",
+                               target_column="target",
+                               eval_name="eval_name")
+
+    result = eval_fn(predictions)
+
+    assert result["eval_name"] == pytest.approx(0.833333)
 
 
 def test_precision_evaluator():

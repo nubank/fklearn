@@ -422,16 +422,18 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
     random_state : int
         A seed for the random number generator that shuffles the IDs.
     """
-    assert 0.0 < np.min(train_percentages) <= 1.0, "Train percentages must be between 0 and 1"
+    if np.min(train_percentages) < 0 or np.min(train_percentages) > 1:
+        raise ValueError('Train percentages must be between 0 and 1')
 
     if isinstance(training_limit, str):
         training_limit = datetime.strptime(training_limit, "%Y-%m-%d")
 
-    assert train_data[time_column].min() < training_limit < train_data[time_column].max(), (
-        "Temporal training limit should be within datasets temporal bounds (min and max times)")
-    assert timedelta(days=0) <= holdout_gap, "Holdout gap cannot be negative"
-    assert holdout_gap < train_data[time_column].max() - training_limit, (
-        "After taking the gap into account, there should be enough time for the holdout set")
+    if training_limit < train_data[time_column].min() or training_limit > train_data[time_column].max():
+        raise ValueError('Temporal training limit should be within datasets temporal bounds (min and max times)')
+    if timedelta(days=0) > holdout_gap:
+        raise ValueError('Holdout gap cannot be negative')
+    if holdout_gap >= (train_data[time_column].max() - training_limit):
+        raise ValueError('After taking the gap into account, there should be enough time for the holdout set')
 
     train_data = train_data.reset_index()
 
@@ -734,14 +736,18 @@ def forward_stability_curve_time_splitter(train_data: pd.DataFrame,
 
     max_date = train_data[time_column].max()
 
-    assert train_data[time_column].min() <= training_time_start < training_time_end <= max_date, (
-        "Temporal training limits should be within datasets temporal bounds (min and max times)")
-    assert timedelta(days=0) <= holdout_gap, "Holdout gap cannot be negative"
-    assert timedelta(days=0) <= holdout_size, "Holdout size cannot be negative"
+    if not (train_data[time_column].min() <= training_time_start < training_time_end <= max_date):
+        raise ValueError('Temporal training limits should be within datasets temporal bounds (min and max times)')
+    if timedelta(days=0) > holdout_gap:
+        raise ValueError('Holdout gap cannot be negative')
+    if timedelta(days=0) > holdout_size:
+        raise ValueError('Holdout size cannot be negative')
 
     n_folds = int(np.ceil((max_date - holdout_size - holdout_gap - training_time_end) / step))
 
-    assert n_folds > 0, "After taking the gap and holdout into account, there should be enough time for the holdout set"
+    if n_folds <= 0:
+        raise ValueError(
+            'After taking the gap and holdout into account, there should be enough time for the holdout set')
 
     train_ranges = [(training_time_start + i * step * move_training_start_with_steps, training_time_end + i * step)
                     for i in range(n_folds)]

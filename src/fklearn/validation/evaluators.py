@@ -1,14 +1,18 @@
+import warnings
 from typing import Any, Callable, Iterable, List
 
-import toolz as fp
-from toolz import curry
-import pandas as pd
 import numpy as np
+import pandas as pd
+import toolz as fp
 from pandas.util import hash_pandas_object
-from sklearn.metrics import roc_auc_score, r2_score, mean_squared_error, log_loss, precision_score, recall_score, \
-    fbeta_score, brier_score_loss, mean_absolute_error
+from sklearn.metrics import (average_precision_score, brier_score_loss,
+                             fbeta_score, log_loss, mean_absolute_error,
+                             mean_squared_error, precision_score, r2_score,
+                             recall_score, roc_auc_score)
+from toolz import curry
 
-from fklearn.types import EvalFnType, EvalReturnType, PredictFnType, UncurriedEvalFnType
+from fklearn.types import (EvalFnType, EvalReturnType, PredictFnType,
+                           UncurriedEvalFnType)
 
 
 def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., float]) -> UncurriedEvalFnType:
@@ -59,7 +63,7 @@ def auc_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction scores.
@@ -76,7 +80,75 @@ def auc_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the ROC AUC Score
     """
 
-    eval_fn = generic_sklearn_evaluator("auc_evaluator__", roc_auc_score)
+    warnings.warn("The method `auc_evaluator` will be renamed to `roc_auc_evaluator` in the next major release 2.0.0."
+                  " Please use `roc_auc_evaluator` instead of `auc_evaluator` for Area Under the Curve of the"
+                  " Receiver Operating Characteristics curve.")
+
+    return roc_auc_evaluator(test_data, prediction_column, target_column, eval_name)
+
+
+@curry
+def roc_auc_evaluator(test_data: pd.DataFrame,
+                      prediction_column: str = "prediction",
+                      target_column: str = "target",
+                      eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the ROC AUC score, given true label and prediction scores.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with target and prediction scores.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction scores.
+
+    target_column : String
+        The name of the column in `test_data` with the binary target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the ROC AUC Score
+    """
+
+    eval_fn = generic_sklearn_evaluator("roc_auc_evaluator__", roc_auc_score)
+    eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
+
+    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+
+
+@curry
+def pr_auc_evaluator(test_data: pd.DataFrame,
+                     prediction_column: str = "prediction",
+                     target_column: str = "target",
+                     eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the PR AUC score, given true label and prediction scores.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with target and prediction scores.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction scores.
+
+    target_column : String
+        The name of the column in `test_data` with the binary target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    A log-like dictionary with the PR AUC Score
+    """
+
+    eval_fn = generic_sklearn_evaluator("pr_auc_evaluator__", average_precision_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -647,8 +719,8 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
     if split_values is None:
         split_values = unique_values
     else:
-        assert all(sv in unique_values for sv in split_values), (
-            "All split values must be present in the column (after date formatting it)")
+        if not (all(sv in unique_values for sv in split_values)):
+            raise ValueError('All split values must be present in the column (after date formatting it')
 
     return {eval_name + "_" + str(value): eval_fn(test_data.loc[lambda df: formatted_time_col == value])
             for value in split_values}

@@ -7,25 +7,22 @@ import toolz as fp
 
 from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
-
+    
 def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
     no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
-    assert len(no_default_list) <= 1, "Learner {0} has more than one unfilled argument: {1}\n" \
-                                      "Make sure all learners are curried properly and only require one argument," \
-                                      " which is the dataset (usually `df`).".format(
-        learner.__name__,
-        ', '.join(no_default_list)
-    )
-
+    if len(no_default_list) > 1:
+        raise ValueError("Learner {0} has more than one unfilled argument: {1}\n"
+                         "Make sure all learners are curried properly and only require one argument,"
+                         " which is the dataset (usually `df`)."
+                         .format(learner.__name__, ', '.join(no_default_list)))
 
 def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None:
     invalid_parameter_kinds = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
     var_args = [p for p, a in signature(predict_fn).parameters.items() if a.kind in invalid_parameter_kinds]
-    assert len(var_args) == 0, "Predict function of learner {0} contains variable length arguments: {1}\n" \
-                               "Make sure no predict function uses arguments like *args or **kwargs.".format(
-        learner.__name__,
-        ', '.join(var_args)
-    )
+    if len(var_args) != 0:
+        raise ValueError("Predict function of learner {0} contains variable length arguments: {1}\n"
+                         "Make sure no predict function uses arguments like *args or **kwargs."
+                         .format(learner.__name__, ', '.join(var_args)))
 
 
 def _check_unfilled_arg(learners: LearnerFnType) -> None:

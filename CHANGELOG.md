@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.16.1] - 2020-01-02
+- **Enhancement**
+    - Increasing isotonic calibration regression by adding upper and lower bounds.
+
+## [1.16.0] - 2019-10-07
+- **Enhancement**
+    - Improve split evaluator to avoid unexpected errors
+- **New**
+    - Now users can install only the set of requirements they need
+    - Add Target encoding learner
+    - Add PR AUC and rename AUC evaluator to ROC AUC
+- **Bug Fix**
+    - Fix bug with space_time_split_dataset fn
+- **Documentation**
+    - Update space time split DOCSTRING to match the actual behaviour
+    - Add more tutorials(Pydata)
+
+
 ## [1.15.1] - 2019-08-16
 - **Enhancement**
     - Now learners that have a model exposes it in the logs as `object` key
