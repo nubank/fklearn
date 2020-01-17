@@ -34,7 +34,7 @@ def _check_unfilled_arg(*learners: LearnerFnType) -> None:
 def build_pipeline_repeated_learners(*learners: LearnerFnType) -> LearnerFnType:
     """
     Builds a pipeline of chained learners functions with the possibility of using keyword arguments
-    in the predict functions of the pipeline. It also supports several learners with the same name.
+    in the predict functions of the pipeline. Note that it supports several learners with the same name.
 
     Say you have two learners, you create a pipeline with `pipeline = build_pipeline(learner1, learner2)`.
     Those learners must be functions with just one unfilled argument (the dataset itself).
@@ -115,9 +115,10 @@ def build_pipeline_repeated_learners(*learners: LearnerFnType) -> LearnerFnType:
 
 def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
     """
-    Builds a pipeline of chained learners functions with the possibility of using keyword arguments
+    Builds a pipeline of different chained learners functions with the possibility of using keyword arguments
     in the predict functions of the pipeline. It does not support multiple learners with the same name inside the same
-    pipeline. E.g: multiple xgboost learners each one using the same features, but different targets.
+    pipeline. E.g: multiple xgboost learners each one using the same features, but different targets. In those cases,
+    the pipeline logs would be inconsistent.
 
     Say you have two learners, you create a pipeline with `pipeline = build_pipeline(learner1, learner2)`.
     Those learners must be functions with just one unfilled argument (the dataset itself).

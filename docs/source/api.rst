@@ -75,6 +75,7 @@ Pipeline (fklearn.training.pipeline)
 
 .. autosummary::
    build_pipeline
+   build_pipeline_repeated_learners
 
 Regression (fklearn.training.regression)
 ########################################
