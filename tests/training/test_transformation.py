@@ -489,7 +489,6 @@ def test_target_categorizer():
     assert_almost_equal(data[expected_output_train_continuous_target.columns].values,
                         expected_output_train_continuous_target.values, decimal=5)
 
-
     # Test with binary target
     categorizer_learner = target_categorizer(
         columns_to_categorize=["feat2_cat", "feat3_cat"], target_column="target", suffix="__suffix")
