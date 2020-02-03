@@ -5,13 +5,15 @@ import toolz
 
 from typing import Any, Callable, Dict, List, Optional
 
+from ..types import LearnerReturnType
+
 
 @toolz.curry
 def feature_duplicator(df: pd.DataFrame,
                        columns_to_duplicate: Optional[List[str]] = None,
                        columns_mapping: Optional[Dict[str, str]] = None,
                        preffix: Optional[str] = None,
-                       suffix: Optional[str] = None):
+                       suffix: Optional[str] = None) -> LearnerReturnType:
     """
     Duplicates some columns in the dataframe
 
@@ -69,7 +71,7 @@ def feature_duplicator(df: pd.DataFrame,
     return p, p(df), log
 
 
-def column_duplicatable(columns_to_bind: str):
+def column_duplicatable(columns_to_bind: str) -> Callable:
     """
     Decorator to duplicate some columns in the dataframe
 
@@ -79,17 +81,17 @@ def column_duplicatable(columns_to_bind: str):
         Duplicates these columns before applying an inplace learner
     """
 
-    def _decorator(child: Callable):
+    def _decorator(child: Callable) -> Callable:
         mixin = feature_duplicator
 
-        def _init(**kwargs: Dict[str, Any]):
+        def _init(**kwargs: Dict[str, Any]) -> Callable:
             mixin_spec = inspect.getfullargspec(mixin)
             mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
 
             child_spec = inspect.getfullargspec(child)
             child_named_args = set(child_spec.args) | set(child_spec.kwonlyargs)
 
-            def _learn(df: pd.DataFrame):
+            def _learn(df: pd.DataFrame) -> LearnerReturnType:
                 mixin_kwargs = {key: value for key, value in kwargs.items() if key in mixin_named_args}
 
                 if 'preffix' in kwargs.keys() or 'suffix' in kwargs.keys():
