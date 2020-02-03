@@ -47,7 +47,6 @@ def feature_duplicator(df: pd.DataFrame,
         }
     else:
         columns_final_mapping = {}
-    
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         for src_col, dest_col in columns_final_mapping.items():
