@@ -418,6 +418,15 @@ def test_target_categorizer():
         ("target", [1, 0, 0, 1, 0, 1])
     )))
 
+    expected_output_train_binary_target_suffix = pd.DataFrame(OrderedDict((
+        ("feat1_num", [1, 0.5, nan, 100, 10, 0.7]),
+        ("feat2_cat", ["a", "a", "a", "b", "c", "c"]),
+        ("feat3_cat", ["c", "c", "c", "a", "a", "a"]),
+        ("target", [1, 0, 0, 1, 0, 1]),
+        ("feat2_cat__suffix", [0.375, 0.375, 0.375, 0.75, 0.5, 0.5]),
+        ("feat3_cat__suffix", [0.375, 0.375, 0.375, 0.625, 0.625, 0.625]),
+    )))
+
     input_df_test_binary_target = pd.DataFrame({
         "feat1_num": [2.0, 4.0, 8.0],
         "feat2_cat": ["b", "a", "c"],
@@ -480,6 +489,17 @@ def test_target_categorizer():
     assert_almost_equal(data[expected_output_train_continuous_target.columns].values,
                         expected_output_train_continuous_target.values, decimal=5)
 
+
+    # Test with binary target
+    categorizer_learner = target_categorizer(
+        columns_to_categorize=["feat2_cat", "feat3_cat"], target_column="target", suffix="__suffix")
+
+    pred_fn, data, log = categorizer_learner(input_df_train_binary_target)
+
+    test_result = pred_fn(input_df_test_binary_target)
+
+    assert (data[expected_output_train_binary_target_suffix.columns].  # we don't care about output order
+            equals(expected_output_train_binary_target_suffix))
 
 def test_standard_scaler():
     input_df_train = pd.DataFrame({
