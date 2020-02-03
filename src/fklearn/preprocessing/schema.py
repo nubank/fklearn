@@ -97,7 +97,7 @@ def column_duplicatable(columns_to_bind: str):
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
 
-                child_kwargs = {key: value for key, value in kwargs.items() if key in child_named_args}
+                child_kwargs: Dict[str, Any] = {key: value for key, value in kwargs.items() if key in child_named_args}
                 child_fn, child_df, child_log = child(mixin_df, **child_kwargs)
 
                 child_kwargs[columns_to_bind] = \
