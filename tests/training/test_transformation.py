@@ -501,6 +501,7 @@ def test_target_categorizer():
     assert (data[expected_output_train_binary_target_suffix.columns].  # we don't care about output order
             equals(expected_output_train_binary_target_suffix))
 
+
 def test_standard_scaler():
     input_df_train = pd.DataFrame({
         "feat1_num": [1.0, 0.5, 100.0],
