@@ -81,7 +81,7 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
         Duplicates these columns before applying an inplace learner
     """
 
-    def _decorator(child: LearnerReturnType) -> LearnerReturnType:
+    def _decorator(child: Callable) -> Callable:
         mixin = feature_duplicator
 
         def _init(*args: List[Any], **kwargs: Dict[str, Any]) -> LearnerReturnType:
