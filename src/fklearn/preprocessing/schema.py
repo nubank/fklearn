@@ -3,7 +3,7 @@ import inspect
 import pandas as pd
 import toolz
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from ..types import LearnerLogType, LearnerReturnType
 
@@ -84,7 +84,7 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
     def _decorator(child: Callable) -> Callable:
         mixin = feature_duplicator
 
-        def _init(*args: List[Any], **kwargs: Dict[str, Any]) -> LearnerReturnType:
+        def _init(*args: List[Any], **kwargs: Dict[str, Any]) -> Union[Callable, LearnerReturnType]:
             mixin_spec = inspect.getfullargspec(mixin)
             mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
 
