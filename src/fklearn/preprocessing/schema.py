@@ -5,7 +5,7 @@ import toolz
 
 from typing import Any, Callable, Dict, List, Optional
 
-from ..types import LearnerReturnType
+from ..types import LearnerLogType, LearnerReturnType
 
 
 @toolz.curry
@@ -57,7 +57,7 @@ def feature_duplicator(df: pd.DataFrame,
 
     p.__doc__ = eval(inspect.stack()[0].function).__doc__
 
-    log = {
+    log: LearnerLogType = {
         stackname: {
             'columns_to_duplicate': columns_to_duplicate,
             'columns_mapping': columns_mapping,
@@ -81,10 +81,10 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
         Duplicates these columns before applying an inplace learner
     """
 
-    def _decorator(child: Callable) -> Callable:
+    def _decorator(child: LearnerReturnType) -> LearnerReturnType:
         mixin = feature_duplicator
 
-        def _init(**kwargs: Dict[str, Any]) -> Callable:
+        def _init(*args: List[Any], **kwargs: Dict[str, Any]) -> LearnerReturnType:
             mixin_spec = inspect.getfullargspec(mixin)
             mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
 
@@ -100,16 +100,18 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
 
                 child_kwargs: Dict[str, Any] = {key: value for key, value in kwargs.items() if key in child_named_args}
-                child_fn, child_df, child_log = child(mixin_df, **child_kwargs)
+                child_fn, child_df, child_log = child(mixin_df, *args[1:], **child_kwargs)
 
                 child_kwargs[columns_to_bind] = \
                     list(mixin_log['feature_duplicator']['columns_final_mapping'].values())
 
                 return toolz.compose(child_fn, mixin_fn), child_df, {**mixin_log, **child_log}
 
-            _learn.__doc__ = child.__doc__
-
-            return _learn
+            if not len(args):
+                _learn.__doc__ = child.__doc__
+                return _learn
+            else:
+                return _learn(args[0])
 
         callable_fn = functools.wraps(child)(_init)
         callable_fn.__doc__ = child.__doc__
