@@ -81,23 +81,19 @@ def column_duplicatable(columns_to_bind: str):
 
         def _init(**kwargs: Dict[str, Any]):
             mixin_spec = inspect.getfullargspec(mixin)
-            mixin_kargs = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
+            mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
+
             child_spec = inspect.getfullargspec(child)
-            child_kargs = set(child_spec.args) | set(child_spec.kwonlyargs)
+            child_named_args = set(child_spec.args) | set(child_spec.kwonlyargs)
 
             def _learn(df: pd.DataFrame):
-                mixin_fn, mixin_df, mixin_log = mixin(
-                    df,
-                    **{key: value for key, value in kwargs.items() if key in mixin_kargs})
-                child_fn, child_df, child_log = child(
-                    mixin_df,
-                    **{
-                        **{
-                            key: value
-                            for key, value in kwargs.items()
-                            if key in child_kargs
-                        },
-                        columns_to_bind: list(mixin_log['feature_duplicator']['columns_mapping'].values())})
+                mixin_kwargs = {key: value for key, value in kwargs.items() if key in mixin_named_args}
+                mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
+
+                child_kwargs = {key: value for key, value in kwargs.items() if key in child_named_args}
+                child_fn, child_df, child_log = child(mixin_df, **child_kwargs)
+
+                child_kwargs[columns_to_bind] = list(mixin_log['feature_duplicator']['columns_mapping'].values())
 
                 return toolz.compose(child_fn, mixin_fn), child_df, {**mixin_log, **child_log}
 
