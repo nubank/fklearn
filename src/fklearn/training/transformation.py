@@ -53,6 +53,7 @@ def selector(df: pd.DataFrame,
 selector.__doc__ += learner_return_docstring("Selector")
 
 
+@column_duplicatable('columns_to_cap')
 @curry
 @log_learner_time(learner_name='capper')
 def capper(df: pd.DataFrame,
@@ -99,6 +100,7 @@ def capper(df: pd.DataFrame,
 capper.__doc__ += learner_return_docstring("Capper")
 
 
+@column_duplicatable('columns_to_floor')
 @curry
 @log_learner_time(learner_name='floorer')
 def floorer(df: pd.DataFrame,
@@ -403,6 +405,7 @@ def value_mapper(df: pd.DataFrame,
     return p, p(df), {"value_maps": value_maps}
 
 
+@column_duplicatable('columns_to_truncate')
 @curry
 @log_learner_time(learner_name="truncate_categorical")
 def truncate_categorical(df: pd.DataFrame,
@@ -462,6 +465,7 @@ def truncate_categorical(df: pd.DataFrame,
 truncate_categorical.__doc__ += learner_return_docstring("Truncate Categorical")
 
 
+@column_duplicatable('columns_to_rank')
 @curry
 @log_learner_time(learner_name="rank_categorical")
 def rank_categorical(df: pd.DataFrame,
@@ -514,6 +518,7 @@ def rank_categorical(df: pd.DataFrame,
 rank_categorical.__doc__ += learner_return_docstring("Rank Categorical")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='count_categorizer')
 def count_categorizer(df: pd.DataFrame,
@@ -561,6 +566,7 @@ def count_categorizer(df: pd.DataFrame,
 count_categorizer.__doc__ += learner_return_docstring("Count Categorizer")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='label_categorizer')
 def label_categorizer(df: pd.DataFrame,
@@ -611,6 +617,7 @@ def label_categorizer(df: pd.DataFrame,
 label_categorizer.__doc__ += learner_return_docstring("Label Categorizer")
 
 
+@column_duplicatable('columns_to_bin')
 @curry
 @log_learner_time(learner_name='quantile_biner')
 def quantile_biner(df: pd.DataFrame,
@@ -662,6 +669,7 @@ def quantile_biner(df: pd.DataFrame,
 quantile_biner.__doc__ += learner_return_docstring("Quantile Biner")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='onehot_categorizer')
 def onehot_categorizer(df: pd.DataFrame,
@@ -798,6 +806,7 @@ def target_categorizer(df: pd.DataFrame,
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
 
 
+@column_duplicatable('columns_to_scale')
 @curry
 @log_learner_time(learner_name='standard_scaler')
 def standard_scaler(df: pd.DataFrame,
@@ -837,6 +846,7 @@ def standard_scaler(df: pd.DataFrame,
 standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 
 
+@column_duplicatable('columns_to_transform')
 @curry
 @log_learner_time(learner_name='custom_transformer')
 def custom_transformer(df: pd.DataFrame,
@@ -880,6 +890,7 @@ def custom_transformer(df: pd.DataFrame,
 custom_transformer.__doc__ += learner_return_docstring("Custom Transformer")
 
 
+@column_duplicatable('columns_to_inject')
 @curry
 @log_learner_time(learner_name='null_injector')
 def null_injector(df: pd.DataFrame,
