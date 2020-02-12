@@ -3,6 +3,7 @@ from typing import Any, List
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from toolz import curry
+from typing import Optional
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.types import LearnerReturnType
@@ -13,7 +14,8 @@ from fklearn.training.utils import log_learner_time
 @log_learner_time(learner_name='imputer')
 def imputer(df: pd.DataFrame,
             columns_to_impute: List[str],
-            impute_strategy: str = 'median') -> LearnerReturnType:
+            impute_strategy: str = 'median',
+            fill_value: Optional[str] = None) -> LearnerReturnType:
     """
     Fits a missing value imputer to the dataset.
 
@@ -34,21 +36,36 @@ def imputer(df: pd.DataFrame,
         - If "most_frequent", then replace missing using the most frequent value along the axis.
     """
 
+    columns_to_fill = list()
+    columns_imputable = columns_to_impute
+    if fill_value is not None:
+        df_is_nan = df[columns_to_impute].isna().all(axis=0)
+        columns_to_fill = list(df_is_nan[df_is_nan].index)
+        columns_imputable = list(filter(lambda column: column not in columns_to_fill, columns_to_impute))
+
     imp = SimpleImputer(strategy=impute_strategy)
 
-    imp.fit(df[columns_to_impute].values)
+    imp.fit(df[columns_imputable].values)
 
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
-        new_data = imp.transform(new_data_set[columns_to_impute])
-        new_cols = pd.DataFrame(data=new_data, columns=columns_to_impute).to_dict('list')
-        return new_data_set.assign(**new_cols)
+        new_df = new_data_set[columns_to_impute].copy()
+        new_df.loc[:, columns_imputable] = imp.transform(new_df[columns_imputable])
+        if columns_to_fill:
+            new_df.loc[:, columns_to_fill] = new_df.loc[:, columns_to_fill].fillna(value=fill_value)
+        return new_df
 
     p.__doc__ = learner_pred_fn_docstring("imputer")
 
-    log = {'imputer': {'impute_strategy': impute_strategy,
-                       'columns_to_impute': columns_to_impute,
-                       'training_proportion_of_nulls': df[columns_to_impute].isnull().mean(axis=0).to_dict(),
-                       'statistics': imp.statistics_}}
+    log = {
+        'imputer': {
+            'impute_strategy': impute_strategy,
+            'columns_to_impute': columns_to_impute,
+            'columns_to_fill': columns_to_fill,
+            'columns_imputable': columns_imputable,
+            'training_proportion_of_nulls': df[columns_to_impute].isnull().mean(axis=0).to_dict(),
+            'statistics': imp.statistics_
+        }
+    }
 
     return p, p(df), log
 
