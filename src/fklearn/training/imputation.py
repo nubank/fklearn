@@ -34,16 +34,16 @@ def imputer(df: pd.DataFrame,
         - If "median", then replace missing values using the median along the axis.
         - If "most_frequent", then replace missing using the most frequent value along the axis.
 
-    fill_value : Any, (default=None)
+    placeholder_value : Any, (default=None)
         if not None, use this as default value when some features only contains
         NA values on training. For transformation, NA values on those features
         will be replaced by `fill_value`.
     """
 
     if placeholder_value is not None:
-        df_feat_is_nan = df[columns_to_impute].isna().all(axis=0)
-        columns_to_fill = df_feat_is_nan[df_feat_is_nan].index.values
-        columns_imputable = df_feat_is_nan[~df_feat_is_nan].index.values
+        mask_feat_is_na = df[columns_to_impute].isna().all(axis=0)
+        columns_to_fill = mask_feat_is_na[mask_feat_is_na].index.values
+        columns_imputable = mask_feat_is_na[~mask_feat_is_na].index.values
         
         fill_fn, __, fill_logs = placeholder_imputer(
             df, columns_to_impute=columns_to_fill, placeholder_value=placeholder_value)
