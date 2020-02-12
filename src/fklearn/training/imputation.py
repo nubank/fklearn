@@ -45,12 +45,12 @@ def imputer(df: pd.DataFrame,
         columns_to_fill = mask_feat_is_na[mask_feat_is_na].index.values
         columns_imputable = mask_feat_is_na[~mask_feat_is_na].index.values
         
-        fill_fn, __, fill_logs = placeholder_imputer(
+        fill_fn, _, fill_logs = placeholder_imputer(
             df, columns_to_impute=columns_to_fill, placeholder_value=placeholder_value)
     else:
         columns_to_fill = list()
         columns_imputable = columns_to_impute
-        fill_fn, __, fill_logs = identity, None, dict()
+        fill_fn, _, fill_logs = identity, None, dict()
 
     imp = SimpleImputer(strategy=impute_strategy)
 
