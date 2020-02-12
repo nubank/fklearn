@@ -3,7 +3,7 @@ from typing import Any, List
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from toolz import curry
-from typing import Optional
+from typing import Any, Optional
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.types import LearnerReturnType
@@ -15,7 +15,7 @@ from fklearn.training.utils import log_learner_time
 def imputer(df: pd.DataFrame,
             columns_to_impute: List[str],
             impute_strategy: str = 'median',
-            fill_value: Optional[str] = None) -> LearnerReturnType:
+            fill_value: Optional[Any] = None) -> LearnerReturnType:
     """
     Fits a missing value imputer to the dataset.
 
@@ -34,6 +34,9 @@ def imputer(df: pd.DataFrame,
         - If "mean", then replace missing values using the mean along the axis.
         - If "median", then replace missing values using the median along the axis.
         - If "most_frequent", then replace missing using the most frequent value along the axis.
+
+    fill_value : Any, (default=None)
+        if not None, use this as default value when some feature only contains NA values.
     """
 
     columns_to_fill = list()
