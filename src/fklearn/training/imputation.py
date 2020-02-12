@@ -35,15 +35,23 @@ def imputer(df: pd.DataFrame,
         - If "most_frequent", then replace missing using the most frequent value along the axis.
 
     fill_value : Any, (default=None)
-        if not None, use this as default value when some feature only contains NA values.
+        if not None, use this as default value when some features only contains 
+        NA values on training. For transformation, NA values on those features 
+        will be replaced by `fill_value`.
     """
 
-    columns_to_fill = list()
-    columns_imputable = columns_to_impute
     if fill_value is not None:
-        df_is_nan = df[columns_to_impute].isna().all(axis=0)
-        columns_to_fill = list(df_is_nan[df_is_nan].index)
-        columns_imputable = list(filter(lambda column: column not in columns_to_fill, columns_to_impute))
+        df_feat_is_nan = df[columns_to_impute].isna().all(axis=0)
+        columns_to_fill = df_feat_is_nan[df_feat_is_nan].index.values
+        columns_imputable = df_feat_is_nan[~df_feat_is_nan].index.values
+        imp_fill = SimpleImputer(strategy='constant', fill_value=fill_value)
+
+        if len(columns_to_fill) > 0:
+            imp_fill.fit(df[columns_to_fill].values)
+    else:
+        columns_to_fill = list()
+        columns_imputable = columns_to_impute
+        imp_fill = None
 
     imp = SimpleImputer(strategy=impute_strategy)
 
@@ -53,7 +61,7 @@ def imputer(df: pd.DataFrame,
         new_df = new_data_set[columns_to_impute].copy()
         new_df.loc[:, columns_imputable] = imp.transform(new_df[columns_imputable])
         if columns_to_fill:
-            new_df.loc[:, columns_to_fill] = new_df.loc[:, columns_to_fill].fillna(value=fill_value)
+            new_df.loc[:, columns_to_fill] = imp_fill.transform(new_df[columns_to_fill])
         return new_df
 
     p.__doc__ = learner_pred_fn_docstring("imputer")
@@ -65,7 +73,9 @@ def imputer(df: pd.DataFrame,
             'columns_to_fill': columns_to_fill,
             'columns_imputable': columns_imputable,
             'training_proportion_of_nulls': df[columns_to_impute].isnull().mean(axis=0).to_dict(),
-            'statistics': imp.statistics_
+            'training_proportion_of_nulls_fill': df.loc[:, columns_to_fill].isnull().mean(axis=0).to_dict(),
+            'statistics': imp.statistics_,
+            'statistics_fill': imp_fill.statistics_,
         }
     }
 
