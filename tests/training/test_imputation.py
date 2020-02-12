@@ -37,15 +37,23 @@ def test_imputer_with_fill_value():
         'col3': [None, None, None]
     })
 
+    df = pd.DataFrame({
+        'col1': [10.0, 13.0, 10.0],
+        'col2': [50.0, 100.0, 75.0],
+        'col3': [10.0, None, None]
+    })
+
     expected = pd.DataFrame({
         'col1': [10.0, 13.0, 10.0],
         'col2': [50.0, 100.0, 75.0],
-        'col3': [0, 0, 0]
+        'col3': [10.0, -999, -999]
     })
 
-    pred_fn, data, log = imputer(input_df, ["col1", "col2", "col3"], "mean", fill_value=0)
+    pred_fn, data, log = imputer(input_df, ["col1", "col2", "col3"], "mean", placeholder_value=-999)
 
-    assert expected.equals(data)
+    print(pred_fn(df))
+    print(expected)
+    assert expected.equals(pred_fn(df))
 
 
 def test_placeholder_imputer():
