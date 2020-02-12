@@ -1,9 +1,8 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from toolz import curry
-from typing import Any, Optional
 
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.types import LearnerReturnType
