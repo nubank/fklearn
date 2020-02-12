@@ -44,7 +44,7 @@ def imputer(df: pd.DataFrame,
         mask_feat_is_na = df[columns_to_impute].isna().all(axis=0)
         columns_to_fill = mask_feat_is_na[mask_feat_is_na].index.values
         columns_imputable = mask_feat_is_na[~mask_feat_is_na].index.values
-        
+
         fill_fn, _, fill_logs = placeholder_imputer(
             df, columns_to_impute=columns_to_fill, placeholder_value=placeholder_value)
     else:
