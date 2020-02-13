@@ -51,8 +51,6 @@ def test_imputer_with_fill_value():
 
     pred_fn, data, log = imputer(input_df, ["col1", "col2", "col3"], "mean", placeholder_value=-999)
 
-    print(pred_fn(df))
-    print(expected)
     assert expected.equals(pred_fn(df))
 
 
