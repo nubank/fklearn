@@ -4,8 +4,7 @@ import pandas as pd
 import toolz
 
 from typing import Any, Callable, Dict, List, Optional, Union
-
-from ..types import LearnerLogType, LearnerReturnType
+from fklearn.types import LearnerLogType, LearnerReturnType
 
 
 @toolz.curry

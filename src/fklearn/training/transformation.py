@@ -9,8 +9,7 @@ from toolz import curry, merge, compose, mapcat
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time
 from fklearn.types import LearnerReturnType, LearnerLogType
-
-from ..preprocessing.schema import column_duplicatable
+from fklearn.preprocessing.schema import column_duplicatable
 
 
 @curry
