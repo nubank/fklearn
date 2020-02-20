@@ -1,9 +1,5 @@
 # Changelog
 
-## [1.17.0]
-- **New**
-    - Add a new pipeline build_pipeline_repetead_learners that supports multiple learners with the same name.
-
 ## [1.16.1] - 2020-01-02
 - **Enhancement**
     - Increasing isotonic calibration regression by adding upper and lower bounds.
