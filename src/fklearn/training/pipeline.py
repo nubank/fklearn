@@ -97,13 +97,12 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
             fns_with_args = [fp.curry(fn)(**args) if len(args) > 0 else fn for fn, args in zip(fns, fns_args)]
             return fp.pipe(df, *fns_with_args)
 
-        if not has_repeated_learners:
-            serialisation = {k: v[-1] for k, v in serialisation.items()}
+        serialisation_logs = {k: v if has_repeated_learners else v[-1] for k, v in serialisation.items()}
 
         merged_logs["__fkml__"] = {"pipeline": pipeline,
                                    "output_columns": list(current_data.columns),
                                    "features": features,
-                                   "learners": {**serialisation}}
+                                   "learners": {**serialisation_logs}}
 
         return predict_fn, current_data, merged_logs
 
