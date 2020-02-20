@@ -38,13 +38,10 @@ def feature_duplicator(df: pd.DataFrame,
         A dataset with repeated columns
     """
 
-    if columns_to_duplicate:
-        columns_final_mapping = {
-            col: (preffix or '') + str(col) + (suffix or '')
-            for col in columns_to_duplicate
-        }
-    else:
-        columns_final_mapping = {}
+    columns_final_mapping = {
+        col: (preffix or '') + str(col) + (suffix or '')
+        for col in columns_to_duplicate
+    } if columns_to_duplicate else dict()
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         for src_col, dest_col in columns_final_mapping.items():
