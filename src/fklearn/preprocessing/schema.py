@@ -1,5 +1,4 @@
 import functools
-import inspect
 import pandas as pd
 import toolz
 
@@ -39,8 +38,6 @@ def feature_duplicator(df: pd.DataFrame,
         A dataset with repeated columns
     """
 
-    stackname = inspect.stack()[0].function
-
     if columns_to_duplicate:
         columns_final_mapping = {
             col: (preffix or '') + str(col) + (suffix or '')
@@ -54,10 +51,10 @@ def feature_duplicator(df: pd.DataFrame,
             new_df.insert(len(new_df.columns), dest_col, df[src_col])
         return new_df
 
-    p.__doc__ = eval(inspect.stack()[0].function).__doc__
+    p.__doc__ = feature_duplicator.__doc__
 
     log: LearnerLogType = {
-        stackname: {
+        'feature_duplicator': {
             'columns_to_duplicate': columns_to_duplicate,
             'columns_mapping': columns_mapping,
             'preffix': preffix,
@@ -65,7 +62,6 @@ def feature_duplicator(df: pd.DataFrame,
             'columns_final_mapping': columns_final_mapping,
         }
     }
-    eval(stackname).log = log[stackname]
 
     return p, p(df), log
 
