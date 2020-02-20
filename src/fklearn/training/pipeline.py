@@ -69,7 +69,7 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
         fns = []
         logs = []
         pipeline = []
-        serialisation = defaultdict(list)
+        serialisation = defaultdict(list)  # type: dict
 
         for learner in learners:
             learner_fn, new_data, learner_log = learner(current_data)
