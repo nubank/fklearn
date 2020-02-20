@@ -1,4 +1,5 @@
 import functools
+import inspect
 import pandas as pd
 import toolz
 
