@@ -17,7 +17,6 @@
     - Update space time split DOCSTRING to match the actual behaviour
     - Add more tutorials(Pydata)
 
-
 ## [1.15.1] - 2019-08-16
 - **Enhancement**
     - Now learners that have a model exposes it in the logs as `object` key
