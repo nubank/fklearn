@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.17.0] - 2020-02-28
+- **Enhancement**
+    - Allow users to set a gap between training and holdout in time splitters
+    - Raise Errors instead of use asserts
+- **New**
+    - Support pipelines with duplicated learners
+    - Add stratified split method
+- **Bug Fix**
+    - Fix space_time_split holdout
+    - Fix compatibility with newer shap version
+
 ## [1.16.1] - 2020-01-02
 - **Enhancement**
     - Increasing isotonic calibration regression by adding upper and lower bounds.
