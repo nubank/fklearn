@@ -66,12 +66,13 @@ def feature_duplicator(df: pd.DataFrame,
 
 def column_duplicatable(columns_to_bind: str) -> Callable:
     """
-    Decorator to duplicate some columns in the dataframe
+    Decorator to prepend the feature_duplicator learner
 
     Parameters
     ----------
-    columns_to_bind: list of str
-        Duplicates these columns before applying an inplace learner
+    columns_to_bind: str
+        Sets feature_duplicator's "columns_to_duplicate" parameter equal to the
+        `columns_to_bind` parameter from the decorated learner
     """
 
     def _decorator(child: Callable) -> Callable:
