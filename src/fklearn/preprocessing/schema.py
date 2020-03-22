@@ -8,11 +8,13 @@ from fklearn.types import LearnerLogType, LearnerReturnType
 
 
 @toolz.curry
-def feature_duplicator(df: pd.DataFrame,
-                       columns_to_duplicate: Optional[List[str]] = None,
-                       columns_mapping: Optional[Dict[str, str]] = None,
-                       preffix: Optional[str] = None,
-                       suffix: Optional[str] = None) -> LearnerReturnType:
+def feature_duplicator(
+    df: pd.DataFrame,
+    columns_to_duplicate: Optional[List[str]] = None,
+    columns_mapping: Optional[Dict[str, str]] = None,
+    preffix: Optional[str] = None,
+    suffix: Optional[str] = None
+) -> LearnerReturnType:
     """
     Duplicates some columns in the dataframe
 
@@ -39,10 +41,16 @@ def feature_duplicator(df: pd.DataFrame,
         A dataset with repeated columns
     """
 
-    columns_final_mapping = {
-        col: (preffix or '') + str(col) + (suffix or '')
-        for col in columns_to_duplicate
-    } if columns_to_duplicate else dict()
+    columns_final_mapping = (
+        columns_mapping
+        if columns_mapping is not None
+        else {
+            col: (preffix or '') + str(col) + (suffix or '')
+            for col in columns_to_duplicate
+        }
+        if columns_to_duplicate
+        else dict()
+    )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         for src_col, dest_col in columns_final_mapping.items():
@@ -78,7 +86,10 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
     def _decorator(child: Callable) -> Callable:
         mixin = feature_duplicator
 
-        def _init(*args: List[Any], **kwargs: Dict[str, Any]) -> Union[Callable, LearnerReturnType]:
+        def _init(
+            *args: List[Any],
+            **kwargs: Dict[str, Any]
+        ) -> Union[Callable, LearnerReturnType]:
             mixin_spec = inspect.getfullargspec(mixin)
             mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
 
@@ -86,14 +97,22 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
             child_named_args = set(child_spec.args) | set(child_spec.kwonlyargs)
 
             def _learn(df: pd.DataFrame) -> LearnerReturnType:
-                mixin_kwargs = {key: value for key, value in kwargs.items() if key in mixin_named_args}
+                mixin_kwargs = {
+                    key: value
+                    for key, value in kwargs.items()
+                    if key in mixin_named_args
+                }
 
                 if 'preffix' in kwargs.keys() or 'suffix' in kwargs.keys():
                     mixin_kwargs['columns_to_duplicate'] = kwargs[columns_to_bind]
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
 
-                child_kwargs: Dict[str, Any] = {key: value for key, value in kwargs.items() if key in child_named_args}
+                child_kwargs: Dict[str, Any] = {
+                    key: value
+                    for key, value in kwargs.items()
+                    if key in child_named_args
+                }
                 child_fn, child_df, child_log = child(mixin_df, *args[1:], **child_kwargs)
 
                 child_kwargs[columns_to_bind] = \
