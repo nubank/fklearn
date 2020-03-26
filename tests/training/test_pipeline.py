@@ -11,7 +11,8 @@ from fklearn.training.regression import xgb_regression_learner
 from fklearn.training.transformation import count_categorizer, onehot_categorizer
 
 
-def test_build_pipeline():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline(has_repeated_learners):
     df_train = pd.DataFrame({
         'id': ["id1", "id2", "id3", "id4", "id3", "id4"],
         'x1': [10.0, 13.0, 10.0, 13.0, None, 13.0],
@@ -37,7 +38,8 @@ def test_build_pipeline():
         xgb_regression_learner(features=features,
                                target=target,
                                num_estimators=20,
-                               extra_params={"seed": 42}))
+                               extra_params={"seed": 42}),
+        has_repeated_learners=has_repeated_learners)
 
     predict_fn, pred_train, log = train_fn(df_train)
 
@@ -50,7 +52,8 @@ def test_build_pipeline():
     pd.util.testing.assert_frame_equal(pred_test_with_shap[pred_test_without_shap.columns], pred_test_without_shap)
 
 
-def test_build_pipeline_no_side_effects():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline_no_side_effects(has_repeated_learners):
     test_df = pd.DataFrame({"x": [1, 2, 3, 4, 5], "y": [2, 4, 6, 8, 10]})
     orig_df = test_df.copy()
 
@@ -66,13 +69,15 @@ def test_build_pipeline_no_side_effects():
 
         return p, p(df), {}
 
-    side_effect_pipeline = build_pipeline(side_effect_learner, kwargs_learner)
+    side_effect_pipeline = build_pipeline(
+        side_effect_learner, kwargs_learner, has_repeated_learners=has_repeated_learners)
     side_effect_pipeline(test_df)
 
     pd.util.testing.assert_frame_equal(test_df, orig_df)
 
 
-def test_build_pipeline_idempotency():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline_idempotency(has_repeated_learners):
     test_df = pd.DataFrame({"x": [1, 2, 3, 4, 5], "y": [2, 4, 6, 8, 10]})
     orig_df = test_df.copy()
 
@@ -89,7 +94,7 @@ def test_build_pipeline_idempotency():
         return lambda dataset: dataset, df, {"dummy_learner": {"dummy": {}}}
 
     for variation in itertools.permutations([dummy_learner, kwargs_learner, dummy_learner]):
-        side_effect_pipeline = build_pipeline(*variation)
+        side_effect_pipeline = build_pipeline(*variation, has_repeated_learners=has_repeated_learners)
         predict_fn, result_df, log = side_effect_pipeline(test_df)
 
         pd.util.testing.assert_frame_equal(test_df, orig_df)
@@ -97,7 +102,8 @@ def test_build_pipeline_idempotency():
         pd.util.testing.assert_frame_equal(predict_fn(test_df, mult=mult_constant), expected_df)
 
 
-def test_build_pipeline_learner_assertion():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline_learner_assertion(has_repeated_learners):
     @fp.curry
     def learner(df, a, b, c=3):
         return lambda dataset: dataset + a + b + c, df, {}
@@ -105,14 +111,15 @@ def test_build_pipeline_learner_assertion():
     learner_fn = learner(b=2)
 
     with pytest.raises(ValueError):
-        build_pipeline(learner_fn)
+        build_pipeline(learner_fn, has_repeated_learners=has_repeated_learners)
 
     learner_fn = learner(a=1, b=2)
 
     build_pipeline(learner_fn)
 
 
-def test_build_pipeline_predict_arguments_assertion():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline_predict_arguments_assertion(has_repeated_learners):
     test_df = pd.DataFrame({"x": [1, 2, 3, 4, 5], "y": [2, 4, 6, 8, 10]})
 
     @fp.curry
@@ -123,7 +130,7 @@ def test_build_pipeline_predict_arguments_assertion():
         return p, df, {}
 
     with pytest.raises(ValueError):
-        build_pipeline(invalid_learner)(test_df)
+        build_pipeline(invalid_learner, has_repeated_learners=has_repeated_learners)(test_df)
 
 
 def test_build_pipeline_serialisation():
@@ -165,7 +172,8 @@ def test_build_pipeline_serialisation():
     assert "obj" not in log.keys()
 
 
-def test_build_pipeline_with_onehotencoder():
+@pytest.mark.parametrize("has_repeated_learners", [False, True])
+def test_build_pipeline_with_onehotencoder(has_repeated_learners):
     df_train = pd.DataFrame({
         'id': ["id1", "id2", "id3", "id4", "id3", "id4"],
         'x1': [10.0, 13.0, 10.0, 13.0, None, 13.0],
@@ -191,7 +199,8 @@ def test_build_pipeline_with_onehotencoder():
         xgb_regression_learner(features=features,
                                target=target,
                                num_estimators=20,
-                               extra_params={"seed": 42}))
+                               extra_params={"seed": 42}),
+        has_repeated_learners=has_repeated_learners)
 
     predict_fn, pred_train, log = train_fn(df_train)
 
@@ -201,3 +210,41 @@ def test_build_pipeline_with_onehotencoder():
                                                "fklearn_feat__cat==c4", "fklearn_feat__cat==nan"]
 
     assert set(pred_test.columns) == set(expected_feature_columns_after_encoding + ["id", target, "prediction"])
+
+
+def test_build_pipeline_repeated_learners_serialisation():
+    df_train = pd.DataFrame({
+        'id': ["id1"],
+        'x1': [10.0],
+        'y': [2.3]
+    })
+
+    fn = lambda x: x
+
+    @fp.curry
+    def dummy_learner(df, fn, call):
+        return fn, df, {f"dummy_learner_{call}": {}}
+
+    @fp.curry
+    def dummy_learner_2(df, fn, call):
+        return dummy_learner(df, fn, call)
+
+    train_fn = build_pipeline(
+        dummy_learner(fn=fn, call=1),
+        dummy_learner_2(fn=fn, call=2),
+        dummy_learner(fn=fn, call=3),
+        has_repeated_learners=True)
+
+    predict_fn, pred_train, log = train_fn(df_train)
+
+    fkml = {"pipeline": ["dummy_learner", "dummy_learner_2", "dummy_learner"],
+            "output_columns": ['id', 'x1', 'y'],
+            "features": ['id', 'x1', 'y'],
+            "learners": {
+                "dummy_learner": [
+                    {"fn": fn, "log": {"dummy_learner_1": {}}},
+                    {"fn": fn, "log": {"dummy_learner_3": {}}}],
+                "dummy_learner_2": [{"fn": fn, "log": {"dummy_learner_2": {}}}]}}
+
+    assert log["__fkml__"] == fkml
+    assert "obj" not in log.keys()
