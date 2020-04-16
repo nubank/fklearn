@@ -10,7 +10,7 @@ from fklearn.validation.evaluators import (
     fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
     mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
     pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
-    roc_auc_evaluator, spearman_evaluator, split_evaluator,
+    roc_auc_evaluator, spearman_evaluator, ndcg_evaluator, split_evaluator,
     temporal_split_evaluator)
 
 
@@ -275,6 +275,19 @@ def test_spearman_evaluator():
     result = spearman_evaluator(predictions)
 
     assert result['spearman_evaluator__target'] == 1.0
+
+
+def test_ndcg_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [0, 1, 2],
+            'prediction': [0.5, 0.9, 1.5]
+        }
+    )
+
+    result = ndcg_evaluator(predictions)
+
+    assert result['ndcg_evaluator__target'] == 1.0
 
 
 def test_split_evaluator():
