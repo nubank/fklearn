@@ -642,7 +642,7 @@ def ndcg_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = f"ndcg_evaluator__" + target_column
+        eval_name = f"ndcg_evaluator__{target_column}"
 
     rel = np.argsort(test_data[prediction_column])[::-1][:k]
     cum_gain = test_data[target_column][rel]
