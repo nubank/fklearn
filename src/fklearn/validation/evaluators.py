@@ -635,6 +635,9 @@ def ndcg_evaluator(test_data: pd.DataFrame,
         relevant items. If the relevance of these items is binary values in {0,1}, then the two approaches
         are the same, which is the linear case.
 
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
     Returns
     ----------
     log: dict
