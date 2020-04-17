@@ -629,6 +629,7 @@ def ndcg_evaluator(test_data: pd.DataFrame,
 
     k : int, optional (default=None)
         The size of the rank that is used to fit (highest k scores) the NDCG score. If None, use all outputs.
+        Note that this value must between [1, +inf].
 
     exponential_gain : bool (default=True)
         If False, then use the linear gain. The exponential gain places a stronger emphasis on retrieving
@@ -636,7 +637,7 @@ def ndcg_evaluator(test_data: pd.DataFrame,
         are the same, which is the linear case.
 
     eval_name : String, optional (default=None)
-        the name of the evaluator as it will appear in the logs.
+        The name of the evaluator as it will appear in the logs.
 
     Returns
     ----------
@@ -646,6 +647,9 @@ def ndcg_evaluator(test_data: pd.DataFrame,
 
     if eval_name is None:
         eval_name = f"ndcg_evaluator__{target_column}"
+
+    if isinstance(k, int) and k <= 0:
+        raise AttributeError("k value must between [1, +inf].")
 
     rel = np.argsort(test_data[prediction_column])[::-1][:k]
     cum_gain = test_data[target_column][rel]

@@ -277,16 +277,35 @@ def test_spearman_evaluator():
     assert result['spearman_evaluator__target'] == 1.0
 
 
-def test_ndcg_evaluator():
+@pytest.mark.parametrize("exponential_gain", [False, True])
+def test_ndcg_evaluator(exponential_gain):
     predictions = pd.DataFrame(
         {
-            'target': [0, 1, 2],
-            'prediction': [0.5, 0.9, 1.5]
+            'target': [1.0, 0.5, 1.5],
+            'prediction': [0.9, 0.3, 1.2]
         }
     )
 
-    result = ndcg_evaluator(predictions)
+    result = ndcg_evaluator(
+        predictions,
+        exponential_gain=exponential_gain
+    )
+    assert result['ndcg_evaluator__target'] == 1.0
 
+    k = 0
+    with pytest.raises(AttributeError):
+        ndcg_evaluator(
+            predictions,
+            k=k,
+            exponential_gain=exponential_gain
+        )
+
+    k = 2
+    result = ndcg_evaluator(
+        predictions,
+        k=k,
+        exponential_gain=exponential_gain
+    )
     assert result['ndcg_evaluator__target'] == 1.0
 
 
