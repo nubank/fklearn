@@ -286,27 +286,23 @@ def test_ndcg_evaluator(exponential_gain):
         }
     )
 
-    result = ndcg_evaluator(
-        predictions,
-        exponential_gain=exponential_gain
-    )
-    assert result['ndcg_evaluator__target'] == 1.0
+    k_raises = [-1, 0, 4]
+    for k in k_raises:
+        with pytest.raises(ValueError):
+            ndcg_evaluator(
+                predictions,
+                k=k,
+                exponential_gain=exponential_gain
+            )
 
-    k = 0
-    with pytest.raises(AttributeError):
-        ndcg_evaluator(
+    k_not_raises = [None, 1, 2, 3]
+    for k in k_not_raises:
+        result = ndcg_evaluator(
             predictions,
             k=k,
             exponential_gain=exponential_gain
         )
-
-    k = 2
-    result = ndcg_evaluator(
-        predictions,
-        k=k,
-        exponential_gain=exponential_gain
-    )
-    assert result['ndcg_evaluator__target'] == 1.0
+        assert result['ndcg_evaluator__target'] == 1.0
 
 
 def test_split_evaluator():
