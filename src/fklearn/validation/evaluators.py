@@ -604,6 +604,73 @@ def spearman_evaluator(test_data: pd.DataFrame,
 
 
 @curry
+def ndcg_evaluator(test_data: pd.DataFrame,
+                   prediction_column: str = "prediction",
+                   target_column: str = "target",
+                   k: int = None,
+                   exponential_gain: bool = True,
+                   eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the Normalized Discount Cumulative Gain (NDCG) between
+    of the original and predicted rankings:
+    https://en.wikipedia.org/wiki/Discounted_cumulative_gain
+
+    Parameters
+    ----------
+
+    test_data : Pandas DataFrame
+        A Pandas' DataFrame with with target and prediction scores.
+
+    prediction_column : String
+        The name of the column in `test_data` with the prediction scores.
+
+    target_column : String
+        The name of the column in `test_data` with the target.
+
+    k : int, optional (default=None)
+        The size of the rank that is used to fit (highest k scores) the NDCG score. If None, use all outputs.
+        Otherwise, this value must be between [1, len(test_data[prediction_column])].
+
+    exponential_gain : bool (default=True)
+        If False, then use the linear gain. The exponential gain places a stronger emphasis on retrieving
+        relevant items. If the relevance of these items is binary values in {0,1}, then the two approaches
+        are the same, which is the linear case.
+
+    eval_name : String, optional (default=None)
+        The name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the NDCG score, float in [0,1].
+    """
+
+    if isinstance(k, (int, float)) and not 0 < k <= len(test_data[prediction_column]):
+        raise ValueError("k must be between [1, len(test_data[prediction_column])].")
+
+    if eval_name is None:
+        eval_name = f"ndcg_evaluator__{target_column}"
+
+    rel = np.argsort(test_data[prediction_column])[::-1][:k]
+    cum_gain = test_data[target_column][rel]
+
+    ideal_cum_gain = np.sort(test_data[target_column])[::-1][:k]
+
+    if exponential_gain:
+        cum_gain = (2 ** cum_gain) - 1
+        ideal_cum_gain = (2 ** ideal_cum_gain) - 1
+
+    discount = np.log2(np.arange(len(cum_gain)) + 2.0)
+
+    dcg = np.sum(cum_gain / discount)
+    idcg = np.sum(ideal_cum_gain / discount)
+
+    ndcg_score = dcg / idcg
+
+    return {eval_name: ndcg_score}
+
+
+@curry
 def combined_evaluators(test_data: pd.DataFrame,
                         evaluators: List[EvalFnType]) -> EvalReturnType:
     """

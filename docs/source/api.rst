@@ -202,6 +202,7 @@ Evaluators (fklearn.validation.evaluators)
    r2_evaluator
    recall_evaluator
    spearman_evaluator
+   ndcg_evaluator
    split_evaluator
    temporal_split_evaluator
 
