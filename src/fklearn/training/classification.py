@@ -56,7 +56,7 @@ def logistic_classification_learner(df: pd.DataFrame,
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
-    def_params = {"C": 0.1, "multi_class": "ovr"}
+    def_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
     merged_params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
@@ -413,7 +413,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
     default_vect_params = {"strip_accents": "unicode", "min_df": 20}
     merged_vect_params = default_vect_params if not vectorizer_params else merge(default_vect_params, vectorizer_params)
 
-    default_clf_params = {"C": 0.1, "multi_class": "ovr"}
+    default_clf_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
     merged_logistic_params = default_clf_params if not logistic_params else merge(default_clf_params, logistic_params)
 
     vect = TfidfVectorizer(**merged_vect_params)
