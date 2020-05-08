@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.0] - 2020-05-08
+- **Enhancement**
+    - Allow users to inform a Placeholder value in imputer learner
+- **New**
+    - Add Normalized Discount Cumulative Gain evaluator
+- **Bug Fix**
+    - Fix some sklearn related warnings
+    - Fix get_recovery logic in make_confounded_data method
+- **Documentation**
+    - Add target_categorizer documentation
+
 ## [1.17.0] - 2020-02-28
 - **Enhancement**
     - Allow users to set a gap between training and holdout in time splitters
