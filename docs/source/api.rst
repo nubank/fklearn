@@ -109,6 +109,7 @@ Transformation (fklearn.training.transformation)
    rank_categorical
    selector
    standard_scaler
+   target_categorizer
    truncate_categorical
    value_mapper
 
