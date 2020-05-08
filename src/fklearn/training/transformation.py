@@ -747,11 +747,11 @@ def target_categorizer(df: pd.DataFrame,
     target_column : str
         Target column name. Target can be binary or continuous.
 
-    smoothing : float
+    smoothing : float (default: 1.0)
         Weight given to overall target mean against target mean by category.
         The value must be greater than or equal to 0
 
-    ignore_unseen : bool
+    ignore_unseen : bool (default: True)
         If True, unseen values will be encoded as nan
         If False, these will be replaced by target mean.
 
