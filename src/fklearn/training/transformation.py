@@ -186,12 +186,16 @@ def ecdfer(df: pd.DataFrame,
 
     ecdf = ed.ECDF(values)
 
+    labels = ecdf.x
+    function_image = map(lambda image: base + sign * max_range * image, ecdf.y)
+
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return new_df.assign(**{ecdf_column: (base + sign * max_range * ecdf(new_df[prediction_column]))})
 
     p.__doc__ = learner_pred_fn_docstring("ecdefer")
 
     log = {'ecdfer': {
+        'map': dict(zip(labels, function_image)),
         'nobs': len(values),
         'prediction_column': prediction_column,
         'ascending': ascending,
