@@ -528,6 +528,7 @@ def test_ecdfer():
     actual_df = pred_fn(input_df)
 
     assert_almost_equal(expected_df[ecdf_column].values, actual_df[ecdf_column].values, decimal=5)
+    assert log["ecdfer"].get("map") is not None
 
     ascending = False
     pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
@@ -537,6 +538,7 @@ def test_ecdfer():
     })
     actual_df = pred_fn(input_df)
     assert_almost_equal(expected_df[ecdf_column].values, actual_df[ecdf_column].values, decimal=5)
+    assert log["ecdfer"].get("map") is not None
 
 
 def test_discrete_ecdfer():

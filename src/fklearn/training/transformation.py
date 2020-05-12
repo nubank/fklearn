@@ -192,7 +192,7 @@ def ecdfer(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return new_df.assign(**{ecdf_column: (base + sign * max_range * ecdf(new_df[prediction_column]))})
 
-    p.__doc__ = learner_pred_fn_docstring("ecdefer")
+    p.__doc__ = learner_pred_fn_docstring("ecdfer")
 
     log = {'ecdfer': {
         'map': dict(zip(labels, function_image)),
