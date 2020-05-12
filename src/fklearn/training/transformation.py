@@ -150,7 +150,8 @@ def ecdfer(df: pd.DataFrame,
            ascending: bool = True,
            prediction_column: str = "prediction",
            ecdf_column: str = "prediction_ecdf",
-           max_range: int = 1000) -> LearnerReturnType:
+           max_range: int = 1000,
+           store_mapping: bool = False) -> LearnerReturnType:
     """
     Learns an Empirical Cumulative Distribution Function from the specified column
     in the input DataFrame. It is usually used in the prediction column to convert
@@ -173,6 +174,9 @@ def ecdfer(df: pd.DataFrame,
     max_range : int
         The maximum value for the ECDF. It will go will go
          from 0 to max_range.
+
+    store_mapping : bool (default: False)
+        Whether to store the ecdf label -> value dictionary in the log.
     """
 
     if ascending:
@@ -195,11 +199,13 @@ def ecdfer(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("ecdfer")
 
     log = {'ecdfer': {
-        'map': dict(zip(labels, function_image)),
         'nobs': len(values),
         'prediction_column': prediction_column,
         'ascending': ascending,
         'transformed_column': [ecdf_column]}}
+
+    if store_mapping:
+        log['ecdfer']['map'] = dict(zip(labels, function_image))
 
     return p, p(df), log
 

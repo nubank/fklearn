@@ -524,14 +524,14 @@ def test_ecdfer():
     ecdf_column = "prediction_ecdf"
     max_range = 1000
 
-    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
+    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range, store_mapping=False)
     actual_df = pred_fn(input_df)
 
     assert_almost_equal(expected_df[ecdf_column].values, actual_df[ecdf_column].values, decimal=5)
-    assert log["ecdfer"].get("map") is not None
+    assert log["ecdfer"].get("map") is None
 
     ascending = False
-    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
+    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range, store_mapping=True)
 
     expected_df = pd.DataFrame({
         "prediction_ecdf": [800.0, 800.0, 700.0, 700.0, 500.0, 300.0, 300.0, 200.0, 100.0, 0.0, 0.0]
