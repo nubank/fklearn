@@ -159,10 +159,11 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         partial_holdout_space = state.choice(train_period_space,
                                              int(space_holdout_percentage * len(train_period_space)),
                                              replace=False)
-        in_space = all_space_in_time[~np.isin(all_space_in_time, partial_holdout_space)]
+
+        in_space = pd.Index(all_space_in_time).difference(pd.Index(partial_holdout_space)).values
 
     else:
-        in_space = all_space_in_time[~np.isin(all_space_in_time, holdout_space)]
+        in_space = pd.Index(all_space_in_time).difference(pd.Index(holdout_space)).values
 
     in_space_mask = dataset[space_column].isin(in_space)
 
