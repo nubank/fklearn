@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.18.0] - 2020-05-08
+- **Enhancement**
+    - Allow users to inform a Placeholder value in imputer learner
+- **New**
+    - Add Normalized Discount Cumulative Gain evaluator
+- **Bug Fix**
+    - Fix some sklearn related warnings
+    - Fix get_recovery logic in make_confounded_data method
+- **Documentation**
+    - Add target_categorizer documentation
+
+## [1.17.0] - 2020-02-28
+- **Enhancement**
+    - Allow users to set a gap between training and holdout in time splitters
+    - Raise Errors instead of use asserts
+- **New**
+    - Support pipelines with duplicated learners
+    - Add stratified split method
+- **Bug Fix**
+    - Fix space_time_split holdout
+    - Fix compatibility with newer shap version
+
+## [1.16.1] - 2020-01-02
+- **Enhancement**
+    - Increasing isotonic calibration regression by adding upper and lower bounds.
+
 ## [1.16.0] - 2019-10-07
 - **Enhancement**
     - Improve split evaluator to avoid unexpected errors
@@ -12,7 +38,6 @@
 - **Documentation**
     - Update space time split DOCSTRING to match the actual behaviour
     - Add more tutorials(Pydata)
-
 
 ## [1.15.1] - 2019-08-16
 - **Enhancement**

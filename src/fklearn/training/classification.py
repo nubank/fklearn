@@ -56,7 +56,7 @@ def logistic_classification_learner(df: pd.DataFrame,
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
-    def_params = {"C": 0.1, "multi_class": "ovr"}
+    def_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
     merged_params = def_params if not params else merge(def_params, params)
 
     weights = df[weight_column].values if weight_column else None
@@ -194,10 +194,12 @@ def xgb_classification_learner(df: pd.DataFrame,
             if params["objective"] == "multi:softprob":
                 shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                  np.repeat(expected_value, len(class_shap_values))
-                                                  for (class_index, (expected_value, class_shap_values))
-                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_expected_value_multiclass = {
+                    f"shap_expected_value_{class_index}":
+                        np.repeat(expected_value, len(class_shap_values))
+                    for (class_index, (expected_value, class_shap_values))
+                    in enumerate(zip(shap_expected_value, shap_values))
+                }
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
@@ -325,20 +327,21 @@ def catboost_classification_learner(df: pd.DataFrame,
 
         if apply_shap:
             import shap
-            explainer = shap.TreeExplainer(cbr)
-            shap_values = explainer.shap_values(dtest)
-            shap_expected_value = explainer.expected_value
-
             if params["objective"] == "MultiClass":
-                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
+                shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
+                # catboost shap returns a list for each row, we reformat it to return
+                # a list for each class
+                shap_values = shap_values.transpose(1, 0, 2)
+                shap_values_multiclass = {f"shap_values_{class_index}": list(value[:, :-1])
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                  np.repeat(expected_value, len(class_shap_values))
-                                                  for (class_index, (expected_value, class_shap_values))
-                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}": value[:, -1]
+                                                  for (class_index, value) in enumerate(shap_values)}
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
+                explainer = shap.TreeExplainer(cbr)
+                shap_values = explainer.shap_values(dtest)
+                shap_expected_value = explainer.expected_value
                 shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
                                "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
@@ -410,7 +413,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
     default_vect_params = {"strip_accents": "unicode", "min_df": 20}
     merged_vect_params = default_vect_params if not vectorizer_params else merge(default_vect_params, vectorizer_params)
 
-    default_clf_params = {"C": 0.1, "multi_class": "ovr"}
+    default_clf_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
     merged_logistic_params = default_clf_params if not logistic_params else merge(default_clf_params, logistic_params)
 
     vect = TfidfVectorizer(**merged_vect_params)
@@ -551,16 +554,18 @@ def lgbm_classification_learner(df: pd.DataFrame,
             if params["objective"] == "multiclass":
                 shap_values_multiclass = {f"shap_values_{class_index}": list(value)
                                           for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}":
-                                                  np.repeat(expected_value, len(class_shap_values))
-                                                  for (class_index, (expected_value, class_shap_values))
-                                                  in enumerate(zip(shap_expected_value, shap_values))}
+                shap_expected_value_multiclass = {
+                    f"shap_expected_value_{class_index}":
+                        np.repeat(expected_value, len(class_shap_values))
+                    for (class_index, (expected_value, class_shap_values))
+                    in enumerate(zip(shap_expected_value, shap_values))
+                }
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
-                shap_values = list(shap_values)
+                shap_values = list(shap_values[1])
                 shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+                               "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values))}
 
             col_dict = merge(col_dict, shap_output)
 

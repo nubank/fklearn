@@ -42,7 +42,7 @@ def isolation_forest_learner(df: pd.DataFrame,
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
     """
 
-    default_params = {"n_jobs": -1, "random_state": 1729}
+    default_params = {"n_jobs": -1, "random_state": 1729, "contamination": 0.1, "behaviour": "new"}
     params = default_params if not params else merge(default_params, params)
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)

@@ -13,7 +13,9 @@ from fklearn.training.utils import log_learner_time
 def isotonic_calibration_learner(df: pd.DataFrame,
                                  target_column: str = "target",
                                  prediction_column: str = "prediction",
-                                 output_column: str = "calibrated_prediction") -> LearnerReturnType:
+                                 output_column: str = "calibrated_prediction",
+                                 y_min: float = 0.0,
+                                 y_max: float = 1.0) -> LearnerReturnType:
     """
     Fits a single feature isotonic regression to the dataset.
 
@@ -35,9 +37,16 @@ def isotonic_calibration_learner(df: pd.DataFrame,
     output_column : str
         The name of the column with the calibrated predictions from the model.
 
+    y_min: float
+        Lower bound of Isotonic Regression
+
+    y_max: float
+        Upper bound of Isotonic Regression
+
     """
 
-    clf = IsotonicRegression(y_min=0, y_max=1, out_of_bounds='clip')
+    clf = IsotonicRegression(y_min=y_min, y_max=y_max, out_of_bounds='clip')
+
     clf.fit(df[prediction_column], df[target_column])
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:

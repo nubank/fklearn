@@ -1,3 +1,4 @@
+from collections import defaultdict
 from inspect import Parameter, signature
 from typing import Dict
 
@@ -7,9 +8,9 @@ import toolz as fp
 from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
 
-def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
+def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False) -> LearnerFnType:
     """
-    Builds a pipeline of chained learners functions with the possibility of using keyword arguments
+    Builds a pipeline of different chained learners functions with the possibility of using keyword arguments
     in the predict functions of the pipeline.
 
     Say you have two learners, you create a pipeline with `pipeline = build_pipeline(learner1, learner2)`.
@@ -24,6 +25,9 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
     Parameters
     ----------
     learners : partially-applied learner functions.
+
+    has_repeated_learners : bool
+        Boolean value indicating wheter the pipeline contains learners with the same name or not.
 
     Returns
     ----------
@@ -65,24 +69,24 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
         fns = []
         logs = []
         pipeline = []
-        serialisation = {}  # type: dict
+        serialisation = defaultdict(list)  # type: dict
 
         for learner in learners:
             learner_fn, new_data, learner_log = learner(current_data)
+            # Check for invalid predict fn arguments
+            _no_variable_args(learner, learner_fn)
+
             learner_name = learner.__name__
+            fns.append(learner_fn)
+            pipeline.append(learner_name)
+            current_data = new_data
+
             model_objects = {}
             if learner_log.get("obj"):
                 model_objects["obj"] = learner_log.pop("obj")
 
-            serialisation[learner_name] = {"fn": learner_fn,
-                                           "log": learner_log,
-                                           **model_objects}
-
-            _no_variable_args(learner, learner_fn)  # Check for invalid predict fn arguments
-            fns.append(learner_fn)
+            serialisation[learner_name].append({"fn": learner_fn, "log": learner_log, **model_objects})
             logs.append(learner_log)
-            pipeline.append(learner_name)
-            current_data = new_data
 
         merged_logs = fp.merge(logs)
 
@@ -93,10 +97,12 @@ def build_pipeline(*learners: LearnerFnType) -> LearnerFnType:
             fns_with_args = [fp.curry(fn)(**args) if len(args) > 0 else fn for fn, args in zip(fns, fns_args)]
             return fp.pipe(df, *fns_with_args)
 
+        serialisation_logs = {k: v if has_repeated_learners else v[-1] for k, v in serialisation.items()}
+
         merged_logs["__fkml__"] = {"pipeline": pipeline,
                                    "output_columns": list(current_data.columns),
                                    "features": features,
-                                   "learners": {**serialisation}}
+                                   "learners": {**serialisation_logs}}
 
         return predict_fn, current_data, merged_logs
 

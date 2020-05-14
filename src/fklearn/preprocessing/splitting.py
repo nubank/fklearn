@@ -1,8 +1,9 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy.random import RandomState
 import pandas as pd
+from sklearn.model_selection import StratifiedShuffleSplit
 from toolz import curry
 
 from fklearn.types import DateType
@@ -144,27 +145,76 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     """
     holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
 
-    train_period = dataset[
-        (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
-    outime_hdout = dataset[
-        (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
+    in_time_mask = (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)
+    out_time_mask = (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)
+
+    all_space_in_time = dataset[in_time_mask][space_column].unique()
 
     if holdout_space is None:
-        train_period_space = train_period[space_column].unique()
-
         # for repeatability
         state = RandomState(split_seed)
-
-        train_period_space = np.sort(train_period_space)
+        train_period_space = np.sort(all_space_in_time)
 
         # randomly sample accounts from the train period to hold out
-        holdout_space = state.choice(train_period_space,
-                                     int(space_holdout_percentage * len(train_period_space)),
-                                     replace=False)
+        partial_holdout_space = state.choice(train_period_space,
+                                             int(space_holdout_percentage * len(train_period_space)),
+                                             replace=False)
+        in_space = all_space_in_time[~np.isin(all_space_in_time, partial_holdout_space)]
 
-    train_set = train_period[~train_period[space_column].isin(holdout_space)]
-    intime_outspace_hdout = train_period[train_period[space_column].isin(holdout_space)]
-    outime_outspace_hdout = outime_hdout[outime_hdout[space_column].isin(holdout_space)]
-    outime_inspace_hdout = outime_hdout[~outime_hdout[space_column].isin(holdout_space)]
+    else:
+        in_space = all_space_in_time[~np.isin(all_space_in_time, holdout_space)]
 
-    return train_set, intime_outspace_hdout, outime_inspace_hdout, outime_outspace_hdout
+    in_space_mask = dataset[space_column].isin(in_space)
+
+    train_set = dataset[in_space_mask & in_time_mask]
+    intime_outspace_hdout = dataset[~in_space_mask & in_time_mask]
+    outtime_outspace_hdout = dataset[~in_space_mask & out_time_mask]
+    outtime_inspace_hdout = dataset[in_space_mask & out_time_mask]
+
+    return train_set, intime_outspace_hdout, outtime_inspace_hdout, outtime_outspace_hdout
+
+
+@curry
+def stratified_split_dataset(dataset: pd.DataFrame, target_column: str, test_size: float,
+                             random_state: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+        Splits data into a training and testing datasets such that
+        they maintain the same class ratio of the original dataset.
+
+        Parameters
+        ----------
+        dataset : pandas.DataFrame
+            A Pandas' DataFrame with the target column.
+            The model will be trained to predict the target column
+            from the features.
+
+        target_column : str
+            The name of the target column of `dataset`.
+
+        test_size : float
+            Represent the proportion of the dataset to include in the test split.
+            should be between 0.0 and 1.0.
+
+        random_state : int or None, optional (default=None)
+            If int, random_state is the seed used by the random number generator;
+            If None, the random number generator is the RandomState instance used
+            by `np.random`.
+
+        Returns
+        ----------
+        train_set : pandas.DataFrame
+            The train dataset sampled from the full dataset.
+
+        test_set : pandas.DataFrame
+            The test dataset sampled from the full dataset.
+        """
+    train_placeholder = np.zeros(len(dataset))
+    target = dataset[target_column]
+
+    splitter = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+
+    train_indices, test_indices = next(splitter.split(train_placeholder, target))
+    train_set = dataset.iloc[train_indices]
+    test_set = dataset.iloc[test_indices]
+
+    return train_set, test_set

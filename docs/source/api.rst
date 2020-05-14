@@ -109,6 +109,7 @@ Transformation (fklearn.training.transformation)
    rank_categorical
    selector
    standard_scaler
+   target_categorizer
    truncate_categorical
    value_mapper
 
@@ -202,6 +203,7 @@ Evaluators (fklearn.validation.evaluators)
    r2_evaluator
    recall_evaluator
    spearman_evaluator
+   ndcg_evaluator
    split_evaluator
    temporal_split_evaluator
 
