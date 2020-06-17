@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.19.0] - 2020-06-17
+- **Enhancement**
+    - Improve `space_time_split_dataset` performance
+
 ## [1.18.0] - 2020-05-08
 - **Enhancement**
     - Allow users to inform a Placeholder value in imputer learner
