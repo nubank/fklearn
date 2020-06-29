@@ -1,5 +1,7 @@
+import numpy as np
 import pandas as pd
 import sklearn
+
 from sklearn.isotonic import IsotonicRegression
 from toolz import curry
 
@@ -67,3 +69,94 @@ def isotonic_calibration_learner(df: pd.DataFrame,
 
 
 isotonic_calibration_learner.__doc__ += learner_return_docstring("Isotonic Calibration")
+
+
+@curry
+@log_learner_time(learner_name='find_thresholds_with_same_risk')
+def find_thresholds_with_same_risk(df: pd.DataFrame,
+                                   sensitive_factor: str,
+                                   band_size: int = 10,
+                                   prediction_ecdf: str = "prediction_ecdf",
+                                   target_column: str = "target",
+                                   output_column: str = "fair") -> LearnerReturnType:
+    """
+    Calculate fair calibration, where for each band any sensitive factor group have the same target mean.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    sensitive_facor: str
+        Column where we have the different group classifications that we want to have the same target mean
+
+    band_size: str
+        Number of bins we want to create for the prediction_ecdf column
+
+    target_column : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be binary, since this is a classification model.
+
+    prediction_column : str
+        The name of the column with the uncalibrated predictions from the model.
+
+    output_column : str
+        The name of the column with the fair bins.
+    """
+    sorted_df = df.sort_values(by=prediction_ecdf).reset_index(drop=True)
+
+    def _find_thresholds_with_same_risk(df: pd.DataFrame,
+                                        metric_by_band: pd.DataFrame) -> list:
+        current_threshold = -1
+        fair_thresholds = [current_threshold]
+
+        for band, metric in metric_by_band.iterrows():
+            df = df[df[prediction_ecdf] > current_threshold]
+            if df.empty:
+                break
+            df["cumulative_risk"] = df[target_column].expanding(min_periods=1).mean()
+            df["distance"] = abs(df["cumulative_risk"] - metric[target_column])
+            threshold = df.sort_values(by="distance").iloc[0][prediction_ecdf]
+
+            fair_thresholds.append(threshold)
+
+            current_threshold = threshold
+
+        return fair_thresholds
+
+    sorted_df["bands"] = np.floor(sorted_df[prediction_ecdf] / band_size) * band_size
+    metric_by_band = sorted_df.groupby("bands").agg({target_column: "mean"})
+    sensitive_groups = list(filter(lambda x: x, sorted_df[sensitive_factor].unique()))
+    fair_thresholds = {}
+
+    for group in sensitive_groups:
+        raw_ecdf_with_target = sorted_df[sorted_df[sensitive_factor] == group][[prediction_ecdf, target_column]]
+        fair_thresholds[group] = _find_thresholds_with_same_risk(raw_ecdf_with_target,
+                                                                 metric_by_band)
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        new_df["fair"] = pd.Series(dtype='int')
+        for group in sensitive_groups:
+            group_filter = new_df[sensitive_factor] == group
+            new_df.loc[group_filter, "fair"] = band_size * pd.cut(new_df.loc[group_filter, prediction_ecdf],
+                                                                  bins=fair_thresholds[group],
+                                                                  labels=False)
+        return new_df
+
+    p.__doc__ = learner_pred_fn_docstring("find_thresholds_with_same_risk")
+
+    log = {'find_thresholds_with_same_risk': {
+        'output_column': output_column,
+        'prediction_ecdf': prediction_ecdf,
+        'target_column': target_column,
+        'bands_size': band_size,
+        'sensitive_factor': sensitive_factor,
+        'fair_thresholds': fair_thresholds}}
+
+    return p, p(df), log
+
+
+find_thresholds_with_same_risk.__doc__ += learner_return_docstring("find_thresholds_with_same_risk")
