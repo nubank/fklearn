@@ -313,12 +313,9 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
 
-        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)),
-                     cat_features=cat_features)
-
-        pred = cbr.predict_proba(dtest)[:, 1]
+        pred = cbr.predict_proba(new_df[features])[:, 1]
         if params["objective"] == "MultiClass":
-            pred = cbr.predict_proba(dtest)
+            pred = cbr.predict_proba(new_df[features])
             col_dict = {prediction_column + "_" + str(key): value
                         for (key, value) in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
@@ -328,7 +325,7 @@ def catboost_classification_learner(df: pd.DataFrame,
         if apply_shap:
             import shap
             if params["objective"] == "MultiClass":
-                shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
+                shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=df[features])
                 # catboost shap returns a list for each row, we reformat it to return
                 # a list for each class
                 shap_values = shap_values.transpose(1, 0, 2)
@@ -340,7 +337,7 @@ def catboost_classification_learner(df: pd.DataFrame,
 
             else:
                 explainer = shap.TreeExplainer(cbr)
-                shap_values = explainer.shap_values(dtest)
+                shap_values = explainer.shap_values(new_df[features])
                 shap_expected_value = explainer.expected_value
                 shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
