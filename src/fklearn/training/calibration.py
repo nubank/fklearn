@@ -78,7 +78,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
                                    unfair_band_column: str,
                                    prediction_ecdf: str = "prediction_ecdf",
                                    target_column: str = "target",
-                                   output_column: str = "fair") -> LearnerReturnType:
+                                   output_column_name: str = "fair_band") -> LearnerReturnType:
     """
     Calculate fair calibration, where for each band any sensitive factor group have the same target mean.
 
@@ -103,7 +103,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
     prediction_column : str
         The name of the column with the uncalibrated predictions from the model.
 
-    output_column : str
+    output_column_name : str
         The name of the column with the fair bins.
     """
     sorted_df = df.sort_values(by=prediction_ecdf).reset_index(drop=True)
@@ -138,11 +138,11 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
                                                                  metric_by_band)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        new_df[output_column] = pd.Series(dtype='int')
+        new_df[output_column_name] = pd.Series(dtype='int')
         for group in sensitive_groups:
             group_filter = new_df[sensitive_factor] == group
-            new_df.loc[group_filter, output_column] = band_size * pd.cut(new_df.loc[group_filter, prediction_ecdf],
             n_of_bands = len(fair_thresholds[group]) - 1
+            new_df.loc[group_filter, output_column_name] = pd.cut(new_df.loc[group_filter, prediction_ecdf],
                                                                   bins=fair_thresholds[group],
                                                                   labels=unfair_bands[:n_of_bands])
         return new_df
@@ -150,7 +150,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
     p.__doc__ = learner_pred_fn_docstring("find_thresholds_with_same_risk")
 
     log = {'find_thresholds_with_same_risk': {
-        'output_column': output_column,
+        'output_column': output_column_name,
         'prediction_ecdf': prediction_ecdf,
         'target_column': target_column,
         'unfair_band_column': unfair_band_column,
