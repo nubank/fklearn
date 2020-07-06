@@ -142,8 +142,9 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
         for group in sensitive_groups:
             group_filter = new_df[sensitive_factor] == group
             new_df.loc[group_filter, output_column] = band_size * pd.cut(new_df.loc[group_filter, prediction_ecdf],
+            n_of_bands = len(fair_thresholds[group]) - 1
                                                                   bins=fair_thresholds[group],
-                                                                  labels=False)
+                                                                  labels=unfair_bands[:n_of_bands])
         return new_df
 
     p.__doc__ = learner_pred_fn_docstring("find_thresholds_with_same_risk")
