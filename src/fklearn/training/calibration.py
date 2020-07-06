@@ -138,10 +138,10 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
                                                                  metric_by_band)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        new_df["fair"] = pd.Series(dtype='int')
+        new_df[output_column] = pd.Series(dtype='int')
         for group in sensitive_groups:
             group_filter = new_df[sensitive_factor] == group
-            new_df.loc[group_filter, "fair"] = band_size * pd.cut(new_df.loc[group_filter, prediction_ecdf],
+            new_df.loc[group_filter, output_column] = band_size * pd.cut(new_df.loc[group_filter, prediction_ecdf],
                                                                   bins=fair_thresholds[group],
                                                                   labels=False)
         return new_df
