@@ -75,7 +75,7 @@ isotonic_calibration_learner.__doc__ += learner_return_docstring("Isotonic Calib
 @log_learner_time(learner_name='find_thresholds_with_same_risk')
 def find_thresholds_with_same_risk(df: pd.DataFrame,
                                    sensitive_factor: str,
-                                   band_size: int = 10,
+                                   unfair_band_column: str,
                                    prediction_ecdf: str = "prediction_ecdf",
                                    target_column: str = "target",
                                    output_column: str = "fair") -> LearnerReturnType:
@@ -127,8 +127,8 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
 
         return fair_thresholds
 
-    sorted_df["bands"] = np.floor(sorted_df[prediction_ecdf] / band_size) * band_size
-    metric_by_band = sorted_df.groupby("bands").agg({target_column: "mean"})
+    unfair_bands = sorted(sorted_df[unfair_band_column].unique())
+    metric_by_band = sorted_df.groupby(unfair_band_column).agg({target_column: "mean"})
     sensitive_groups = list(filter(lambda x: x, sorted_df[sensitive_factor].unique()))
     fair_thresholds = {}
 
@@ -152,7 +152,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
         'output_column': output_column,
         'prediction_ecdf': prediction_ecdf,
         'target_column': target_column,
-        'bands_size': band_size,
+        'unfair_band_column': unfair_band_column,
         'sensitive_factor': sensitive_factor,
         'fair_thresholds': fair_thresholds}}
 
