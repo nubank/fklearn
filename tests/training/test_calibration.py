@@ -46,7 +46,7 @@ def test_find_thresholds_with_same_risk():
 
     df_expected = df_with_ecdf.copy()
     df_expected["fair"] = pd.Series([2, 3, 4, 1, 4, 4, 3, None, 2, 1])
-    fair_thresholds = {'group_2': [-1, 105.0, 152.0, 328.0, 427.0, 670.0],
+    fair_thresholds = {'group_2': [-1, 105.0, 152.0, 328.0, 670.0],
                        'group_1': [-1, 305.0, 416.0, 635.0, 672.0]}
 
     learner = find_thresholds_with_same_risk(sensitive_factor="sensitive_factor", unfair_band_column="unfair_band")
