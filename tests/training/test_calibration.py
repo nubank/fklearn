@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from fklearn.training.calibration import (isotonic_calibration_learner,
                                           find_thresholds_with_same_risk)
@@ -44,12 +45,15 @@ def test_find_thresholds_with_same_risk():
                                 columns=["sensitive_factor", "target",
                                          "prediction_ecdf"])
 
+    band_size = 10
+    df_with_ecdf["unfair_band"] = np.floor(df_with_ecdf["prediction_ecdf"] / band_size) * band_size
+
     df_expected = df_with_ecdf.copy()
     df_expected["fair"] = pd.Series([10, 20, 40, 0, 30, 30, 20, None, 10, 0])
     fair_thresholds = {'group_2': [-1, 105.0, 152.0, 328.0, 427.0, 670.0],
                        'group_1': [-1, 305.0, 416.0, 635.0, 672.0]}
 
-    learner = find_thresholds_with_same_risk(sensitive_factor="sensitive_factor")
+    learner = find_thresholds_with_same_risk(sensitive_factor="sensitive_factor", unfair_band_column="unfair_band")
 
     predict_fn, pred_df, log = learner(df_with_ecdf)
 
