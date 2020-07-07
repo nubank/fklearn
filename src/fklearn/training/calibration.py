@@ -124,6 +124,8 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
 
             current_threshold = threshold
 
+        fair_thresholds[-1] = df[prediction_ecdf].max()
+
         return fair_thresholds
 
     unfair_bands = sorted(sorted_df[unfair_band_column].unique())
