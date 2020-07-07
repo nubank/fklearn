@@ -237,7 +237,7 @@ def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
     """
     Auxiliar method to allow us to get shap values for Catboost multiclass models
 
-    This method was create to allow us serialize catboost models as pickle without any issues
+    This method exists to allow us to serialize catboost models as pickle without any issues
 
     Parameters
     ----------
