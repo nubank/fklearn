@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from fklearn.training.calibration import (isotonic_calibration_learner,
                                           find_thresholds_with_same_risk)
