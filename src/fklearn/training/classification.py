@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 import numpy as np
 import pandas as pd
@@ -231,6 +231,46 @@ xgb_classification_learner.__doc__ += learner_return_docstring("XGboost Classifi
 
 
 @curry
+def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
+                              features: List, target: str,
+                              weights: List, cat_features: List) -> np.array:
+    """
+    Auxiliar method to allow us to get shap values for Catboost multiclass models
+
+    This method exists to allow us to serialize catboost models as pickle without any issues
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        Shap values will be calculated over this data.
+
+    cbr: Any
+        Catboost trained model
+
+    features : List[str]
+        A list of column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+
+    weights : List
+        Weight column values as a list
+
+    cat_features: List[str]
+        A list of column names that are used as categoriacal features for the model.
+    """
+    import catboost
+    dtrain = catboost.Pool(df[features].values, df[target].values, weight=weights,
+                           feature_names=list(map(str, features)),
+                           cat_features=cat_features)
+    return cbr.get_feature_importance(type=catboost.EFstrType.ShapValues,
+                                      data=dtrain)
+
+
+@curry
 @log_learner_time(learner_name='catboost_classification_learner')
 def catboost_classification_learner(df: pd.DataFrame,
                                     features: List[str],
@@ -313,22 +353,18 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
 
-        dtest = Pool(new_df[features].values, feature_names=list(map(str, features)),
-                     cat_features=cat_features)
-
-        pred = cbr.predict_proba(dtest)[:, 1]
+        pred = cbr.predict_proba(new_df[features])
         if params["objective"] == "MultiClass":
-            pred = cbr.predict_proba(dtest)
             col_dict = {prediction_column + "_" + str(key): value
                         for (key, value) in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
         else:
-            col_dict = {prediction_column: pred}
+            col_dict = {prediction_column: pred[:, 1]}
 
         if apply_shap:
             import shap
             if params["objective"] == "MultiClass":
-                shap_values = cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
+                shap_values = _get_catboost_shap_values(df, cbr, features, target, weights, cat_features)
                 # catboost shap returns a list for each row, we reformat it to return
                 # a list for each class
                 shap_values = shap_values.transpose(1, 0, 2)
@@ -340,7 +376,7 @@ def catboost_classification_learner(df: pd.DataFrame,
 
             else:
                 explainer = shap.TreeExplainer(cbr)
-                shap_values = explainer.shap_values(dtest)
+                shap_values = explainer.shap_values(new_df[features])
                 shap_expected_value = explainer.expected_value
                 shap_values = list(shap_values)
                 shap_output = {"shap_values": shap_values,
