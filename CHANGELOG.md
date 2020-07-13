@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.20.0] - 2020-07-13
+- **Enhancement**
+    - Now Catboost learner is pickable
+
 ## [1.19.0] - 2020-06-17
 - **Enhancement**
     - Improve `space_time_split_dataset` performance
