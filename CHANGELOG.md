@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.19.1] - 2020-07-13
+- **Bug Fix**
+    - Be less restrictive with Numba requirements
+
 ## [1.19.0] - 2020-06-17
 - **Enhancement**
     - Improve `space_time_split_dataset` performance
