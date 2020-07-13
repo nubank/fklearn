@@ -457,7 +457,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
 
     folds_indices = _lc_fold_to_indexes(folds)  # final formatting with idx
 
-    logs = [assoc(l, "percentage", p) for l, p in zip(map(_log_time_fold, folds), train_percentages)]
+    logs = [assoc(learner, "percentage", p) for learner, p in zip(map(_log_time_fold, folds), train_percentages)]
 
     return folds_indices, logs
 

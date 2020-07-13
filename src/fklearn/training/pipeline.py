@@ -60,8 +60,8 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
                              .format(learner.__name__, ', '.join(var_args)))
 
     # Check for unfilled arguments of learners
-    for l in learners:
-        _has_one_unfilled_arg(l)
+    for learner in learners:
+        _has_one_unfilled_arg(learner)
 
     def pipeline(data: pd.DataFrame) -> LearnerReturnType:
         current_data = data.copy()
