@@ -16,7 +16,16 @@ def feature_duplicator(
     suffix: Optional[str] = None
 ) -> LearnerReturnType:
     """
-    Duplicates some columns in the dataframe
+    Duplicates some columns in the dataframe.
+    
+    When encoding features, a good practice is to save the encoded 
+    version in a different column rather than replacing the
+    original values. The purpose of this function is to duplicate
+    the column to be encoded, to be later replaced by the encoded 
+    values.
+    
+    The duplication method is used to preserve the original 
+    behaviour (replace).
 
     Parameters
     ----------
@@ -69,7 +78,7 @@ def feature_duplicator(
         }
     }
 
-    return p, p(df), log
+    return p, p(df.copy()), log
 
 
 def column_duplicatable(columns_to_bind: str) -> Callable:
