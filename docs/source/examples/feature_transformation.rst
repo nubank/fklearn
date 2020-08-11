@@ -50,7 +50,7 @@ Below we present an example of encoder usage, applying a ``target_categorizer`` 
 
     # Add prefix to the columns with original values
     pipe = target_categorizer(columns_to_categorize=['b', 'a'], 
-                              target_column='c', preffix='raw__')
+                              target_column='c', prefix='raw__')
     p, p_df2, log = pipe(df)
 
     # Add suffix to the columns with original values

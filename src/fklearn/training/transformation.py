@@ -418,7 +418,7 @@ def truncate_categorical(df: pd.DataFrame,
     You can think of it like "others" category.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -480,7 +480,7 @@ def rank_categorical(df: pd.DataFrame,
     Rank categorical features by their frequency in the train set.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -538,7 +538,7 @@ def count_categorizer(df: pd.DataFrame,
     Replaces categorical variables by count.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -591,7 +591,7 @@ def label_categorizer(df: pd.DataFrame,
     Replaces categorical variables with a numeric identifier.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -648,7 +648,7 @@ def quantile_biner(df: pd.DataFrame,
     to find the bins and then numpy.digitize to fit the columns into bins.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -708,7 +708,7 @@ def onehot_categorizer(df: pd.DataFrame,
     and `val` is one of the values the feature can assume.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -777,7 +777,7 @@ def target_categorizer(df: pd.DataFrame,
     Uses a weighted average with the overall mean of the target variable for smoothing.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -849,7 +849,7 @@ def standard_scaler(df: pd.DataFrame,
     Fits a standard scaler to the dataset.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -896,7 +896,7 @@ def custom_transformer(df: pd.DataFrame,
     Applies a custom function to the desired columns.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 
@@ -946,7 +946,7 @@ def null_injector(df: pd.DataFrame,
     Applies a custom function to the desired columns.
     
     The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `preffix` or `suffix`
+    the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
     mapping using the `columns_mapping` parameter.
 

@@ -12,7 +12,7 @@ def feature_duplicator(
     df: pd.DataFrame,
     columns_to_duplicate: Optional[List[str]] = None,
     columns_mapping: Optional[Dict[str, str]] = None,
-    preffix: Optional[str] = None,
+    prefix: Optional[str] = None,
     suffix: Optional[str] = None
 ) -> LearnerReturnType:
     """
@@ -38,8 +38,8 @@ def feature_duplicator(
     columns_mapping: int (default None)
         Mapping of source columns to destination columns
 
-    preffix: int (default None)
-        Preffix to add to columns to duplicate
+    prefix: int (default None)
+        prefix to add to columns to duplicate
 
     suffix: int (default None)
         Suffix to add to columns to duplicate
@@ -54,7 +54,7 @@ def feature_duplicator(
         columns_mapping
         if columns_mapping is not None
         else {
-            col: (preffix or '') + str(col) + (suffix or '')
+            col: (prefix or '') + str(col) + (suffix or '')
             for col in columns_to_duplicate
         }
         if columns_to_duplicate
@@ -72,7 +72,7 @@ def feature_duplicator(
         'feature_duplicator': {
             'columns_to_duplicate': columns_to_duplicate,
             'columns_mapping': columns_mapping,
-            'preffix': preffix,
+            'prefix': prefix,
             'suffix': suffix,
             'columns_final_mapping': columns_final_mapping,
         }
@@ -112,7 +112,7 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                     if key in mixin_named_args
                 }
 
-                if 'preffix' in kwargs.keys() or 'suffix' in kwargs.keys():
+                if 'prefix' in kwargs.keys() or 'suffix' in kwargs.keys():
                     mixin_kwargs['columns_to_duplicate'] = kwargs[columns_to_bind]
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
