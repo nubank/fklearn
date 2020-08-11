@@ -37,10 +37,6 @@ def feature_importance_backward_selection(train_data: pd.DataFrame,
         train_data : pandas.DataFrame
             A Pandas' DataFrame with training data
 
-        auxiliary_columns: list of str
-            List of columns from the dataset that are not used as features but are
-            used for evaluation or cross validation. (id, date, etc)
-
         param_train_fn : function (DataFrame, List of Strings) -> prediction_function, predictions_dataset, logs
             A partially defined learning function that takes a training set and a feature list and
             returns a predict function, a dataset with training predictions and training
@@ -87,7 +83,7 @@ def feature_importance_backward_selection(train_data: pd.DataFrame,
             tuning step and appends it into a file
             Example: save_intermediary_result(save_path='tuning.pkl')
 
-        n_jobs : int
+        n_jobs : int (default 1)
             Number of parallel processes to spawn.
 
         Returns
