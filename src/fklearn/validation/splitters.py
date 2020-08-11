@@ -335,7 +335,7 @@ def reverse_time_learning_curve_splitter(train_data: pd.DataFrame,
         The name of the Date column of `train_data`.
 
     training_time_limit : str
-        The Date String for the end of the testing period. Should be of the same
+        The Date String for the end of the training period. Should be of the same
         format as `time_column`.
 
     lower_time_limit : str
