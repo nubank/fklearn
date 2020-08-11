@@ -205,7 +205,7 @@ Temporary Items
 
 
 
-# Unison                                                                           1
+# Unison
 *.unison
 *.zip
 .unison*
@@ -219,3 +219,6 @@ Temporary Items
 
 # Vim swap files
 *.swp
+
+catboost_info
+cb_model.json

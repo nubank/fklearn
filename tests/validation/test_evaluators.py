@@ -10,7 +10,7 @@ from fklearn.validation.evaluators import (
     fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
     mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
     pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
-    roc_auc_evaluator, spearman_evaluator, split_evaluator,
+    roc_auc_evaluator, spearman_evaluator, ndcg_evaluator, split_evaluator,
     temporal_split_evaluator)
 
 
@@ -275,6 +275,34 @@ def test_spearman_evaluator():
     result = spearman_evaluator(predictions)
 
     assert result['spearman_evaluator__target'] == 1.0
+
+
+@pytest.mark.parametrize("exponential_gain", [False, True])
+def test_ndcg_evaluator(exponential_gain):
+    predictions = pd.DataFrame(
+        {
+            'target': [1.0, 0.5, 1.5],
+            'prediction': [0.9, 0.3, 1.2]
+        }
+    )
+
+    k_raises = [-1, 0, 4]
+    for k in k_raises:
+        with pytest.raises(ValueError):
+            ndcg_evaluator(
+                predictions,
+                k=k,
+                exponential_gain=exponential_gain
+            )
+
+    k_not_raises = [None, 1, 2, 3]
+    for k in k_not_raises:
+        result = ndcg_evaluator(
+            predictions,
+            k=k,
+            exponential_gain=exponential_gain
+        )
+        assert result['ndcg_evaluator__target'] == 1.0
 
 
 def test_split_evaluator():

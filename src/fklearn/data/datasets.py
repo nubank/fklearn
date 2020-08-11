@@ -81,7 +81,7 @@ def make_confounded_data(n: int) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFra
                                         + 0.5 * df["sex"]
                                         + 0.03 * df["age"]
                                         + df["severity"]
-                                        + df["medication"]))
+                                        - df["medication"]))
 
     np.random.seed(1111)
     sexes = np.random.randint(0, 2, size=n)

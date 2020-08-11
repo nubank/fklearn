@@ -735,6 +735,7 @@ def onehot_categorizer(df: pd.DataFrame,
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
+
         make_dummies = lambda col: dict(map(lambda categ: ("fklearn_feat__" + col + "==" + str(categ),
                                                            (new_df[col] == categ).astype(int)),
                                             vec[col]))
@@ -792,11 +793,11 @@ def target_categorizer(df: pd.DataFrame,
     target_column : str
         Target column name. Target can be binary or continuous.
 
-    smoothing : float
+    smoothing : float (default: 1.0)
         Weight given to overall target mean against target mean by category.
         The value must be greater than or equal to 0
 
-    ignore_unseen : bool
+    ignore_unseen : bool (default: True)
         If True, unseen values will be encoded as nan
         If False, these will be replaced by target mean.
 
