@@ -62,9 +62,8 @@ def feature_duplicator(
     )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        for src_col, dest_col in columns_final_mapping.items():
-            new_df.insert(len(new_df.columns), dest_col, df[src_col])
-        return new_df
+        categ_columns = {dest_col: df[src_col] for src_col, dest_col in columns_final_mapping.items()}
+        return new_df.assign(**categ_columns)
 
     p.__doc__ = feature_duplicator.__doc__
 
@@ -83,7 +82,9 @@ def feature_duplicator(
 
 def column_duplicatable(columns_to_bind: str) -> Callable:
     """
-    Decorator to prepend the feature_duplicator learner
+    Decorator to prepend the feature_duplicator learner.
+    
+    Identifies the columns to be duplicated and applies duplicator.
 
     Parameters
     ----------
@@ -113,7 +114,10 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                 }
 
                 if 'prefix' in kwargs.keys() or 'suffix' in kwargs.keys():
-                    mixin_kwargs['columns_to_duplicate'] = kwargs[columns_to_bind]
+                    columns_to_duplicate = (kwargs[columns_to_bind] if columns_to_bind in 
+                                            kwargs.keys() else 
+                                            args[child_spec.args.index(columns_to_bind)])
+                    mixin_kwargs['columns_to_duplicate'] = columns_to_duplicate
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
 
