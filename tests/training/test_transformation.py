@@ -57,11 +57,26 @@ def test_capper():
         'feat2': [75, None],
     })
 
-    pred_fn, data, log = capper(input_df, ["feat1", "feat2"], {'feat1': 9.0})
+    pred_fn1, data1, log = capper(input_df, ["feat1", "feat2"], {'feat1': 9.0})
+    pred_fn2, data2, log = capper(input_df, ["feat1", "feat2"], {'feat1': 9.0}, suffix="_suffix")
+    pred_fn3, data3, log = capper(input_df, ["feat1", "feat2"], {'feat1': 9.0}, prefix="prefix_")
+    pred_fn4, data4, log = capper(input_df, ["feat1", "feat2"], {'feat1': 9.0}, 
+                                  columns_mapping={'feat1': 'feat1_raw', 'feat2': 'feat2_raw'})
 
-    assert expected1.equals(data)
+    assert expected1.equals(data1)
+    assert expected2.equals(pred_fn1(input_df2))
 
-    assert expected2.equals(pred_fn(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df2))
+
+    assert pd.concat([expected1, input_df.copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected2, input_df2.copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df2))
+
+    assert pd.concat([expected1, input_df.copy().add_suffix("_raw")], axis=1).equals(data4)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df2))
 
 
 def test_floorer():
@@ -85,11 +100,26 @@ def test_floorer():
         'feat2': [50, None],
     })
 
-    pred_fn, data, log = floorer(input_df, ["feat1", "feat2"], {'feat1': 11})
+    pred_fn1, data1, log = floorer(input_df, ["feat1", "feat2"], {'feat1': 11})
+    pred_fn2, data2, log = floorer(input_df, ["feat1", "feat2"], {'feat1': 11}, suffix="_suffix")
+    pred_fn3, data3, log = floorer(input_df, ["feat1", "feat2"], {'feat1': 11}, prefix="prefix_")
+    pred_fn4, data4, log = floorer(input_df, ["feat1", "feat2"], {'feat1': 11}, 
+                                   columns_mapping={'feat1': 'feat1_raw', 'feat2': 'feat2_raw'})
 
-    assert expected1.equals(data)
+    assert expected1.equals(data1)
+    assert expected2.equals(pred_fn1(input_df2))
 
-    assert expected2.equals(pred_fn(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df2))
+
+    assert pd.concat([expected1, input_df.copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected2, input_df2.copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df2))
+
+    assert pd.concat([expected1, input_df.copy().add_suffix("_raw")], axis=1).equals(data4)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df2))
 
 
 def test_prediction_ranger():
@@ -138,6 +168,71 @@ def test_value_mapper():
     assert expected_not_ignore.equals(data_not_ignore)
 
 
+def test_truncate_categorical():
+    input_df_train = pd.DataFrame({
+        "col": ["a", "a", "a", "b", "b", "b", "b", "c", "d", "f", nan],
+        "y": [1., 0, 1, 1, 1, 0, 1, 0, 1, 0, 1]
+    })
+
+    input_df_test = pd.DataFrame({
+        "col": ["a", "a", "b", "c", "d", "f", "e", nan],
+        "y": [1., 0, 1, 1, 1, 0, 1, 1]
+    })
+
+    expected_output_train = pd.DataFrame({
+        "col": ["a", "a", "a", "b", "b", "b", "b", -9999, -9999, -9999, nan],
+        "y": [1., 0, 1, 1, 1, 0, 1, 0, 1, 0, 1]
+    })
+
+    expected_output_test = pd.DataFrame({
+        "col": ["a", "a", "b", -9999, -9999, -9999, -9999, nan],
+        "y": [1., 0, 1, 1, 1, 0, 1, 1]
+    })
+
+    truncate_learner1 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1)
+    truncate_learner2 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1, 
+                                             suffix="_suffix")
+    truncate_learner3 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1, 
+                                             prefix="prefix_")
+    truncate_learner4 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1,
+                                             columns_mapping={'col': 'col_raw'})
+
+    pred_fn1, data1, log = truncate_learner1(input_df_train)
+    pred_fn2, data2, log = truncate_learner2(input_df_train)
+    pred_fn3, data3, log = truncate_learner3(input_df_train)
+    pred_fn4, data4, log = truncate_learner4(input_df_train)
+
+    assert expected_output_train.equals(data1)
+    assert expected_output_test.equals(pred_fn1(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(data2)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(data3)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(data4)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df_test))
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 def test_count_categorizer():
     input_df_train = pd.DataFrame({
         "feat1_num": [1, 0.5, nan, 100],
@@ -233,36 +328,6 @@ def test_quantile_biner():
     biner_learner = quantile_biner(columns_to_bin=["col"], q=4, right=True)
 
     pred_fn, data, log = biner_learner(input_df_train)
-    test_result = pred_fn(input_df_test)
-
-    assert data.equals(expected_output_train)
-    assert test_result.equals(expected_output_test)
-
-
-def test_truncate_categorical():
-    input_df_train = pd.DataFrame({
-        "col": ["a", "a", "a", "b", "b", "b", "b", "c", "d", "f", nan],
-        "y": [1., 0, 1, 1, 1, 0, 1, 0, 1, 0, 1]
-    })
-
-    input_df_test = pd.DataFrame({
-        "col": ["a", "a", "b", "c", "d", "f", "e", nan],
-        "y": [1., 0, 1, 1, 1, 0, 1, 1]
-    })
-
-    expected_output_train = pd.DataFrame({
-        "col": ["a", "a", "a", "b", "b", "b", "b", -9999, -9999, -9999, nan],
-        "y": [1., 0, 1, 1, 1, 0, 1, 0, 1, 0, 1]
-    })
-
-    expected_output_test = pd.DataFrame({
-        "col": ["a", "a", "b", -9999, -9999, -9999, -9999, nan],
-        "y": [1., 0, 1, 1, 1, 0, 1, 1]
-    })
-
-    truncate_learner = truncate_categorical(columns_to_truncate=["col"], percentile=0.1)
-
-    pred_fn, data, log = truncate_learner(input_df_train)
     test_result = pred_fn(input_df_test)
 
     assert data.equals(expected_output_train)

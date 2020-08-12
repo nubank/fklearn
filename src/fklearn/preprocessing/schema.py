@@ -62,7 +62,7 @@ def feature_duplicator(
     )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        categ_columns = {dest_col: df[src_col] for src_col, dest_col in columns_final_mapping.items()}
+        categ_columns = {dest_col: new_df[src_col] for src_col, dest_col in columns_final_mapping.items()}
         return new_df.assign(**categ_columns)
 
     p.__doc__ = feature_duplicator.__doc__

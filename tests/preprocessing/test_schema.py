@@ -12,7 +12,7 @@ def test_feature_duplicator():
     expected1 = pd.DataFrame({
         'a': [1, 2, 3],
         'b': [4, 5, 6],
-        'preffix__a': [1, 2, 3],
+        'prefix__a': [1, 2, 3],
     })
 
     expected2 = pd.DataFrame({
@@ -32,7 +32,7 @@ def test_feature_duplicator():
         feature_duplicator(
             input_df.copy(),
             columns_to_duplicate=['a'],
-            preffix='preffix__',
+            prefix='prefix__',
         )[1])
     assert expected2.equals(
         feature_duplicator(
