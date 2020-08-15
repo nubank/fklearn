@@ -643,9 +643,12 @@ def quantile_biner(df: pd.DataFrame,
     bin_getter = lambda col: pd.qcut(df[col], q, retbins=True)[1]
     bins = {column: bin_getter(column) for column in columns_to_bin}
 
+    def _fix_values(values, max):
+        return [1.0 if value == 0 else (value - 1.0 if value == max else value) for value in values]
+
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         col_biner = lambda col: np.where(new_df[col].isnull(), nan, np.digitize(new_df[col], bins[col], right=right))
-        bined_columns = {col: col_biner(col) for col in columns_to_bin}
+        bined_columns = {col: _fix_values(col_biner(col), len(bins[col])) for col in columns_to_bin}
         return new_df.assign(**bined_columns)
 
     p.__doc__ = learner_pred_fn_docstring("quantile_biner")
