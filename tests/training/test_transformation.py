@@ -320,6 +320,15 @@ def test_onehot_categorizer():
         ("fklearn_feat__region==nan", [0, 0, 0, 1])
     )))
 
+    expected_output_train_drop_first_hardcode = pd.DataFrame(OrderedDict((
+        ("feat1_num", [1, 0.5, nan, 100]),
+        ("fklearn_feat__sex==male", [0, 1, 1, 1]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 0]),
+        ("fklearn_feat__region==RG", [0, 1, 0, 0]),
+        ("fklearn_feat__region==SP", [1, 0, 0, 0]),
+        ("fklearn_feat__region==nan", [0, 0, 0, 1])
+    )))
+
     expected_output_train_drop_first = pd.DataFrame(OrderedDict((
         ("feat1_num", [1, 0.5, nan, 100]),
         ("fklearn_feat__sex==male", [0, 1, 1, 1]),
@@ -360,35 +369,38 @@ def test_onehot_categorizer():
         ("fklearn_feat__region==SP", [0, 0, 1, 0])
     )))
 
-    # Test without hardcoding NaNs
+    expected_output_test_drop_first_hardcode = pd.DataFrame(OrderedDict((
+        ("feat1_num", [2, 20, 200, 2000]),
+        ("fklearn_feat__sex==male", [1, 0, 1, 0]),
+        ("fklearn_feat__sex==nan", [0, 0, 0, 1]),
+        ("fklearn_feat__region==RG", [0, 0, 0, 1]),
+        ("fklearn_feat__region==SP", [0, 0, 1, 0]),
+        ("fklearn_feat__region==nan", [1, 1, 0, 0])
+    )))
+
+    # Test without hardcoding NaNs and not dropping first column
     categorizer_learner = onehot_categorizer(
-        columns_to_categorize=["sex", "region"], hardcode_nans=False)
+        columns_to_categorize=["sex", "region"], hardcode_nans=False, drop_first_column=False)
 
     pred_fn, data, log = categorizer_learner(input_df_train)
 
     test_result = pred_fn(input_df_test)
 
-    assert (test_result[expected_output_test_no_hardcode.columns].  # we don't care about output order
-            equals(expected_output_test_no_hardcode))
+    assert (test_result.equals(expected_output_test_no_hardcode))
+    assert (data.equals(expected_output_train_no_hardcode))
 
-    assert (data[expected_output_train_no_hardcode.columns].  # we don't care about output order
-            equals(expected_output_train_no_hardcode))
-
-    # Test with hardcoding NaNs
+    # Test with hardcoding NaNs and not dropping first column
     categorizer_learner = onehot_categorizer(
-        columns_to_categorize=["sex", "region"], hardcode_nans=True)
+        columns_to_categorize=["sex", "region"], hardcode_nans=True, drop_first_column=False)
 
     pred_fn, data, log = categorizer_learner(input_df_train)
 
     test_result = pred_fn(input_df_test)
 
-    assert (test_result[expected_output_test_hardcode.columns].  # we don't care about output order
-            equals(expected_output_test_hardcode))
+    assert (test_result.equals(expected_output_test_hardcode))
+    assert (data.equals(expected_output_train_hardcode))
 
-    assert (data[expected_output_train_hardcode.columns].  # we don't care about output order
-            equals(expected_output_train_hardcode))
-
-    # Testing dropping the first column
+    # Testing dropping the first column and without hardcoding NaNs
     categorizer_learner = onehot_categorizer(
         columns_to_categorize=["sex", "region"], hardcode_nans=False,
         drop_first_column=True)
@@ -397,10 +409,20 @@ def test_onehot_categorizer():
 
     test_result = pred_fn(input_df_test)
 
-    assert (test_result[expected_output_test_drop_first.columns]
-            .equals(expected_output_test_drop_first))
-    assert (data[expected_output_train_drop_first.columns]
-            .equals(expected_output_train_drop_first))
+    assert (test_result.equals(expected_output_test_drop_first))
+    assert (data.equals(expected_output_train_drop_first))
+
+    # Testing dropping the first column and hardcoding NaNs
+    categorizer_learner = onehot_categorizer(
+        columns_to_categorize=["sex", "region"], hardcode_nans=True,
+        drop_first_column=True)
+
+    pred_fn, data, log = categorizer_learner(input_df_train)
+
+    test_result = pred_fn(input_df_test)
+
+    assert (test_result.equals(expected_output_test_drop_first_hardcode))
+    assert (data.equals(expected_output_train_drop_first_hardcode))
 
 
 def test_target_categorizer():
