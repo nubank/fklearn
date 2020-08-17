@@ -17,14 +17,14 @@ def feature_duplicator(
 ) -> LearnerReturnType:
     """
     Duplicates some columns in the dataframe.
-    
-    When encoding features, a good practice is to save the encoded 
+
+    When encoding features, a good practice is to save the encoded
     version in a different column rather than replacing the
     original values. The purpose of this function is to duplicate
-    the column to be encoded, to be later replaced by the encoded 
+    the column to be encoded, to be later replaced by the encoded
     values.
-    
-    The duplication method is used to preserve the original 
+
+    The duplication method is used to preserve the original
     behaviour (replace).
 
     Parameters
@@ -83,7 +83,7 @@ def feature_duplicator(
 def column_duplicatable(columns_to_bind: str) -> Callable:
     """
     Decorator to prepend the feature_duplicator learner.
-    
+
     Identifies the columns to be duplicated and applies duplicator.
 
     Parameters
@@ -114,8 +114,8 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                 }
 
                 if 'prefix' in kwargs.keys() or 'suffix' in kwargs.keys():
-                    columns_to_duplicate = (kwargs[columns_to_bind] if columns_to_bind in 
-                                            kwargs.keys() else 
+                    columns_to_duplicate = (kwargs[columns_to_bind] if columns_to_bind in
+                                            kwargs.keys() else
                                             args[child_spec.args.index(columns_to_bind)])
                     mixin_kwargs['columns_to_duplicate'] = columns_to_duplicate
 

@@ -416,7 +416,7 @@ def truncate_categorical(df: pd.DataFrame,
     """
     Truncate infrequent categories and replace them by a single one.
     You can think of it like "others" category.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -478,7 +478,7 @@ def rank_categorical(df: pd.DataFrame,
                      store_mapping: bool = False) -> LearnerReturnType:
     """
     Rank categorical features by their frequency in the train set.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -536,7 +536,7 @@ def count_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables by count.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -589,7 +589,7 @@ def label_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables with a numeric identifier.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -646,7 +646,7 @@ def quantile_biner(df: pd.DataFrame,
     """
     Discretize continuous numerical columns into its quantiles. Uses pandas.qcut
     to find the bins and then numpy.digitize to fit the columns into bins.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -706,7 +706,7 @@ def onehot_categorizer(df: pd.DataFrame,
     Encoded columns are removed and substituted by columns named
     `fklearn_feat__col==val`, where `col` is the name of the column
     and `val` is one of the values the feature can assume.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -776,7 +776,7 @@ def target_categorizer(df: pd.DataFrame,
     """
     Replaces categorical variables with the smoothed mean of the target variable by category.
     Uses a weighted average with the overall mean of the target variable for smoothing.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -848,7 +848,7 @@ def standard_scaler(df: pd.DataFrame,
                     columns_to_scale: List[str]) -> LearnerReturnType:
     """
     Fits a standard scaler to the dataset.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -895,7 +895,7 @@ def custom_transformer(df: pd.DataFrame,
                        is_vectorized: bool = False) -> LearnerReturnType:
     """
     Applies a custom function to the desired columns.
-    
+
     The default behaviour is to replace the original values. To store
     the transformed values in a new column, specify `prefix` or `suffix`
     in the parameters, or specify a dictionary with the desired column
@@ -935,7 +935,6 @@ def custom_transformer(df: pd.DataFrame,
 custom_transformer.__doc__ += learner_return_docstring("Custom Transformer")
 
 
-@column_duplicatable('columns_to_inject')
 @curry
 @log_learner_time(learner_name='null_injector')
 def null_injector(df: pd.DataFrame,
@@ -944,12 +943,7 @@ def null_injector(df: pd.DataFrame,
                   groups: Optional[List[List[str]]] = None,
                   seed: int = 1) -> LearnerReturnType:
     """
-    Applies a custom function to the desired columns.
-    
-    The default behaviour is to replace the original values. To store
-    the transformed values in a new column, specify `prefix` or `suffix`
-    in the parameters, or specify a dictionary with the desired column
-    mapping using the `columns_mapping` parameter.
+    Injects null into columns
 
     Parameters
     ----------
