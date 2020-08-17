@@ -221,17 +221,46 @@ def test_truncate_categorical():
                      axis=1).equals(pred_fn4(input_df_test))
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+def test_rank_categorical():
+    input_df_train = pd.DataFrame({
+        "col": ["a", "b", "b", "c", "c", "d", "d", "d", nan, nan, nan]
+    })
+
+    input_df_test = pd.DataFrame({
+        "col": ["a", "b", "c", "d", "d", nan, nan]
+    })
+
+    expected_output_train = pd.DataFrame({
+        "col": [4, 2, 2, 3, 3, 1, 1, 1, nan, nan, nan]
+    })
+
+    expected_output_test = pd.DataFrame({
+        "col": [4, 2, 3, 1, 1, nan, nan]
+    })
+
+    pred_fn1, data1, log = rank_categorical(input_df_train, ["col"])
+    pred_fn2, data2, log = rank_categorical(input_df_train, ["col"], suffix="_suffix")
+    pred_fn3, data3, log = rank_categorical(input_df_train, ["col"], prefix="prefix_")
+    pred_fn4, data4, log = rank_categorical(input_df_train, ["col"], columns_mapping={'col': 'col_raw'})
+
+    assert expected_output_train.equals(data1)
+    assert expected_output_test.equals(pred_fn1(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(data2)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(data3)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(data4)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df_test))
+
     
 def test_count_categorizer():
     input_df_train = pd.DataFrame({
@@ -258,15 +287,40 @@ def test_count_categorizer():
         "feat3_cat": [nan, nan, 3, 3]
     })
 
-    categorizer_learner = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"],
-                                            replace_unseen=1)
+    categorizer_learner1 = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=1)
+    categorizer_learner2 = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=1, suffix="_suffix")
+    categorizer_learner3 = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=1, prefix="prefix_")
+    categorizer_learner4 = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=1, 
+                                             columns_mapping={'feat2_cat': 'feat2_cat_raw',
+                                                              'feat3_cat': 'feat3_cat_raw'})
 
-    pred_fn, data, log = categorizer_learner(input_df_train)
+    pred_fn1, data1, log = categorizer_learner1(input_df_train)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train)
 
-    test_result = pred_fn(input_df_test)
+    assert expected_output_train.equals(data1)
+    assert expected_output_test.equals(pred_fn1(input_df_test))
 
-    assert data.equals(expected_output_train)
-    assert test_result.equals(expected_output_test)
+    categorized = ["feat2_cat", "feat3_cat"]
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_suffix("_suffix")], 
+                     axis=1).equals(data2)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_prefix("prefix_")], 
+                     axis=1).equals(data3)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_suffix("_raw")], 
+                     axis=1).equals(data4)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df_test))
 
 
 def test_label_categorizer():
@@ -294,14 +348,40 @@ def test_label_categorizer():
         "feat3_cat": [nan, nan, 0, 0]
     })
 
-    categorizer_learner = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"],
-                                            replace_unseen=-99)
+    categorizer_learner1 = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=-99)
+    categorizer_learner2 = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=-99, suffix="_suffix")
+    categorizer_learner3 = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=-99, prefix="prefix_")
+    categorizer_learner4 = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], 
+                                             replace_unseen=-99, 
+                                             columns_mapping={'feat2_cat': 'feat2_cat_raw',
+                                                              'feat3_cat': 'feat3_cat_raw'})
 
-    pred_fn, data, log = categorizer_learner(input_df_train)
-    test_result = pred_fn(input_df_test)
+    pred_fn1, data1, log = categorizer_learner1(input_df_train)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train)
 
-    assert data.equals(expected_output_train)
-    assert test_result.equals(expected_output_test)
+    assert expected_output_train.equals(data1)
+    assert expected_output_test.equals(pred_fn1(input_df_test))
+
+    categorized = ["feat2_cat", "feat3_cat"]
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_suffix("_suffix")], 
+                     axis=1).equals(data2)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_prefix("prefix_")], 
+                     axis=1).equals(data3)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df_test))
+
+    assert pd.concat([expected_output_train, input_df_train[categorized].copy().add_suffix("_raw")], 
+                     axis=1).equals(data4)
+    assert pd.concat([expected_output_test, input_df_test[categorized].copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df_test))
 
 
 def test_quantile_biner():
@@ -325,37 +405,34 @@ def test_quantile_biner():
         "y": [1., 0, 1, 1, 1, 0, 1, 0, 1, 0, 1]
     })
 
-    biner_learner = quantile_biner(columns_to_bin=["col"], q=4, right=True)
+    biner_learner1 = quantile_biner(columns_to_bin=["col"], q=4, right=True)
+    biner_learner2 = quantile_biner(columns_to_bin=["col"], q=4, right=True, suffix="_suffix")
+    biner_learner3 = quantile_biner(columns_to_bin=["col"], q=4, right=True, prefix="prefix_")
+    biner_learner4 = quantile_biner(columns_to_bin=["col"], q=4, right=True, 
+                                    columns_mapping={'col': 'col_raw'})
 
-    pred_fn, data, log = biner_learner(input_df_train)
-    test_result = pred_fn(input_df_test)
+    pred_fn1, data1, log = biner_learner1(input_df_train)
+    pred_fn2, data2, log = biner_learner2(input_df_train)
+    pred_fn3, data3, log = biner_learner3(input_df_train)
+    pred_fn4, data4, log = biner_learner4(input_df_train)
 
-    assert data.equals(expected_output_train)
-    assert test_result.equals(expected_output_test)
+    assert expected_output_train.equals(data1)
+    assert expected_output_test.equals(pred_fn1(input_df_test))
 
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(data2)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_suffix")], 
+                     axis=1).equals(pred_fn2(input_df_test))
 
-def test_rank_categorical():
-    input_df_train = pd.DataFrame({
-        "col": ["a", "b", "b", "c", "c", "d", "d", "d", nan, nan, nan]
-    })
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(data3)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_prefix("prefix_")], 
+                     axis=1).equals(pred_fn3(input_df_test))
 
-    input_df_test = pd.DataFrame({
-        "col": ["a", "b", "c", "d", "d", nan, nan]
-    })
-
-    expected_output_train = pd.DataFrame({
-        "col": [4, 2, 2, 3, 3, 1, 1, 1, nan, nan, nan]
-    })
-
-    expected_output_test = pd.DataFrame({
-        "col": [4, 2, 3, 1, 1, nan, nan]
-    })
-
-    pred_fn, data, log = rank_categorical(input_df_train, ["col"])
-    test_result = pred_fn(input_df_test)
-
-    assert expected_output_train.equals(data), "rank_categorical is not working as expected in train."
-    assert expected_output_test.equals(test_result), "rank_categorical is not working as expected in test."
+    assert pd.concat([expected_output_train, input_df_train[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(data4)
+    assert pd.concat([expected_output_test, input_df_test[['col']].copy().add_suffix("_raw")], 
+                     axis=1).equals(pred_fn4(input_df_test))
 
 
 def test_onehot_categorizer():
@@ -426,46 +503,137 @@ def test_onehot_categorizer():
     )))
 
     # Test without hardcoding NaNs
-    categorizer_learner = onehot_categorizer(
-        columns_to_categorize=["sex", "region"], hardcode_nans=False)
+    categorizer_learner1 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False)
+    categorizer_learner2 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, suffix="_suffix")
+    categorizer_learner3 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, prefix="prefix_")
+    categorizer_learner4 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, 
+                                              columns_mapping={'sex': 'sex_raw', 
+                                                               'region': 'region_raw'})
 
-    pred_fn, data, log = categorizer_learner(input_df_train)
+    pred_fn1, data1, log = categorizer_learner1(input_df_train)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train)
 
-    test_result = pred_fn(input_df_test)
+    assert expected_output_train_no_hardcode.equals(data1)
+    assert expected_output_test_no_hardcode.equals(pred_fn1(input_df_test))
 
-    assert (test_result[expected_output_test_no_hardcode.columns].  # we don't care about output order
-            equals(expected_output_test_no_hardcode))
+    assert pd.concat([expected_output_train_no_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(data2.sort_index(axis=1))
+    assert pd.concat([expected_output_test_no_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn2(input_df_test).sort_index(axis=1))
 
-    assert (data[expected_output_train_no_hardcode.columns].  # we don't care about output order
-            equals(expected_output_train_no_hardcode))
+    assert pd.concat([expected_output_train_no_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(data3.sort_index(axis=1))
+    assert pd.concat([expected_output_test_no_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn3(input_df_test).sort_index(axis=1))
+
+    assert pd.concat([expected_output_train_no_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(data4.sort_index(axis=1))
+    assert pd.concat([expected_output_test_no_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn4(input_df_test).sort_index(axis=1))
 
     # Test with hardcoding NaNs
-    categorizer_learner = onehot_categorizer(
-        columns_to_categorize=["sex", "region"], hardcode_nans=True)
+    categorizer_learner1 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=True)
+    categorizer_learner2 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=True, suffix="_suffix")
+    categorizer_learner3 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=True, prefix="prefix_")
+    categorizer_learner4 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=True, 
+                                              columns_mapping={'sex': 'sex_raw', 
+                                                               'region': 'region_raw'})
 
-    pred_fn, data, log = categorizer_learner(input_df_train)
+    pred_fn1, data1, log = categorizer_learner1(input_df_train)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train)
 
-    test_result = pred_fn(input_df_test)
+    assert expected_output_train_hardcode.equals(data1)
+    assert expected_output_test_hardcode.equals(pred_fn1(input_df_test))
 
-    assert (test_result[expected_output_test_hardcode.columns].  # we don't care about output order
-            equals(expected_output_test_hardcode))
+    assert pd.concat([expected_output_train_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(data2.sort_index(axis=1))
+    assert pd.concat([expected_output_test_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn2(input_df_test).sort_index(axis=1))
 
-    assert (data[expected_output_train_hardcode.columns].  # we don't care about output order
-            equals(expected_output_train_hardcode))
+    assert pd.concat([expected_output_train_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(data3.sort_index(axis=1))
+    assert pd.concat([expected_output_test_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn3(input_df_test).sort_index(axis=1))
+
+    assert pd.concat([expected_output_train_hardcode, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(data4.sort_index(axis=1))
+    assert pd.concat([expected_output_test_hardcode, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(pred_fn4(input_df_test).sort_index(axis=1))
 
     # Testing dropping the first column
-    categorizer_learner = onehot_categorizer(
-        columns_to_categorize=["sex", "region"], hardcode_nans=False,
-        drop_first_column=True)
+    categorizer_learner1 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, drop_first_column=True)
+    categorizer_learner2 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, drop_first_column=True, 
+                                              suffix="_suffix")
+    categorizer_learner3 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, drop_first_column=True, 
+                                              prefix="prefix_")
+    categorizer_learner4 = onehot_categorizer(columns_to_categorize=["sex", "region"], 
+                                              hardcode_nans=False, drop_first_column=True, 
+                                              columns_mapping={'sex': 'sex_raw', 
+                                                               'region': 'region_raw'})
 
-    pred_fn, data, log = categorizer_learner(input_df_train)
+    pred_fn1, data1, log = categorizer_learner1(input_df_train)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train)
 
-    test_result = pred_fn(input_df_test)
+    to_drop = ["fklearn_feat__sex==female", "fklearn_feat__region==MG"]
 
-    assert (test_result[expected_output_test_drop_first.columns]
-            .equals(expected_output_test_drop_first))
-    assert (data[expected_output_train_drop_first.columns]
-            .equals(expected_output_train_drop_first))
+    assert expected_output_train_drop_first.equals(data1.drop(columns=to_drop))
+    assert expected_output_test_drop_first.equals(pred_fn1(input_df_test).drop(columns = to_drop))
+
+    assert pd.concat([expected_output_train_drop_first, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(
+        data2.sort_index(axis=1).drop(columns = to_drop))
+    assert pd.concat([expected_output_test_drop_first, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_suffix")], 
+                     axis=1).sort_index(axis=1).equals(
+        pred_fn2(input_df_test).sort_index(axis=1).drop(columns = to_drop))
+
+    assert pd.concat([expected_output_train_drop_first, 
+                      input_df_train[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(
+        data3.sort_index(axis=1).drop(columns = to_drop))
+    assert pd.concat([expected_output_test_drop_first, 
+                      input_df_test[["sex", "region"]].copy().add_prefix("prefix_")], 
+                     axis=1).sort_index(axis=1).equals(
+        pred_fn3(input_df_test).sort_index(axis=1).drop(columns = to_drop))
+
+    assert pd.concat([expected_output_train_drop_first, 
+                      input_df_train[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(
+        data4.sort_index(axis=1).drop(columns = to_drop))
+    assert pd.concat([expected_output_test_drop_first, 
+                      input_df_test[["sex", "region"]].copy().add_suffix("_raw")], 
+                     axis=1).sort_index(axis=1).equals(
+        pred_fn4(input_df_test).sort_index(axis=1).drop(columns = to_drop))
 
 
 def test_target_categorizer():
@@ -564,6 +732,19 @@ def test_target_categorizer():
 
     assert (data[expected_output_train_binary_target_suffix.columns].  # we don't care about output order
             equals(expected_output_train_binary_target_suffix))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def test_standard_scaler():
