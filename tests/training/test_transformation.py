@@ -1413,7 +1413,7 @@ def test_standard_scaler():
 
     assert_almost_equal(expected_output_train.values, data1.values, decimal=5)
     assert_almost_equal(
-        expected_output_train.values, pred_fn1(input_df_test).values, decimal=5
+        expected_output_test.values, pred_fn1(input_df_test).values, decimal=5
     )
 
     assert_almost_equal(
