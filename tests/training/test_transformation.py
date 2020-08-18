@@ -1398,17 +1398,6 @@ def test_standard_scaler():
         {"feat1_num": [-0.68038342, -0.63763682, -0.55214362]}
     )
 
-    pred_fn, train_result, log = standard_scaler(input_df_train, ["feat1_num"])
-    test_result = pred_fn(input_df_test)
-
-    assert_almost_equal(
-        expected_output_train.values, train_result.values, decimal=5
-    )
-
-    assert_almost_equal(
-        test_result.values, expected_output_test.values, decimal=5
-    )
-
     pred_fn1, data1, log = standard_scaler(input_df_train, ["feat1_num"])
     pred_fn2, data2, log = standard_scaler(
         input_df_train, ["feat1_num"], suffix="_suffix"

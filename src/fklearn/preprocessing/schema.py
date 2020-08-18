@@ -114,9 +114,9 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                 }
 
                 if 'prefix' in kwargs.keys() or 'suffix' in kwargs.keys():
-                    columns_to_duplicate = (kwargs[columns_to_bind] if columns_to_bind in
-                                            kwargs.keys() else
-                                            args[child_spec.args.index(columns_to_bind)])
+                    columns_to_duplicate: Any = (kwargs[columns_to_bind] if columns_to_bind in
+                                                 kwargs.keys() else
+                                                 args[child_spec.args.index(columns_to_bind)])
                     mixin_kwargs['columns_to_duplicate'] = columns_to_duplicate
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
