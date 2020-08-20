@@ -89,7 +89,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
         The model will be trained to predict the target column
         from the features.
 
-    sensitive_facor: str
+    sensitive_factor: str
         Column where we have the different group classifications that we want to have the same target mean
 
     band_size: str
@@ -146,7 +146,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
             n_of_bands = len(fair_thresholds[group]) - 1
             new_df_copy.loc[group_filter, output_column_name] = pd.cut(new_df_copy.loc[group_filter, prediction_ecdf],
                                                                        bins=fair_thresholds[group],
-                                                                       labels=unfair_bands[:n_of_bands])
+                                                                       labels=unfair_bands[:n_of_bands]).astype(float)
         return new_df_copy[output_column_name]
 
     p.__doc__ = learner_pred_fn_docstring("find_thresholds_with_same_risk")
