@@ -75,7 +75,7 @@ isotonic_calibration_learner.__doc__ += learner_return_docstring("Isotonic Calib
 def find_thresholds_with_same_risk(df: pd.DataFrame,
                                    sensitive_factor: str,
                                    unfair_band_column: str,
-                                   prediction_ecdf: str = "prediction_ecdf",
+                                   model_prediction_output: str,
                                    target_column: str = "target",
                                    output_column_name: str = "fair_band") -> LearnerReturnType:
     """
@@ -92,20 +92,20 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
     sensitive_factor: str
         Column where we have the different group classifications that we want to have the same target mean
 
-    band_size: str
-        Number of bins we want to create for the prediction_ecdf column
+    unfair_band_column: str
+        Column with the original bands
+
+    model_prediction_output : str
+        Risk model's output
 
     target_column : str
         The name of the column in `df` that should be used as target for the model.
         This column should be binary, since this is a classification model.
 
-    prediction_column : str
-        The name of the column with the uncalibrated predictions from the model.
-
     output_column_name : str
         The name of the column with the fair bins.
     """
-    sorted_df = df.sort_values(by=prediction_ecdf).reset_index(drop=True)
+    sorted_df = df.sort_values(by=model_prediction_output).reset_index(drop=True)
 
     def _find_thresholds_with_same_risk(df: pd.DataFrame,
                                         metric_by_band: pd.DataFrame) -> list:
@@ -113,18 +113,18 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
         fair_thresholds = [current_threshold]
 
         for band, metric in metric_by_band.iterrows():
-            df = df[df[prediction_ecdf] > current_threshold]
+            df = df[df[model_prediction_output] > current_threshold]
             if df.empty:
                 break
             df["cumulative_risk"] = df[target_column].expanding(min_periods=1).mean()
             df["distance"] = abs(df["cumulative_risk"] - metric[target_column])
-            threshold = df.sort_values(by="distance").iloc[0][prediction_ecdf]
+            threshold = df.sort_values(by="distance").iloc[0][model_prediction_output]
 
             fair_thresholds.append(threshold)
 
             current_threshold = threshold
 
-        fair_thresholds[-1] = df[prediction_ecdf].max()
+        fair_thresholds[-1] = df[model_prediction_output].max()
 
         return fair_thresholds
 
@@ -134,7 +134,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
     fair_thresholds = {}
 
     for group in sensitive_groups:
-        raw_ecdf_with_target = sorted_df[sorted_df[sensitive_factor] == group][[prediction_ecdf, target_column]]
+        raw_ecdf_with_target = sorted_df[sorted_df[sensitive_factor] == group][[model_prediction_output, target_column]]
         fair_thresholds[group] = _find_thresholds_with_same_risk(raw_ecdf_with_target,
                                                                  metric_by_band)
 
@@ -144,7 +144,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
         for group in sensitive_groups:
             group_filter = new_df_copy[sensitive_factor] == group
             n_of_bands = len(fair_thresholds[group]) - 1
-            new_df_copy.loc[group_filter, output_column_name] = pd.cut(new_df_copy.loc[group_filter, prediction_ecdf],
+            new_df_copy.loc[group_filter, output_column_name] = pd.cut(new_df_copy.loc[group_filter, model_prediction_output],
                                                                        bins=fair_thresholds[group],
                                                                        labels=unfair_bands[:n_of_bands]).astype(float)
         return new_df_copy[output_column_name]
@@ -153,7 +153,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
 
     log = {'find_thresholds_with_same_risk': {
         'output_column': output_column_name,
-        'prediction_ecdf': prediction_ecdf,
+        'prediction_ecdf': model_prediction_output,
         'target_column': target_column,
         'unfair_band_column': unfair_band_column,
         'sensitive_factor': sensitive_factor,

@@ -49,7 +49,8 @@ def test_find_thresholds_with_same_risk():
     fair_thresholds = {'group_2': [-1, 105.0, 152.0, 328.0, 670.0],
                        'group_1': [-1, 305.0, 416.0, 635.0, 672.0]}
 
-    learner = find_thresholds_with_same_risk(sensitive_factor="sensitive_factor", unfair_band_column="unfair_band")
+    learner = find_thresholds_with_same_risk(sensitive_factor="sensitive_factor", unfair_band_column="unfair_band",
+                                             model_prediction_output="prediction_ecdf")
 
     predict_fn, pred_df, log = learner(df_with_ecdf)
     df_with_ecdf["fair"] = pred_df
