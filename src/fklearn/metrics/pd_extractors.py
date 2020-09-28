@@ -19,19 +19,20 @@ def combined_evaluator_extractor(result, base_extractors):
 
 
 @curry
-def split_evaluator_extractor_iteration(split_value, result, eval_name, base_extractor):
+def split_evaluator_extractor_iteration(split_value, result, split_col, base_extractor, eval_name=None):
+    if eval_name is None:
+        eval_name = 'split_evaluator__' + split_col
+
     key = eval_name + '_' + str(split_value)
+
     return (base_extractor(result.get(key, {}))
             .assign(**{eval_name: split_value}))
 
 
 @curry
 def split_evaluator_extractor(result, split_col, split_values, base_extractor, eval_name=None):
-    if eval_name is None:
-        eval_name = 'split_evaluator__' + split_col
-
     return pd.concat(
-        list(map(split_evaluator_extractor_iteration(result=result, eval_name=eval_name, base_extractor=base_extractor),
+        list(map(split_evaluator_extractor_iteration(result=result, split_col=split_col, base_extractor=base_extractor, eval_name=eval_name),
                  split_values)))
 
 
