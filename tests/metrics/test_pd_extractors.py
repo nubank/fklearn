@@ -8,6 +8,7 @@ from fklearn.data.datasets import make_tutorial_data
 from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
                                            evaluator_extractor, extract,
                                            split_evaluator_extractor,
+                                           split_evaluator_extractor_iteration,
                                            temporal_split_evaluator_extractor)
 from fklearn.training.regression import linear_regression_learner
 from fklearn.validation.evaluators import (combined_evaluators, r2_evaluator,
@@ -17,6 +18,51 @@ from fklearn.validation.splitters import (
     forward_stability_curve_time_splitter, out_of_time_and_space_splitter,
     stability_curve_time_splitter, time_learning_curve_splitter)
 from fklearn.validation.validator import validator
+
+
+def test__split_evaluator_extractor_iteration__default():
+    logs = {
+        'split_evaluator__split_0': {'roc_auc': 0.48},
+        'split_evaluator__split_1': {'roc_auc': 0.52},
+    }
+
+    expected_df = pd.DataFrame({
+        'roc_auc': [0.52],
+        'split_evaluator__split': [1],
+    })
+
+    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+
+    actual_df = split_evaluator_extractor_iteration(split_value=1,
+                                                    result=logs,
+                                                    split_col="split",
+                                                    base_extractor=base_evaluator,
+                                                    ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
+
+
+def test__split_evaluator_extractor_iteration__with_eval_name():
+    logs = {
+        'named_eval_0': {'roc_auc': 0.48},
+        'named_eval_1': {'roc_auc': 0.52},
+    }
+
+    expected_df = pd.DataFrame({
+        'roc_auc': [0.52],
+        'named_eval': [1],
+    })
+
+    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+
+    actual_df = split_evaluator_extractor_iteration(split_value=1,
+                                                    result=logs,
+                                                    base_extractor=base_evaluator,
+                                                    split_col="irrelevant",
+                                                    eval_name="named_eval",
+                                                    ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
 
 
 def test__split_evaluator_extractor__when_split_value_is_missing():
