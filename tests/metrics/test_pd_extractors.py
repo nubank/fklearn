@@ -92,6 +92,51 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
     pd.testing.assert_frame_equal(actual_df, expected_df, check_like=True)
 
 
+def test__split_evaluator_extractor__default():
+    logs = {
+        'split_evaluator__split_0': {'roc_auc': 0.48},
+        'split_evaluator__split_1': {'roc_auc': 0.52},
+    }
+
+    expected_df = pd.DataFrame({
+        'roc_auc': [0.48, 0.52],
+        'split_evaluator__split': [0, 1],
+    })
+
+    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+
+    actual_df = split_evaluator_extractor(logs,
+                                          base_extractor=base_evaluator,
+                                          split_col="split",
+                                          split_values=[0, 1]
+                                          ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
+
+
+def test__split_evaluator_extractor__with_eval_name():
+    logs = {
+        'named_eval_0': {'roc_auc': 0.48},
+        'named_eval_1': {'roc_auc': 0.52},
+    }
+
+    expected_df = pd.DataFrame({
+        'roc_auc': [0.48, 0.52],
+        'named_eval': [0, 1],
+    })
+
+    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+
+    actual_df = split_evaluator_extractor(logs,
+                                          base_extractor=base_evaluator,
+                                          split_col="irrelevant",
+                                          eval_name="named_eval",
+                                          split_values=[0, 1]
+                                          ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
+
+
 def test_extract():
     boston = load_boston()
     df = pd.DataFrame(boston['data'], columns=boston['feature_names'])
