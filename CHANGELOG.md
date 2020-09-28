@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.20.1] - 2020-09-28
+- **Bug Fix**
+    - Fix split_evaluator_extractor when split_evaluator uses eval_name 
+
 ## [1.20.0] - 2020-07-13
 - **Enhancement**
     - Now Catboost learner is pickable
