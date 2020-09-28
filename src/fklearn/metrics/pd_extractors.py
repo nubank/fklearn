@@ -32,7 +32,8 @@ def split_evaluator_extractor_iteration(split_value, result, split_col, base_ext
 @curry
 def split_evaluator_extractor(result, split_col, split_values, base_extractor, eval_name=None):
     return pd.concat(
-        list(map(split_evaluator_extractor_iteration(result=result, split_col=split_col, base_extractor=base_extractor, eval_name=eval_name),
+        list(map(split_evaluator_extractor_iteration(result=result, split_col=split_col, base_extractor=base_extractor,
+                                                     eval_name=eval_name),
                  split_values)))
 
 
