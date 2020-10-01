@@ -22,23 +22,24 @@ from fklearn.validation.validator import validator
 
 
 @pytest.fixture
-def create_logs():
-    def _create_logs(eval_name):
-        return {
+def create_split_logs_and_evaluator():
+    def _create_split_logs_and_evaluator(eval_name):
+        logs = {
             eval_name + '_0': {'roc_auc': 0.48},
             eval_name + '_1': {'roc_auc': 0.52},
         }
+        base_evaluator = evaluator_extractor(evaluator_name='roc_auc')
+        return logs, base_evaluator
 
-    return _create_logs
+    return _create_split_logs_and_evaluator
 
 
-@pytest.mark.parametrize("eval_name, split_kwargs", [
-    ('split_evaluator__split', {"split_col": "split"}),
-    ('named_eval',  {"split_col": "irr", "eval_name": "named_eval"})
+@pytest.mark.parametrize('eval_name, split_kwargs', [
+    ('split_evaluator__split', {'split_col': 'split'}),
+    ('named_eval', {'split_col': 'irrelevant', 'eval_name': 'named_eval'})
 ])
-def test__split_evaluator_extractor_iteration(eval_name, split_kwargs, create_logs):
-    logs = create_logs(eval_name)
-    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+def test__split_evaluator_extractor_iteration(eval_name, split_kwargs, create_split_logs_and_evaluator):
+    logs, base_evaluator = create_split_logs_and_evaluator(eval_name)
 
     expected_df = pd.DataFrame({'roc_auc': [0.52], eval_name: [1]})
     actual_df = split_evaluator_extractor_iteration(split_value=1,
@@ -50,13 +51,12 @@ def test__split_evaluator_extractor_iteration(eval_name, split_kwargs, create_lo
     pd.testing.assert_frame_equal(actual_df, expected_df)
 
 
-@pytest.mark.parametrize("eval_name, split_kwargs", [
-    ('split_evaluator__split', {"split_col": "split"}),
-    ('named_eval',  {"split_col": "irr", "eval_name": "named_eval"})
+@pytest.mark.parametrize('eval_name, split_kwargs', [
+    ('split_evaluator__split', {'split_col': 'split'}),
+    ('named_eval', {'split_col': 'irrelevant', 'eval_name': 'named_eval'})
 ])
-def test__split_evaluator_extractor__default(eval_name, split_kwargs, create_logs):
-    logs = create_logs(eval_name)
-    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
+def test__split_evaluator_extractor(eval_name, split_kwargs, create_split_logs_and_evaluator):
+    logs, base_evaluator = create_split_logs_and_evaluator(eval_name)
 
     expected_df = pd.DataFrame({'roc_auc': [0.48, 0.52], eval_name: [0, 1]})
     actual_df = split_evaluator_extractor(logs,
