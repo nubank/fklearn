@@ -11,5 +11,6 @@ List of examples
 - :doc:`nlp_classification`
 - :doc:`regression`
 - :doc:`causal_inference`
-- :doc: `fklearn_overview`
-- :doc: `fklearn_overview_dataset_generation`
+- :doc:`feature_transformation`
+- :doc:`fklearn_overview`
+- :doc:`fklearn_overview_dataset_generation`

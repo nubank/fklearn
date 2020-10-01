@@ -9,6 +9,7 @@ from toolz import curry, merge, compose, mapcat
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time
 from fklearn.types import LearnerReturnType, LearnerLogType
+from fklearn.preprocessing.schema import column_duplicatable
 
 
 @curry
@@ -51,6 +52,7 @@ def selector(df: pd.DataFrame,
 selector.__doc__ += learner_return_docstring("Selector")
 
 
+@column_duplicatable('columns_to_cap')
 @curry
 @log_learner_time(learner_name='capper')
 def capper(df: pd.DataFrame,
@@ -97,6 +99,7 @@ def capper(df: pd.DataFrame,
 capper.__doc__ += learner_return_docstring("Capper")
 
 
+@column_duplicatable('columns_to_floor')
 @curry
 @log_learner_time(learner_name='floorer')
 def floorer(df: pd.DataFrame,
@@ -401,6 +404,7 @@ def value_mapper(df: pd.DataFrame,
     return p, p(df), {"value_maps": value_maps}
 
 
+@column_duplicatable('columns_to_truncate')
 @curry
 @log_learner_time(learner_name="truncate_categorical")
 def truncate_categorical(df: pd.DataFrame,
@@ -412,6 +416,11 @@ def truncate_categorical(df: pd.DataFrame,
     """
     Truncate infrequent categories and replace them by a single one.
     You can think of it like "others" category.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -460,6 +469,7 @@ def truncate_categorical(df: pd.DataFrame,
 truncate_categorical.__doc__ += learner_return_docstring("Truncate Categorical")
 
 
+@column_duplicatable('columns_to_rank')
 @curry
 @log_learner_time(learner_name="rank_categorical")
 def rank_categorical(df: pd.DataFrame,
@@ -468,6 +478,11 @@ def rank_categorical(df: pd.DataFrame,
                      store_mapping: bool = False) -> LearnerReturnType:
     """
     Rank categorical features by their frequency in the train set.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -512,6 +527,7 @@ def rank_categorical(df: pd.DataFrame,
 rank_categorical.__doc__ += learner_return_docstring("Rank Categorical")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='count_categorizer')
 def count_categorizer(df: pd.DataFrame,
@@ -520,6 +536,11 @@ def count_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables by count.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -559,6 +580,7 @@ def count_categorizer(df: pd.DataFrame,
 count_categorizer.__doc__ += learner_return_docstring("Count Categorizer")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='label_categorizer')
 def label_categorizer(df: pd.DataFrame,
@@ -567,6 +589,11 @@ def label_categorizer(df: pd.DataFrame,
                       store_mapping: bool = False) -> LearnerReturnType:
     """
     Replaces categorical variables with a numeric identifier.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -609,6 +636,7 @@ def label_categorizer(df: pd.DataFrame,
 label_categorizer.__doc__ += learner_return_docstring("Label Categorizer")
 
 
+@column_duplicatable('columns_to_bin')
 @curry
 @log_learner_time(learner_name='quantile_biner')
 def quantile_biner(df: pd.DataFrame,
@@ -618,6 +646,11 @@ def quantile_biner(df: pd.DataFrame,
     """
     Discretize continuous numerical columns into its quantiles. Uses pandas.qcut
     to find the bins and then numpy.digitize to fit the columns into bins.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -660,6 +693,7 @@ def quantile_biner(df: pd.DataFrame,
 quantile_biner.__doc__ += learner_return_docstring("Quantile Biner")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='onehot_categorizer')
 def onehot_categorizer(df: pd.DataFrame,
@@ -672,6 +706,11 @@ def onehot_categorizer(df: pd.DataFrame,
     Encoded columns are removed and substituted by columns named
     `fklearn_feat__col==val`, where `col` is the name of the column
     and `val` is one of the values the feature can assume.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -724,6 +763,7 @@ def onehot_categorizer(df: pd.DataFrame,
 onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
+@column_duplicatable('columns_to_categorize')
 @curry
 @log_learner_time(learner_name='target_categorizer')
 def target_categorizer(df: pd.DataFrame,
@@ -735,6 +775,11 @@ def target_categorizer(df: pd.DataFrame,
     """
     Replaces categorical variables with the smoothed mean of the target variable by category.
     Uses a weighted average with the overall mean of the target variable for smoothing.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -795,12 +840,18 @@ def target_categorizer(df: pd.DataFrame,
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
 
 
+@column_duplicatable('columns_to_scale')
 @curry
 @log_learner_time(learner_name='standard_scaler')
 def standard_scaler(df: pd.DataFrame,
                     columns_to_scale: List[str]) -> LearnerReturnType:
     """
     Fits a standard scaler to the dataset.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -834,6 +885,7 @@ def standard_scaler(df: pd.DataFrame,
 standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 
 
+@column_duplicatable('columns_to_transform')
 @curry
 @log_learner_time(learner_name='custom_transformer')
 def custom_transformer(df: pd.DataFrame,
@@ -842,6 +894,11 @@ def custom_transformer(df: pd.DataFrame,
                        is_vectorized: bool = False) -> LearnerReturnType:
     """
     Applies a custom function to the desired columns.
+
+    The default behaviour is to replace the original values. To store
+    the transformed values in a new column, specify `prefix` or `suffix`
+    in the parameters, or specify a dictionary with the desired column
+    mapping using the `columns_mapping` parameter.
 
     Parameters
     ----------
@@ -885,7 +942,7 @@ def null_injector(df: pd.DataFrame,
                   groups: Optional[List[List[str]]] = None,
                   seed: int = 1) -> LearnerReturnType:
     """
-    Applies a custom function to the desired columns.
+    Injects null into columns
 
     Parameters
     ----------
