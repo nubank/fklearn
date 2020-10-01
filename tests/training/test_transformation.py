@@ -705,125 +705,122 @@ def test_quantile_biner():
 @pytest.mark.parametrize(
     "df_train, df_test, columns_to_categorize, drop_first, hardcode, expected_output_train, expected_output_test",
     [(  # no drop_first - no hardcode
-            pd.DataFrame({
-                    "feat1_num": [1, 0.5, nan, 100],
-                    "sex": ["female", "male", "male", "male"],
-                    "region": ["SP", "RG", "MG", nan]
-                }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "sex": ["male", "female", "male", "nonbinary"],
-                    "region": [nan, nan, "SP", "RG"]
-                }),
-            ["sex", "region"],
-            False, False,
-            pd.DataFrame({
-                    "feat1_num": [1, 0.5, nan, 100],
-                    "fklearn_feat__sex==female": [1, 0, 0, 0],
-                    "fklearn_feat__sex==male": [0, 1, 1, 1],
-                    "fklearn_feat__region==MG": [0, 0, 1, 0],
-                    "fklearn_feat__region==RG": [0, 1, 0, 0],
-                    "fklearn_feat__region==SP": [1, 0, 0, 0]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "fklearn_feat__sex==female": [0, 1, 0, 0],
-                    "fklearn_feat__sex==male": [1, 0, 1, 0],
-                    "fklearn_feat__region==MG": [0, 0, 0, 0],
-                    "fklearn_feat__region==RG": [0, 0, 0, 1],
-                    "fklearn_feat__region==SP": [0, 0, 1, 0]
-            }),
-        ),
-        (  # no drop_first - hardcode
-            pd.DataFrame({
-                "feat1_num": [1, 0.5, nan, 100],
-                "sex": ["female", "male", "male", "male"],
-                "region": ["SP", "RG", "MG", nan]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "sex": ["male", "female", "male", "nonbinary"],
-                    "region": [nan, nan, "SP", "RG"]
-                }),
-            ["sex", "region"],
-            False, True,
-            pd.DataFrame({
-                    "feat1_num": [1, 0.5, nan, 100],
-                    "fklearn_feat__sex==female": [1, 0, 0, 0],
-                    "fklearn_feat__sex==male": [0, 1, 1, 1],
-                    "fklearn_feat__sex==nan": [0, 0, 0, 0],
-                    "fklearn_feat__region==MG": [0, 0, 1, 0],
-                    "fklearn_feat__region==RG": [0, 1, 0, 0],
-                    "fklearn_feat__region==SP": [1, 0, 0, 0],
-                    "fklearn_feat__region==nan": [0, 0, 0, 1]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "fklearn_feat__sex==female": [0, 1, 0, 0],
-                    "fklearn_feat__sex==male": [1, 0, 1, 0],
-                    "fklearn_feat__sex==nan": [0, 0, 0, 1],
-                    "fklearn_feat__region==MG": [0, 0, 0, 0],
-                    "fklearn_feat__region==RG": [0, 0, 0, 1],
-                    "fklearn_feat__region==SP": [0, 0, 1, 0],
-                    "fklearn_feat__region==nan": [1, 1, 0, 0]
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "sex": ["female", "male", "male", "male"],
+            "region": ["SP", "RG", "MG", nan]
         }),
-        ),
-        (  # drop_first - hardcode
-            pd.DataFrame({
-                "feat1_num": [1, 0.5, nan, 100],
-                "sex": ["female", "male", "male", "male"],
-                "region": ["SP", "RG", "MG", nan]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "sex": ["male", "female", "male", "nonbinary"],
-                    "region": [nan, nan, "SP", "RG"]
-                }),
-            ["sex", "region"],
-            True, True,
-            pd.DataFrame({
-                    "feat1_num": [1, 0.5, nan, 100],
-                    "fklearn_feat__sex==male": [0, 1, 1, 1],
-                    "fklearn_feat__sex==nan": [0, 0, 0, 0],
-                    "fklearn_feat__region==RG": [0, 1, 0, 0],
-                    "fklearn_feat__region==SP": [1, 0, 0, 0],
-                    "fklearn_feat__region==nan": [0, 0, 0, 1]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "fklearn_feat__sex==male": [1, 0, 1, 0],
-                    "fklearn_feat__sex==nan": [0, 0, 0, 1],
-                    "fklearn_feat__region==RG": [0, 0, 0, 1],
-                    "fklearn_feat__region==SP": [0, 0, 1, 0],
-                    "fklearn_feat__region==nan": [1, 1, 0, 0],
-            }),
-        ),
-        (  # drop_first - not hardcode
-            pd.DataFrame({
-                "feat1_num": [1, 0.5, nan, 100],
-                "sex": ["female", "male", "male", "male"],
-                "region": ["SP", "RG", "MG", nan]
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "sex": ["male", "female", "male", "nonbinary"],
-                    "region": [nan, nan, "SP", "RG"]
-                }),
-            ["sex", "region"],
-            True, False,
-            pd.DataFrame({
-                    "feat1_num": [1, 0.5, nan, 100],
-                    "fklearn_feat__sex==male": [0, 1, 1, 1],
-                    "fklearn_feat__region==RG": [0, 1, 0, 0],
-                    "fklearn_feat__region==SP": [1, 0, 0, 0],
-            }),
-            pd.DataFrame({
-                    "feat1_num": [2, 20, 200, 2000],
-                    "fklearn_feat__sex==male": [1, 0, 1, 0],
-                    "fklearn_feat__region==RG": [0, 0, 0, 1],
-                    "fklearn_feat__region==SP": [0, 0, 1, 0]
-            }),
-        ),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "sex": ["male", "female", "male", "nonbinary"],
+            "region": [nan, nan, "SP", "RG"]
+        }),
+        ["sex", "region"],
+        False, False,
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "fklearn_feat__sex==female": [1, 0, 0, 0],
+            "fklearn_feat__sex==male": [0, 1, 1, 1],
+            "fklearn_feat__region==MG": [0, 0, 1, 0],
+            "fklearn_feat__region==RG": [0, 1, 0, 0],
+            "fklearn_feat__region==SP": [1, 0, 0, 0]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "fklearn_feat__sex==female": [0, 1, 0, 0],
+            "fklearn_feat__sex==male": [1, 0, 1, 0],
+            "fklearn_feat__region==MG": [0, 0, 0, 0],
+            "fklearn_feat__region==RG": [0, 0, 0, 1],
+            "fklearn_feat__region==SP": [0, 0, 1, 0]
+        })
+    ), (  # no drop_first - hardcode
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "sex": ["female", "male", "male", "male"],
+            "region": ["SP", "RG", "MG", nan]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "sex": ["male", "female", "male", "nonbinary"],
+            "region": [nan, nan, "SP", "RG"]
+        }),
+        ["sex", "region"],
+        False, True,
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "fklearn_feat__sex==female": [1, 0, 0, 0],
+            "fklearn_feat__sex==male": [0, 1, 1, 1],
+            "fklearn_feat__sex==nan": [0, 0, 0, 0],
+            "fklearn_feat__region==MG": [0, 0, 1, 0],
+            "fklearn_feat__region==RG": [0, 1, 0, 0],
+            "fklearn_feat__region==SP": [1, 0, 0, 0],
+            "fklearn_feat__region==nan": [0, 0, 0, 1]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "fklearn_feat__sex==female": [0, 1, 0, 0],
+            "fklearn_feat__sex==male": [1, 0, 1, 0],
+            "fklearn_feat__sex==nan": [0, 0, 0, 1],
+            "fklearn_feat__region==MG": [0, 0, 0, 0],
+            "fklearn_feat__region==RG": [0, 0, 0, 1],
+            "fklearn_feat__region==SP": [0, 0, 1, 0],
+            "fklearn_feat__region==nan": [1, 1, 0, 0]
+        }),
+    ), (  # drop_first - hardcode
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "sex": ["female", "male", "male", "male"],
+            "region": ["SP", "RG", "MG", nan]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "sex": ["male", "female", "male", "nonbinary"],
+            "region": [nan, nan, "SP", "RG"]
+        }),
+        ["sex", "region"],
+        True, True,
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "fklearn_feat__sex==male": [0, 1, 1, 1],
+            "fklearn_feat__sex==nan": [0, 0, 0, 0],
+            "fklearn_feat__region==RG": [0, 1, 0, 0],
+            "fklearn_feat__region==SP": [1, 0, 0, 0],
+            "fklearn_feat__region==nan": [0, 0, 0, 1]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "fklearn_feat__sex==male": [1, 0, 1, 0],
+            "fklearn_feat__sex==nan": [0, 0, 0, 1],
+            "fklearn_feat__region==RG": [0, 0, 0, 1],
+            "fklearn_feat__region==SP": [0, 0, 1, 0],
+            "fklearn_feat__region==nan": [1, 1, 0, 0],
+        }),
+    ), (  # drop_first - not hardcode
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "sex": ["female", "male", "male", "male"],
+            "region": ["SP", "RG", "MG", nan]
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "sex": ["male", "female", "male", "nonbinary"],
+            "region": [nan, nan, "SP", "RG"]
+        }),
+        ["sex", "region"],
+        True, False,
+        pd.DataFrame({
+            "feat1_num": [1, 0.5, nan, 100],
+            "fklearn_feat__sex==male": [0, 1, 1, 1],
+            "fklearn_feat__region==RG": [0, 1, 0, 0],
+            "fklearn_feat__region==SP": [1, 0, 0, 0],
+        }),
+        pd.DataFrame({
+            "feat1_num": [2, 20, 200, 2000],
+            "fklearn_feat__sex==male": [1, 0, 1, 0],
+            "fklearn_feat__region==RG": [0, 0, 0, 1],
+            "fklearn_feat__region==SP": [0, 0, 1, 0]
+        }),
+    ),
     ]
 )
 def test_onehot_categorizer(
