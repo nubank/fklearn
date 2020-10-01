@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.datasets import load_boston
 
 from fklearn.data.datasets import make_tutorial_data
@@ -20,47 +21,49 @@ from fklearn.validation.splitters import (
 from fklearn.validation.validator import validator
 
 
-def test__split_evaluator_extractor_iteration__default():
-    logs = {
-        'split_evaluator__split_0': {'roc_auc': 0.48},
-        'split_evaluator__split_1': {'roc_auc': 0.52},
-    }
+@pytest.fixture
+def create_logs():
+    def _create_logs(eval_name):
+        return {
+            eval_name + '_0': {'roc_auc': 0.48},
+            eval_name + '_1': {'roc_auc': 0.52},
+        }
 
-    expected_df = pd.DataFrame({
-        'roc_auc': [0.52],
-        'split_evaluator__split': [1],
-    })
+    return _create_logs
 
+
+@pytest.mark.parametrize("eval_name, split_kwargs", [
+    ('split_evaluator__split', {"split_col": "split"}),
+    ('named_eval',  {"split_col": "irr", "eval_name": "named_eval"})
+])
+def test__split_evaluator_extractor_iteration(eval_name, split_kwargs, create_logs):
+    logs = create_logs(eval_name)
     base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
 
+    expected_df = pd.DataFrame({'roc_auc': [0.52], eval_name: [1]})
     actual_df = split_evaluator_extractor_iteration(split_value=1,
                                                     result=logs,
-                                                    split_col="split",
                                                     base_extractor=base_evaluator,
+                                                    **split_kwargs
                                                     ).reset_index(drop=True)
 
     pd.testing.assert_frame_equal(actual_df, expected_df)
 
 
-def test__split_evaluator_extractor_iteration__with_eval_name():
-    logs = {
-        'named_eval_0': {'roc_auc': 0.48},
-        'named_eval_1': {'roc_auc': 0.52},
-    }
-
-    expected_df = pd.DataFrame({
-        'roc_auc': [0.52],
-        'named_eval': [1],
-    })
-
+@pytest.mark.parametrize("eval_name, split_kwargs", [
+    ('split_evaluator__split', {"split_col": "split"}),
+    ('named_eval',  {"split_col": "irr", "eval_name": "named_eval"})
+])
+def test__split_evaluator_extractor__default(eval_name, split_kwargs, create_logs):
+    logs = create_logs(eval_name)
     base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
 
-    actual_df = split_evaluator_extractor_iteration(split_value=1,
-                                                    result=logs,
-                                                    base_extractor=base_evaluator,
-                                                    split_col="irrelevant",
-                                                    eval_name="named_eval",
-                                                    ).reset_index(drop=True)
+    expected_df = pd.DataFrame({'roc_auc': [0.48, 0.52], eval_name: [0, 1]})
+    actual_df = split_evaluator_extractor(logs,
+                                          base_extractor=base_evaluator,
+                                          split_values=[0, 1],
+                                          **split_kwargs
+                                          ).reset_index(drop=True)
 
     pd.testing.assert_frame_equal(actual_df, expected_df)
 
@@ -136,51 +139,6 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
 
     actual_df = feature3_date_extractor(results).reset_index(drop=True)
     pd.testing.assert_frame_equal(actual_df, expected_df, check_like=True)
-
-
-def test__split_evaluator_extractor__default():
-    logs = {
-        'split_evaluator__split_0': {'roc_auc': 0.48},
-        'split_evaluator__split_1': {'roc_auc': 0.52},
-    }
-
-    expected_df = pd.DataFrame({
-        'roc_auc': [0.48, 0.52],
-        'split_evaluator__split': [0, 1],
-    })
-
-    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
-
-    actual_df = split_evaluator_extractor(logs,
-                                          base_extractor=base_evaluator,
-                                          split_col="split",
-                                          split_values=[0, 1]
-                                          ).reset_index(drop=True)
-
-    pd.testing.assert_frame_equal(actual_df, expected_df)
-
-
-def test__split_evaluator_extractor__with_eval_name():
-    logs = {
-        'named_eval_0': {'roc_auc': 0.48},
-        'named_eval_1': {'roc_auc': 0.52},
-    }
-
-    expected_df = pd.DataFrame({
-        'roc_auc': [0.48, 0.52],
-        'named_eval': [0, 1],
-    })
-
-    base_evaluator = evaluator_extractor(evaluator_name="roc_auc")
-
-    actual_df = split_evaluator_extractor(logs,
-                                          base_extractor=base_evaluator,
-                                          split_col="irrelevant",
-                                          eval_name="named_eval",
-                                          split_values=[0, 1]
-                                          ).reset_index(drop=True)
-
-    pd.testing.assert_frame_equal(actual_df, expected_df)
 
 
 def test_extract():
