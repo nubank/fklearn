@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.21.0] - 2020-10-02
+- **Enhancement**
+    - Now transformers can create a new column instead of replace the input
+- **Bug Fix**
+    - Make requirements more flexible to cover the latest releases
+    - split_evaluator_extractor now supports eval_name parameter
+    - Fixed `drop_first_column` behaviour in onehot categorizer
+- **New**
+    - Add learner to calibrate predictions based on a fairness metric
+- **Documentation**
+    - Fixed docstrings for `reverse_time_learning_curve_splitter` and `feature_importance_backward_selection`
+
 ## [1.20.0] - 2020-07-13
 - **Enhancement**
     - Now Catboost learner is pickable
