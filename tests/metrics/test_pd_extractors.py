@@ -2,12 +2,14 @@ from datetime import timedelta
 
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.datasets import load_boston
 
 from fklearn.data.datasets import make_tutorial_data
 from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
                                            evaluator_extractor, extract,
                                            split_evaluator_extractor,
+                                           split_evaluator_extractor_iteration,
                                            temporal_split_evaluator_extractor)
 from fklearn.training.regression import linear_regression_learner
 from fklearn.validation.evaluators import (combined_evaluators, r2_evaluator,
@@ -17,6 +19,53 @@ from fklearn.validation.splitters import (
     forward_stability_curve_time_splitter, out_of_time_and_space_splitter,
     stability_curve_time_splitter, time_learning_curve_splitter)
 from fklearn.validation.validator import validator
+
+
+@pytest.fixture
+def create_split_logs_and_evaluator():
+    def _create_split_logs_and_evaluator(eval_name):
+        logs = {
+            eval_name + '_0': {'roc_auc': 0.48},
+            eval_name + '_1': {'roc_auc': 0.52},
+        }
+        base_evaluator = evaluator_extractor(evaluator_name='roc_auc')
+        return logs, base_evaluator
+
+    return _create_split_logs_and_evaluator
+
+
+@pytest.mark.parametrize('eval_name, split_kwargs', [
+    ('split_evaluator__split', {'split_col': 'split'}),
+    ('named_eval', {'split_col': 'irrelevant', 'eval_name': 'named_eval'})
+])
+def test__split_evaluator_extractor_iteration(eval_name, split_kwargs, create_split_logs_and_evaluator):
+    logs, base_evaluator = create_split_logs_and_evaluator(eval_name)
+
+    expected_df = pd.DataFrame({'roc_auc': [0.52], eval_name: [1]})
+    actual_df = split_evaluator_extractor_iteration(split_value=1,
+                                                    result=logs,
+                                                    base_extractor=base_evaluator,
+                                                    **split_kwargs
+                                                    ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
+
+
+@pytest.mark.parametrize('eval_name, split_kwargs', [
+    ('split_evaluator__split', {'split_col': 'split'}),
+    ('named_eval', {'split_col': 'irrelevant', 'eval_name': 'named_eval'})
+])
+def test__split_evaluator_extractor(eval_name, split_kwargs, create_split_logs_and_evaluator):
+    logs, base_evaluator = create_split_logs_and_evaluator(eval_name)
+
+    expected_df = pd.DataFrame({'roc_auc': [0.48, 0.52], eval_name: [0, 1]})
+    actual_df = split_evaluator_extractor(logs,
+                                          base_extractor=base_evaluator,
+                                          split_values=[0, 1],
+                                          **split_kwargs
+                                          ).reset_index(drop=True)
+
+    pd.testing.assert_frame_equal(actual_df, expected_df)
 
 
 def test__split_evaluator_extractor__when_split_value_is_missing():
