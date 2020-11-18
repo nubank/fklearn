@@ -69,7 +69,7 @@ def validator_iteration(data: pd.DataFrame,
     oof_predictions = []
 
     if verbose:
-        print(f"Running validation for {} fold.")
+        print(f"Running validation for {fold_num} fold.")
     for test_index in (tqdm(test_indexes) if verbose else test_indexes):
         test_predictions = predict_fn(data.iloc[test_index])
         eval_results.append(eval_fn(test_predictions))
