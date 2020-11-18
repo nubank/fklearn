@@ -12,6 +12,7 @@ from toolz.functoolz import identity
 
 from fklearn.types import EvalFnType, LearnerFnType, LogType
 from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
+from tqdm import tqdm
 
 
 def validator_iteration(data: pd.DataFrame,
@@ -20,7 +21,8 @@ def validator_iteration(data: pd.DataFrame,
                         fold_num: int,
                         train_fn: LearnerFnType,
                         eval_fn: EvalFnType,
-                        predict_oof: bool = False) -> LogType:
+                        predict_oof: bool = False,
+                        verbose: bool = False) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
 
@@ -65,7 +67,10 @@ def validator_iteration(data: pd.DataFrame,
 
     eval_results = []
     oof_predictions = []
-    for test_index in test_indexes:
+
+    if verbose:
+        print(f"Running validation for {} fold.")
+    for test_index in (tqdm(test_indexes) if verbose else test_indexes):
         test_predictions = predict_fn(data.iloc[test_index])
         eval_results.append(eval_fn(test_predictions))
         if predict_oof:
@@ -85,7 +90,8 @@ def validator(train_data: pd.DataFrame,
               eval_fn: EvalFnType,
               perturb_fn_train: PerturbFnType = identity,
               perturb_fn_test: PerturbFnType = identity,
-              predict_oof: bool = False) -> ValidatorReturnType:
+              predict_oof: bool = False,
+              verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold by calling
