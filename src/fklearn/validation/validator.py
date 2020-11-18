@@ -128,6 +128,9 @@ def validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    verbose: bool
+        Whether to show more information about the cross validation or not
+
     Returns
     ----------
     A list of log-like dictionary evaluations.
@@ -140,7 +143,7 @@ def validator(train_data: pd.DataFrame,
 
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof)
+        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
 
     zipped_logs = pipe(folds,
                        enumerate,
@@ -174,11 +177,12 @@ def parallel_validator_iteration(train_data: pd.DataFrame,
                                  fold: Tuple[int, Tuple[pd.Index, pd.Index]],
                                  train_fn: LearnerFnType,
                                  eval_fn: EvalFnType,
-                                 predict_oof: bool) -> LogType:
+                                 predict_oof: bool,
+                                 verbose: bool = False) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
     train_fn = cloudpickle.loads(train_fn)
     eval_fn = cloudpickle.loads(eval_fn)
-    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof)
+    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
 
 
 @curry
@@ -187,7 +191,8 @@ def parallel_validator(train_data: pd.DataFrame,
                        train_fn: LearnerFnType,
                        eval_fn: EvalFnType,
                        n_jobs: int = 1,
-                       predict_oof: bool = False) -> ValidatorReturnType:
+                       predict_oof: bool = False,
+                       verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold. Tries to run each
@@ -219,6 +224,9 @@ def parallel_validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    verbose: bool
+        Whether to show more information about the cross validation or not
+
     Returns
     ----------
     A list log-like dictionary evaluations.
@@ -229,7 +237,7 @@ def parallel_validator(train_data: pd.DataFrame,
     dumped_eval_fn = cloudpickle.dumps(eval_fn)
 
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, dumped_train_fn, dumped_eval_fn, predict_oof)
+        delayed(parallel_validator_iteration)(train_data, x, dumped_train_fn, dumped_eval_fn, predict_oof, verbose)
         for x in enumerate(folds))
     gc.collect()
 
