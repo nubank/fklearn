@@ -143,7 +143,8 @@ def validator(train_data: pd.DataFrame,
 
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
+        return validator_iteration(train_data, train_index, test_indexes, fold_num,
+                                   train_fn, eval_fn, predict_oof, verbose)
 
     zipped_logs = pipe(folds,
                        enumerate,
