@@ -129,6 +129,8 @@ def validator(train_data: pd.DataFrame,
 
     folds, logs = split_fn(train_data)
 
+    print("oi")
+
     train_fn = compose(train_fn, perturb_fn_train)
     eval_fn = compose(eval_fn, perturb_fn_test)
 
