@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.22.0] -  2020-11-18
+- **Enhancement**
+    - Add verbose method to `validator` and `parallel_validator`
+
 ## [1.21.0] - 2020-10-02
 - **Enhancement**
     - Now transformers can create a new column instead of replace the input

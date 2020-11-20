@@ -56,17 +56,17 @@ def test_capper():
 
     expected2 = pd.DataFrame({"feat1": [7, 9], "feat2": [75, None]})
 
-    pred_fn1, data1, log = capper(input_df, ["feat1", "feat2"], {"feat1": 9.0})
+    pred_fn1, data1, log = capper(input_df, ["feat1", "feat2"], {"feat1": 9})
     pred_fn2, data2, log = capper(
-        input_df, ["feat1", "feat2"], {"feat1": 9.0}, suffix="_suffix"
+        input_df, ["feat1", "feat2"], {"feat1": 9}, suffix="_suffix"
     )
     pred_fn3, data3, log = capper(
-        input_df, ["feat1", "feat2"], {"feat1": 9.0}, prefix="prefix_"
+        input_df, ["feat1", "feat2"], {"feat1": 9}, prefix="prefix_"
     )
     pred_fn4, data4, log = capper(
         input_df,
         ["feat1", "feat2"],
-        {"feat1": 9.0},
+        {"feat1": 9},
         columns_mapping={"feat1": "feat1_raw", "feat2": "feat2_raw"},
     )
 
