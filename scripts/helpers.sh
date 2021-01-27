@@ -2,11 +2,11 @@
 
 set -e
 
-activate_venv(){
-    . venv/bin/activate
+activate_venv() {
+  . venv/bin/activate
 }
 
-install_package(){
+install_package() {
   activate_venv
   venv/bin/python3 -m pip install -qe .$1
 }
