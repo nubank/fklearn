@@ -7,7 +7,7 @@
   # Download and cache dependencies
   restore-cache: &restore-cache
     keys:
-      - v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/cache_version" }}
+      - v1-dependencies-{{ checksum "requirements.txt" }}
 
   create-venv: &create-venv
     name: Create virtualenv
@@ -16,7 +16,7 @@
   save-cache: &save-cache
     paths:
       - ./venv
-    key: v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/cache_version" }}
+    key: v1-dependencies-{{ checksum "requirements.txt" }}
 
   install-package: &install-package
     name: Install package
