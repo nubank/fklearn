@@ -422,7 +422,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
     random_state : int
         A seed for the random number generator that shuffles the IDs.
     """
-    if np.min(train_percentages) < 0 or np.min(train_percentages) > 1:
+    if np.min(train_percentages) < 0 or np.max(train_percentages) > 1:
         raise ValueError('Train percentages must be between 0 and 1')
 
     if isinstance(training_limit, str):

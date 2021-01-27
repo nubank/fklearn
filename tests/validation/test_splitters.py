@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 import pandas as pd
-
+import pytest
 from fklearn.validation.splitters import \
     k_fold_splitter, out_of_time_and_space_splitter, spatial_learning_curve_splitter, time_learning_curve_splitter, \
     reverse_time_learning_curve_splitter, stability_curve_time_splitter, stability_curve_time_in_space_splitter, \
@@ -106,7 +106,7 @@ def test_time_and_space_learning_curve_splitter():
     assert len(train_4[train_4.space.isin(test_4.space)]) == 0
 
 
-def test_spatial_learning_curve_splitte():
+def test_spatial_learning_curve_splitter():
     result, logs = spatial_learning_curve_splitter(
         sample_data,
         train_percentages=[0.5, 1.0],
@@ -131,6 +131,28 @@ def test_spatial_learning_curve_splitte():
     assert test_1["time"].min() - train_1["time"].max() >= timedelta(days=180)
     assert test_2["time"].min() - train_2["time"].max() >= timedelta(days=180)
     assert len(train_2) > len(train_1)
+
+    # should raise an exception when percentage is off bounds
+    with pytest.raises(ValueError):
+        result, logs = spatial_learning_curve_splitter(
+            sample_data,
+            train_percentages=[0.5, 1.1],
+            space_column="space",
+            time_column="time",
+            training_limit="2015-09-09",
+            holdout_gap=timedelta(days=180),
+            random_state=0
+        )
+    with pytest.raises(ValueError):
+        result, logs = spatial_learning_curve_splitter(
+            sample_data,
+            train_percentages=[-0.1, 1.0],
+            space_column="space",
+            time_column="time",
+            training_limit="2015-09-09",
+            holdout_gap=timedelta(days=180),
+            random_state=0
+        )
 
 
 def test_time_learning_curve_splitter():
