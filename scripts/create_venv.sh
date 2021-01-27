@@ -9,4 +9,4 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pip install -q 'setuptools==40.6.2'
+venv/bin/python3 -m pip install -q 'setuptools==51.3.3'
