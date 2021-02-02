@@ -361,6 +361,7 @@ def apply_replacements(df: pd.DataFrame,
     return df.assign(**categ_columns)
 
 
+@column_duplicatable('value_maps')
 @curry
 @log_learner_time(learner_name="value_mapper")
 def value_mapper(df: pd.DataFrame,
