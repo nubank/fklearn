@@ -117,8 +117,6 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
                     columns_to_duplicate: Any = (kwargs[columns_to_bind] if columns_to_bind in
                                                  kwargs.keys() else
                                                  args[child_spec.args.index(columns_to_bind)])
-                    if isinstance(columns_to_duplicate, dict):
-                        columns_to_duplicate = list(columns_to_duplicate.keys())
                     mixin_kwargs['columns_to_duplicate'] = columns_to_duplicate
 
                 mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
