@@ -1,8 +1,12 @@
 # Changelog
 
-## [1.22.0] -  2020-11-18
+## [1.22.0] -  2021-02-09
 - **Enhancement**
     - Add verbose method to `validator` and `parallel_validator`
+    - Add column_duplicator decorator to value_mapper
+- *Bug Fix*
+    - Fix Spatial LC check
+    - Fix circleci
 
 ## [1.21.0] - 2020-10-02
 - **Enhancement**
