@@ -173,6 +173,12 @@ def test_value_mapper():
     }
 
     pred_fn, data_ignore, log = value_mapper(input_df, value_maps)
+    pred_fn2, data_ignore2, log2 = value_mapper(input_df, value_maps, suffix="_suffix")
+    pred_fn3, data_ignore3, log3 = value_mapper(input_df, value_maps, prefix="prefix_")
+    pred_fn4, data_ignore4, log4 = value_mapper(input_df, value_maps,
+                                                columns_mapping={"feat1": "feat1_raw",
+                                                                 "feat2": "feat2_raw",
+                                                                 "feat3": "feat3_raw"})
     pred_fn, data_not_ignore, log = value_mapper(
         input_df, value_maps, ignore_unseen=False
     )
@@ -195,6 +201,18 @@ def test_value_mapper():
 
     assert expected_ignore.equals(data_ignore)
     assert expected_not_ignore.equals(data_not_ignore)
+
+    assert pd.concat(
+        [expected_ignore, input_df.copy().add_suffix("_suffix")], axis=1
+    ).equals(data_ignore2)
+
+    assert pd.concat(
+        [expected_ignore, input_df.copy().add_prefix("prefix_")], axis=1
+    ).equals(data_ignore3)
+
+    assert pd.concat(
+        [expected_ignore, input_df.copy().add_suffix("_raw")], axis=1
+    ).equals(data_ignore4)
 
 
 def test_truncate_categorical():
