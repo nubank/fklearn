@@ -3,7 +3,6 @@ from typing import Dict, Tuple, List
 import warnings
 import inspect
 
-import cloudpickle
 from joblib import Parallel, delayed
 import pandas as pd
 from toolz import compose
@@ -181,8 +180,6 @@ def parallel_validator_iteration(train_data: pd.DataFrame,
                                  predict_oof: bool,
                                  verbose: bool = False) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
-    train_fn = cloudpickle.loads(train_fn)
-    eval_fn = cloudpickle.loads(eval_fn)
     return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
 
 
@@ -234,11 +231,8 @@ def parallel_validator(train_data: pd.DataFrame,
     """
     folds, logs = split_fn(train_data)
 
-    dumped_train_fn = cloudpickle.dumps(train_fn)
-    dumped_eval_fn = cloudpickle.dumps(eval_fn)
-
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, dumped_train_fn, dumped_eval_fn, predict_oof, verbose)
+        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, verbose)
         for x in enumerate(folds))
     gc.collect()
 
