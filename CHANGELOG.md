@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.22.2] - 2021-09-01
+- **Bug fix**
+    - Remove `cloudpickle` from requirements
+
 ## [1.22.1] - 2021-09-01
 - **Bug fix**
     - Remove cloudpickle from parallel_validator
