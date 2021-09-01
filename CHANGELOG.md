@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.22.1] - 2021-09-01
+- **Bug fix**
+    - Remove cloudpickle from parallel_validator
+
 ## [1.22.0] -  2021-02-09
 - **Enhancement**
     - Add verbose method to `validator` and `parallel_validator`
