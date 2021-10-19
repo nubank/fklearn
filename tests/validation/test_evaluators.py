@@ -10,7 +10,7 @@ from fklearn.validation.evaluators import (
     fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
     mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
     pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
-    roc_auc_evaluator, spearman_evaluator, ndcg_evaluator, split_evaluator,
+    roc_auc_evaluator, spearman_evaluator, linear_coefficient_evaluator, ndcg_evaluator, split_evaluator,
     temporal_split_evaluator)
 
 
@@ -275,6 +275,19 @@ def test_spearman_evaluator():
     result = spearman_evaluator(predictions)
 
     assert result['spearman_evaluator__target'] == 1.0
+
+
+def test_linear_coefficient_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [1, 2, 3],
+            'prediction': [2, 4, 6]
+        }
+    )
+
+    result = linear_coefficient_evaluator(predictions)
+
+    assert result['linear_coefficient_evaluator__target'] == 0.5
 
 
 @pytest.mark.parametrize("exponential_gain", [False, True])

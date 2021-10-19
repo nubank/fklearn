@@ -567,6 +567,42 @@ def correlation_evaluator(test_data: pd.DataFrame,
 
 
 @curry
+def linear_coefficient_evaluator(test_data: pd.DataFrame,
+                                 prediction_column: str = "prediction",
+                                 target_column: str = "target",
+                                 eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the linear coefficient from regressing the outcome on the prediction
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and prediction.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction.
+
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the linear coefficient from regressing the outcome on the prediction
+    """
+
+    if eval_name is None:
+        eval_name = "linear_coefficient_evaluator__" + target_column
+
+    cov_mat = test_data[[prediction_column, target_column]].cov()
+    score = cov_mat.iloc[0, 1] / cov_mat.iloc[0, 0]
+    return {eval_name: score}
+
+
+@curry
 def spearman_evaluator(test_data: pd.DataFrame,
                        prediction_column: str = "prediction",
                        target_column: str = "target",
