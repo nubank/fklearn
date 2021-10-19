@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_predict
 from statsmodels.formula.api import ols
 from toolz import curry, merge
-
+from typing import Dict, Any
 
 @curry
 def debias_with_regression_formula(df: pd.DataFrame,
@@ -126,7 +126,7 @@ def debias_with_double_ml(df: pd.DataFrame,
                           outcome: str,
                           confounders: List[str],
                           ml_regressor: RegressorMixin = GradientBoostingRegressor,
-                          hyperparam: dict = dict(max_depth=5),
+                          extra_params: Dict[str, Any] = None,
                           cv: int = 5,
                           suffix: str = "_debiased",
                           denoise: bool = True,
@@ -160,7 +160,7 @@ def debias_with_double_ml(df: pd.DataFrame,
     ml_regressor : Sklearn's RegressorMixin
         A regressor model that implements a fit and a predict method
 
-    hyperparam : dict
+    extra_params : dict
         The hyper-parameters for the model
 
     cv : int
@@ -181,12 +181,14 @@ def debias_with_double_ml(df: pd.DataFrame,
         The original `df` dataframe with debiased columns added.
     """
 
+    params = extra_params if extra_params else {}
+
     cols_to_debias = [treatment, outcome] if denoise else [treatment]
 
     np.random.seed(seed)
 
     def get_cv_resid(col_to_debias: str) -> np.ndarray:
-        model = ml_regressor(**hyperparam)
+        model = ml_regressor(**params)
         cv_pred = cross_val_predict(estimator=model, X=df[confounders], y=df[col_to_debias], cv=cv)
         return df[col_to_debias] - cv_pred + df[col_to_debias].mean()
 
