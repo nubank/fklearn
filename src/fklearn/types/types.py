@@ -42,4 +42,3 @@ ExtractorFnType = Callable[[str], float]
 
 # Effect Functions
 EffectFnType = Callable[[pd.DataFrame, str, str], Union[float, np.ndarray]]
-

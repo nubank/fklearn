@@ -113,4 +113,3 @@ def pearson_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     """
 
     return df[[treatment, outcome]].corr(method="pearson").iloc[0, 1]
-

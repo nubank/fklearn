@@ -25,12 +25,12 @@ def test_linear_effect_ci():
     ))
 
     result = linear_effect_ci(df, treatment="t", outcome="y", z=1.96)
-    expected = np.array([-1.19736616,  1.90324851])
+    expected = np.array([-1.19736616, 1.90324851])
 
     np.testing.assert_allclose(result, expected)
 
     result = linear_effect_ci(df, treatment="t", outcome="y", z=1.64)
-    expected = np.array([-0.94425475,  1.65013711])
+    expected = np.array([-0.94425475, 1.65013711])
 
     np.testing.assert_allclose(result, expected)
 
@@ -55,4 +55,3 @@ def test_pearson_effect():
 
     result = pearson_effect(df, treatment="t", outcome="y")
     assert round(result, 3) == 0.840
-

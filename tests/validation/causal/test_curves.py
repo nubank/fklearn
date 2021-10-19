@@ -80,5 +80,3 @@ def test_relative_cumulative_gain_curve():
                                             steps=df.shape[0], effect_fn=linear_effect)
 
     np.testing.assert_allclose(expected, result, rtol=1e-07)
-
-
