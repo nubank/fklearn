@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from fklearn.causal.effects import (linear_effect, spearman_effect, pearson_effect)

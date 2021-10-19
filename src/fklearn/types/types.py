@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-import numpy as np
 import pandas as pd
 
 # Date type (used to filter datetime columns in dataframes)
