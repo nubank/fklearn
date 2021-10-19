@@ -41,4 +41,4 @@ ColumnWisePerturbFnType = Callable[[pd.Series], pd.Series]
 ExtractorFnType = Callable[[str], float]
 
 # Effect Functions
-EffectFnType = Callable[[pd.DataFrame, str, str], np.ndarray]
+EffectFnType = Callable[[pd.DataFrame, str, str], Union[float, np.ndarray]]

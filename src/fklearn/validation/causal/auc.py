@@ -100,7 +100,7 @@ def area_under_the_relative_cumulative_gain_curve(df: pd.DataFrame,
          The area under the relative cumulative gain curve according to the predictions ordering.
      """
 
-    ate = effect_fn(**dict(df=df, treatment=treatment, outcome=outcome))
+    ate = effect_fn(df, treatment, outcome)
     size = df.shape[0]
     n_rows = list(range(min_rows, size, size // steps)) + [size]
 
