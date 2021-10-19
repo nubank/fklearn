@@ -1,12 +1,9 @@
-import string
-
 import numpy as np
 import pandas as pd
-import pytest
 
+from fklearn.causal.effects import linear_effect, linear_effect_ci
 from fklearn.validation.causal.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
                                               relative_cumulative_gain_curve)
-from fklearn.validation.causal.curves import (linear_effect, linear_effect_ci)
 
 
 def test_effect_by_segment():
