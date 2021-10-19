@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from fklearn.causal.effects import linear_effect, linear_effect_ci
+from fklearn.causal.effects import linear_effect
 from fklearn.validation.causal.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
                                               relative_cumulative_gain_curve)
 
@@ -16,20 +16,6 @@ def test_effect_by_segment():
 
     result = effect_by_segment(df, prediction="x", outcome="y", treatment="t", segments=3, effect_fn=linear_effect)
     expected = pd.Series([1., 2., 3.], index=result.index)
-
-    pd.testing.assert_series_equal(result, expected)
-
-
-def test_effect_by_segment_with_ci():
-
-    df = pd.DataFrame(dict(
-        t=[1, 1, 1, 2, 2, 2, 3, 3, 3],
-        x=[1, 2, 3, 1, 2, 3, 1, 2, 3],
-        y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
-    ))
-
-    result = effect_by_segment(df, prediction="x", outcome="y", treatment="t", segments=3, effect_fn=linear_effect_ci)
-    expected = pd.Series([[1., 1.], [-2.44, 3.44], [-4.8933333333333335, 5.56]], index=result.index)
 
     pd.testing.assert_series_equal(result, expected)
 
