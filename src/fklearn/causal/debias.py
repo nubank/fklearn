@@ -10,6 +10,7 @@ from statsmodels.formula.api import ols
 from toolz import curry, merge
 from typing import Dict, Any
 
+
 @curry
 def debias_with_regression_formula(df: pd.DataFrame,
                                    treatment: str,
