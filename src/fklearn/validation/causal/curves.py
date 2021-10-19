@@ -7,7 +7,7 @@ from fklearn.causal.effects import linear_effect
 
 
 @curry
-def effect_by_segment(df,
+def effect_by_segment(df: pd.DataFrame,
                       treatment: str,
                       outcome: str,
                       prediction: str,
@@ -95,7 +95,8 @@ def cumulative_effect_curve(df: pd.DataFrame,
     size = df.shape[0]
     ordered_df = df.sort_values(prediction, ascending=False).reset_index(drop=True)
     n_rows = list(range(min_rows, size, size // steps)) + [size]
-    return np.array([effect_fn(df=ordered_df.head(rows), outcome=outcome, treatment=treatment) for rows in n_rows])
+    return np.array([effect_fn(**dict(df=ordered_df.head(rows), outcome=outcome, treatment=treatment))
+                     for rows in n_rows])
 
 
 @curry
@@ -194,7 +195,7 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
          The relative cumulative gain according to the predictions ordering.
      """
 
-    ate = effect_fn(df=df, treatment=treatment, outcome=outcome)
+    ate = effect_fn(**dict(df=df, treatment=treatment, outcome=outcome))
     size = df.shape[0]
     n_rows = list(range(min_rows, size, size // steps)) + [size]
 

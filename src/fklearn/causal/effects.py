@@ -30,7 +30,7 @@ def linear_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
 
 
 @curry
-def linear_effect_ci(df: pd.DataFrame, treatment: str, outcome: str, z: int = 1.96) -> np.ndarray:
+def linear_effect_ci(df: pd.DataFrame, treatment: str, outcome: str, z: float = 1.96) -> np.ndarray:
     """
     Computes the confidence interval of the linear coefficient from regressing the outcome on the treatment.
 
