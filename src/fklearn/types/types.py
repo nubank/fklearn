@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Tuple, Union
 
+import numpy as np
 import pandas as pd
 
 # Date type (used to filter datetime columns in dataframes)
@@ -38,3 +39,7 @@ ColumnWisePerturbFnType = Callable[[pd.Series], pd.Series]
 
 # Extractor types
 ExtractorFnType = Callable[[str], float]
+
+# Effect Functions
+EffectFnType = Callable[[pd.DataFrame, str, str], Union[float, np.ndarray]]
+
