@@ -1,7 +1,9 @@
 from statsmodels.formula.api import ols
 import pandas as pd
 from toolz import curry, merge
+from typing import List
 
+from sklearn.linear_model import LinearRegression
 
 @curry
 def debias_with_regression_formula(df: pd.DataFrame,
@@ -56,3 +58,58 @@ def debias_with_regression_formula(df: pd.DataFrame,
     } if denoise else dict()
 
     return df.assign(**merge(treatment_residual, outcome_residual))
+
+
+@curry
+def debias_with_regression(df: pd.DataFrame,
+                           treatment: str,
+                           outcome: str,
+                           confounders: List[str],
+                           suffix: str = "_debiased",
+                           denoise: bool = True) -> pd.DataFrame:
+    """
+    Frisch-Waugh-Lovell style debiasing with linear regression.
+    To debias, we
+     1) fit a linear model to predict the treatment from the confounders and take the residuals from this fit
+     (debias step)
+     2) fit a linear model to predict the outcome from the confounders and take the residuals from this fit
+     (denoise step).
+    We then add back the average outcome and treatment so that their levels remain unchanged.
+
+    Returns a dataframe with the debiased columns with suffix appended to the name
+
+    Parameters
+    ----------
+
+    df : Pandas DataFrame
+        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+
+    treatment : String
+        The name of the column in `df` with the treatment.
+
+    outcome : String
+        The name of the column in `df` with the outcome.
+
+    confounders : List of String
+        A list of confounder present in df
+
+    suffix : String
+        A suffix to append to the returning debiased column names.
+
+    denoise : Bool (Default=True)
+        If it should denoise the outcome using the confounders or not
+
+    Returns
+    ----------
+    debiased_df : Pandas DataFrame
+        The original `df` dataframe with debiased columns added.
+    """
+
+    model = LinearRegression()
+    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+
+    model.fit(df[confounders], df[cols_to_debias])
+
+    debiased = (df[cols_to_debias] - model.predict(df[confounders]) + df[cols_to_debias].mean())
+
+    return df.assign(**{c + suffix: debiased[c] for c in cols_to_debias})
