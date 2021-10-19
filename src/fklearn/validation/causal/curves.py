@@ -202,4 +202,3 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
                                          min_rows=min_rows, steps=steps, effect_fn=effect_fn)
 
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
-
