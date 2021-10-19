@@ -1,8 +1,8 @@
-import numpy as np
 import pandas as pd
 
 from fklearn.causal.effects import linear_effect
-from fklearn.validation.causal.auc import (area_under_the_cumulative_gain_curve, area_under_the_relative_cumulative_gain_curve)
+from fklearn.validation.causal.auc import (area_under_the_cumulative_gain_curve,
+                                           area_under_the_relative_cumulative_gain_curve)
 
 
 def test_area_under_the_cumulative_gain_curve():
