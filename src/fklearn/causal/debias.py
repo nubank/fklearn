@@ -59,7 +59,7 @@ def debias_with_regression_formula(df: pd.DataFrame,
         treatment + suffix: ols(f"{treatment}~{confounder_formula}", data=df).fit().resid + df[treatment].mean()}
 
     outcome_residual = {
-        outcome+suffix: ols(f"{outcome}~{confounder_formula}", data=df).fit().resid + df[outcome].mean()
+        outcome + suffix: ols(f"{outcome}~{confounder_formula}", data=df).fit().resid + df[outcome].mean()
     } if denoise else dict()
 
     return df.assign(**merge(treatment_residual, outcome_residual))
@@ -184,6 +184,7 @@ def debias_with_double_ml(df: pd.DataFrame,
     cols_to_debias = [treatment, outcome] if denoise else [treatment]
 
     np.random.seed(seed)
+
     def get_cv_resid(col_to_debias: str) -> np.ndarray:
         model = ml_regressor(**hyperparam)
         cv_pred = cross_val_predict(estimator=model, X=df[confounders], y=df[col_to_debias], cv=cv)
