@@ -1,9 +1,14 @@
-from statsmodels.formula.api import ols
-import pandas as pd
-from toolz import curry, merge
 from typing import List
 
+import numpy as np
+import pandas as pd
+from sklearn.base import RegressorMixin
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_predict
+from statsmodels.formula.api import ols
+from toolz import curry, merge
+
 
 @curry
 def debias_with_regression_formula(df: pd.DataFrame,
@@ -113,3 +118,75 @@ def debias_with_regression(df: pd.DataFrame,
     debiased = (df[cols_to_debias] - model.predict(df[confounders]) + df[cols_to_debias].mean())
 
     return df.assign(**{c + suffix: debiased[c] for c in cols_to_debias})
+
+
+@curry
+def debias_with_double_ml(df: pd.DataFrame,
+                          treatment: str,
+                          outcome: str,
+                          confounders: List[str],
+                          ml_regressor: RegressorMixin = GradientBoostingRegressor,
+                          hyperparam: dict = dict(max_depth=5),
+                          cv: int = 5,
+                          suffix: str = "_debiased",
+                          denoise: bool = True,
+                          seed: int = 123) -> pd.DataFrame:
+    """
+    Frisch-Waugh-Lovell style debiasing with ML model.
+    To debias, we
+     1) fit a regression ml model to predict the treatment from the confounders and take out of fold residuals from
+      this fit (debias step)
+     2) fit a regression ml model to predict the outcome from the confounders and take the out of fold residuals from
+      this fit (denoise step).
+    We then add back the average outcome and treatment so that their levels remain unchanged.
+
+    Returns a dataframe with the debiased columns with suffix appended to the name
+
+    Parameters
+    ----------
+
+    df : Pandas DataFrame
+        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+
+    treatment : String
+        The name of the column in `df` with the treatment.
+
+    outcome : String
+        The name of the column in `df` with the outcome.
+
+    confounders : List of String
+        A list of confounder present in df
+
+    ml_regressor : Sklearn's RegressorMixin
+        A regressor model that implements a fit and a predict method
+
+    hyperparam : dict
+        The hyper-parameters for the model
+
+    cv : int
+        The number of folds to cross predict
+
+    suffix : String
+        A suffix to append to the returning debiased column names.
+
+    denoise : Bool (Default=True)
+        If it should denoise the outcome using the confounders or not
+
+    seed : int
+        A seed for consistency in random computation
+
+    Returns
+    ----------
+    debiased_df : Pandas DataFrame
+        The original `df` dataframe with debiased columns added.
+    """
+
+    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+
+    np.random.seed(seed)
+    def get_cv_resid(col_to_debias: str) -> np.ndarray:
+        model = ml_regressor(**hyperparam)
+        cv_pred = cross_val_predict(estimator=model, X=df[confounders], y=df[col_to_debias], cv=cv)
+        return df[col_to_debias] - cv_pred + df[col_to_debias].mean()
+
+    return df.assign(**{c + suffix: get_cv_resid(c) for c in cols_to_debias})
