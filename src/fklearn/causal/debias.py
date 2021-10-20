@@ -122,6 +122,57 @@ def debias_with_regression(df: pd.DataFrame,
 
 
 @curry
+def debias_with_fixed_effects(df: pd.DataFrame,
+                              treatment: str,
+                              outcome: str,
+                              confounders: List[str],
+                              suffix: str = "_debiased",
+                              denoise: bool = True) -> pd.DataFrame:
+    """
+    Returns a dataframe with the debiased columns with suffix appended to the name
+
+    This is equivalent of debiasing with regression where the forumla is "C(x1) + C(x2) + ...".
+    However, it is much more eficient than runing such a dummy variable regression.
+
+    Parameters
+    ----------
+
+    df : Pandas DataFrame
+        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+
+    treatment : String
+        The name of the column in `df` with the treatment.
+
+    outcome : String
+        The name of the column in `df` with the outcome.
+
+    confounders : List of String
+        Confounders are categorical groups we wish to explain away. Some examples are units (ex: customers),
+        and time (day, months...). We perform a group by on these columns, so they should not be continuous
+        variables.
+
+    suffix : String
+        A suffix to append to the returning debiased column names.
+
+    denoise : Bool (Default=True)
+        If it should denoise the outcome using the confounders or not
+
+    Returns
+    ----------
+    debiased_df : Pandas DataFrame
+        The original `df` dataframe with debiased columns added.
+    """
+
+    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+
+    def debias_column(c: str) -> dict:
+        mu = sum([df.groupby(x)[c].transform("mean") for x in confounders])
+        return {c + suffix: df[c] - mu + df[c].mean()}
+
+    return df.assign(**merge(*[debias_column(c) for c in cols_to_debias]))
+
+
+@curry
 def debias_with_double_ml(df: pd.DataFrame,
                           treatment: str,
                           outcome: str,
