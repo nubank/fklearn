@@ -1,7 +1,8 @@
 import pandas as pd
 from toolz import curry
 
-from fklearn.validation.evaluators import spearman_evaluator, correlation_evaluator, linear_coefficient_evaluator
+from fklearn.validation.evaluators import (spearman_evaluator, correlation_evaluator, linear_coefficient_evaluator,
+                                           exponential_coefficient_evaluator)
 
 
 @curry
@@ -78,3 +79,30 @@ def pearson_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
         The Pearson correlation between the treatment and the outcome
     """
     return correlation_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+
+
+@curry
+def exponential_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+    """
+    Computes the exponential coefficient between the treatment and the outcome. Finds a1 in the following equation
+    outcome = exp(a0 + a1 treatment) + error
+
+
+    Parameters
+    ----------
+    df : Pandas' DataFrame
+        A Pandas' DataFrame with target and prediction scores.
+
+    treatment : Strings
+        The name of the treatment column in `df`.
+
+    outcome : Strings
+        The name of the outcome column in `df`.
+
+
+    Returns
+    ----------
+    effect: float
+        The Pearson correlation between the treatment and the outcome
+    """
+    return exponential_coefficient_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
