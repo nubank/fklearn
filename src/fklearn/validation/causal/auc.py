@@ -50,11 +50,13 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
 
     size = df.shape[0]
     n_rows = list(range(min_rows, size, size // steps)) + [size]
+    step_sizes = [min_rows] + [t - s for s, t in zip(n_rows, n_rows[1:])]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
                                          min_rows=min_rows, steps=steps, effect_fn=effect_fn)
 
-    return sum([effect * (rows ** 2 / size) for rows, effect in zip(n_rows, cum_effect)])
+    return sum([effect * (rows / size) * step_size
+                for rows, effect, step_size in zip(n_rows, cum_effect, step_sizes)])
 
 
 @curry
@@ -103,8 +105,10 @@ def area_under_the_relative_cumulative_gain_curve(df: pd.DataFrame,
     ate = effect_fn(df, treatment, outcome)
     size = df.shape[0]
     n_rows = list(range(min_rows, size, size // steps)) + [size]
+    step_sizes = [min_rows] + [t - s for s, t in zip(n_rows, n_rows[1:])]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
                                          min_rows=min_rows, steps=steps, effect_fn=effect_fn)
 
-    return sum([(effect - ate) * (rows**2 / size) for rows, effect in zip(n_rows, cum_effect)])
+    return sum([(effect - ate) * (rows / size) * step_size
+                for rows, effect, step_size in zip(n_rows, cum_effect, step_sizes)])
