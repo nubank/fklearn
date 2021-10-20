@@ -11,6 +11,7 @@ from sklearn.metrics import (average_precision_score, brier_score_loss,
                              recall_score, roc_auc_score)
 from toolz import curry, last, first
 from scipy import optimize
+from sklearn.linear_model import LogisticRegression
 
 from fklearn.types import (EvalFnType, EvalReturnType, PredictFnType,
                            UncurriedEvalFnType)
@@ -985,4 +986,42 @@ def exponential_coefficient_evaluator(test_data: pd.DataFrame,
 
     score = last(first(optimize.curve_fit(lambda t, a0, a1: a0 * np.exp(a1 * t),
                                           test_data[prediction_column], test_data[target_column])))
+    return {eval_name: score}
+
+
+@curry
+def logistic_coefficient_evaluator(test_data: pd.DataFrame,
+                                   prediction_column: str = "prediction",
+                                   target_column: str = "target",
+                                   eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the logistic coefficient between prediction and target. Finds a1 in the following equation
+    target = logistic(a0 + a1 prediction)
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and prediction.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction.
+
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the logistic coefficient
+    """
+
+    if eval_name is None:
+        eval_name = "logistic_coefficient_evaluator__" + target_column
+
+    score = LogisticRegression(penalty="none", multi_class="ovr").fit(test_data[[prediction_column]],
+                                                                      test_data[target_column]).coef_[0][0]
+
     return {eval_name: score}

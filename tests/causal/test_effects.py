@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from fklearn.causal.effects import (linear_effect, spearman_effect, pearson_effect, exponential_coefficient_effect)
+from fklearn.causal.effects import (linear_effect, spearman_effect, pearson_effect, exponential_coefficient_effect,
+                                    logistic_coefficient_effect)
 
 
 def test_linear_effect():
@@ -51,3 +52,14 @@ def test_exponential_coefficient_effect():
 
     result = exponential_coefficient_effect(df, treatment="t", outcome="y")
     assert round(result, 3) == a1
+
+
+def test_logistic_coefficient_effect():
+
+    df = pd.DataFrame(dict(
+        t=[1, 1, 1, 2, 2, 2, 3, 3, 3],
+        y=[0, 0, 0, 0, 0, 0, 1, 1, 1]
+    ))
+
+    result = logistic_coefficient_effect(df, treatment="t", outcome="y")
+    assert round(result, 3) == 20.645
