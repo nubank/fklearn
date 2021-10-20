@@ -13,7 +13,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
                                            prediction: str,
                                            min_rows: int = 30,
                                            steps: int = 100,
-                                           effect_fn=linear_effect) -> float:
+                                           effect_fn: EffectFnType = linear_effect) -> float:
     """
      Orders the dataset by prediction and computes the area under the cumulative effect curve, according to that
       ordering.
