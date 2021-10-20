@@ -15,7 +15,7 @@ def test_area_under_the_cumulative_effect_curve():
 
     result = area_under_the_cumulative_effect_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3,
                                                     steps=df.shape[0], effect_fn=linear_effect)
-    assert round(result, 3) == 6.390
+    assert round(result, 3) == 0.71
 
 
 def test_area_under_the_cumulative_gain_curve():
@@ -28,7 +28,7 @@ def test_area_under_the_cumulative_gain_curve():
 
     result = area_under_the_cumulative_gain_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3,
                                                   steps=df.shape[0], effect_fn=linear_effect)
-    assert round(result, 3) == 13.759
+    assert round(result, 3) == 1.529
 
 
 def test_area_under_the_relative_cumulative_gain_curve():
@@ -41,4 +41,4 @@ def test_area_under_the_relative_cumulative_gain_curve():
 
     result = area_under_the_relative_cumulative_gain_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3,
                                                            steps=df.shape[0], effect_fn=linear_effect)
-    assert round(result, 3) == 3.093
+    assert round(result, 3) == 0.344
