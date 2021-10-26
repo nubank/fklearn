@@ -2,7 +2,7 @@ import pandas as pd
 from toolz import curry
 
 from fklearn.types import EffectFnType
-from fklearn.validation.causal.curves import cumulative_effect_curve
+from fklearn.causal.validation.curves import cumulative_effect_curve
 from fklearn.causal.effects import linear_effect
 
 

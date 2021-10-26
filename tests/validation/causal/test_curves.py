@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from fklearn.causal.effects import linear_effect
-from fklearn.validation.causal.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
+from fklearn.causal.validation.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
                                               relative_cumulative_gain_curve)
 
 
