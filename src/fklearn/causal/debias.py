@@ -13,13 +13,13 @@ from typing import Dict, Any
 
 @curry
 def debias_with_regression_formula(df: pd.DataFrame,
-                                   treatment: str,
-                                   outcome: str,
+                                   treatment_column: str,
+                                   outcome_column: str,
                                    confounder_formula: str,
                                    suffix: str = "_debiased",
                                    denoise: bool = True) -> pd.DataFrame:
     """
-    Frisch-Waugh-Lovell style debiasing with linear regression. Uses statsmodels to fit OLS models with formulas.
+    Frisch-Waugh-Lovell style debiasing with linear regression. With R formula to define confounders.
     To debias, we
      1) fit a linear model to predict the treatment from the confounders and take the residuals from this fit
      (debias step)
@@ -33,12 +33,12 @@ def debias_with_regression_formula(df: pd.DataFrame,
     ----------
 
     df : Pandas DataFrame
-        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+        A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment : String
+    treatment_column : String
         The name of the column in `df` with the treatment.
 
-    outcome : String
+    outcome_column : String
         The name of the column in `df` with the outcome.
 
     confounder_formula : String
@@ -56,21 +56,20 @@ def debias_with_regression_formula(df: pd.DataFrame,
         The original `df` dataframe with debiased columns added.
     """
 
-    treatment_residual = {
-        treatment + suffix: ols(f"{treatment}~{confounder_formula}", data=df).fit().resid + df[treatment].mean()}
+    cols_to_debias = [treatment_column, outcome_column] if denoise else [treatment_column]
 
-    outcome_residual = {
-        outcome + suffix: ols(f"{outcome}~{confounder_formula}", data=df).fit().resid + df[outcome].mean()
-    } if denoise else dict()
+    def get_resid(col_to_debias: str) -> np.ndarray:
+        model = ols(f"{col_to_debias}~{confounder_formula}", data=df).fit()
+        return model.resid + df[col_to_debias].mean()
 
-    return df.assign(**merge(treatment_residual, outcome_residual))
+    return df.assign(**{c + suffix: get_resid(c) for c in cols_to_debias})
 
 
 @curry
 def debias_with_regression(df: pd.DataFrame,
-                           treatment: str,
-                           outcome: str,
-                           confounders: List[str],
+                           treatment_column: str,
+                           outcome_column: str,
+                           confounder_columns: List[str],
                            suffix: str = "_debiased",
                            denoise: bool = True) -> pd.DataFrame:
     """
@@ -88,15 +87,15 @@ def debias_with_regression(df: pd.DataFrame,
     ----------
 
     df : Pandas DataFrame
-        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+        A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment : String
+    treatment_column : String
         The name of the column in `df` with the treatment.
 
-    outcome : String
+    outcome_column : String
         The name of the column in `df` with the outcome.
 
-    confounders : List of String
+    confounder_columns : List of String
         A list of confounder present in df
 
     suffix : String
@@ -112,20 +111,20 @@ def debias_with_regression(df: pd.DataFrame,
     """
 
     model = LinearRegression()
-    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+    cols_to_debias = [treatment_column, outcome_column] if denoise else [treatment_column]
 
-    model.fit(df[confounders], df[cols_to_debias])
+    model.fit(df[confounder_columns], df[cols_to_debias])
 
-    debiased = (df[cols_to_debias] - model.predict(df[confounders]) + df[cols_to_debias].mean())
+    debiased = (df[cols_to_debias] - model.predict(df[confounder_columns]) + df[cols_to_debias].mean())
 
     return df.assign(**{c + suffix: debiased[c] for c in cols_to_debias})
 
 
 @curry
 def debias_with_fixed_effects(df: pd.DataFrame,
-                              treatment: str,
-                              outcome: str,
-                              confounders: List[str],
+                              treatment_column: str,
+                              outcome_column: str,
+                              confounder_columns: List[str],
                               suffix: str = "_debiased",
                               denoise: bool = True) -> pd.DataFrame:
     """
@@ -138,15 +137,15 @@ def debias_with_fixed_effects(df: pd.DataFrame,
     ----------
 
     df : Pandas DataFrame
-        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+        A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment : String
+    treatment_column : String
         The name of the column in `df` with the treatment.
 
-    outcome : String
+    outcome_column : String
         The name of the column in `df` with the outcome.
 
-    confounders : List of String
+    confounder_columns : List of String
         Confounders are categorical groups we wish to explain away. Some examples are units (ex: customers),
         and time (day, months...). We perform a group by on these columns, so they should not be continuous
         variables.
@@ -163,10 +162,10 @@ def debias_with_fixed_effects(df: pd.DataFrame,
         The original `df` dataframe with debiased columns added.
     """
 
-    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+    cols_to_debias = [treatment_column, outcome_column] if denoise else [treatment_column]
 
     def debias_column(c: str) -> dict:
-        mu = sum([df.groupby(x)[c].transform("mean") for x in confounders])
+        mu = sum([df.groupby(x)[c].transform("mean") for x in confounder_columns])
         return {c + suffix: df[c] - mu + df[c].mean()}
 
     return df.assign(**merge(*[debias_column(c) for c in cols_to_debias]))
@@ -174,9 +173,9 @@ def debias_with_fixed_effects(df: pd.DataFrame,
 
 @curry
 def debias_with_double_ml(df: pd.DataFrame,
-                          treatment: str,
-                          outcome: str,
-                          confounders: List[str],
+                          treatment_column: str,
+                          outcome_column: str,
+                          confounder_columns: List[str],
                           ml_regressor: RegressorMixin = GradientBoostingRegressor,
                           extra_params: Dict[str, Any] = None,
                           cv: int = 5,
@@ -198,15 +197,15 @@ def debias_with_double_ml(df: pd.DataFrame,
     ----------
 
     df : Pandas DataFrame
-        A Pandas' DataFrame with with treatment, an outcome and confounder columns
+        A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment : String
+    treatment_column : String
         The name of the column in `df` with the treatment.
 
-    outcome : String
+    outcome_column : String
         The name of the column in `df` with the outcome.
 
-    confounders : List of String
+    confounder_columns : List of String
         A list of confounder present in df
 
     ml_regressor : Sklearn's RegressorMixin
@@ -235,13 +234,13 @@ def debias_with_double_ml(df: pd.DataFrame,
 
     params = extra_params if extra_params else {}
 
-    cols_to_debias = [treatment, outcome] if denoise else [treatment]
+    cols_to_debias = [treatment_column, outcome_column] if denoise else [treatment_column]
 
     np.random.seed(seed)
 
     def get_cv_resid(col_to_debias: str) -> np.ndarray:
         model = ml_regressor(**params)
-        cv_pred = cross_val_predict(estimator=model, X=df[confounders], y=df[col_to_debias], cv=cv)
+        cv_pred = cross_val_predict(estimator=model, X=df[confounder_columns], y=df[col_to_debias], cv=cv)
         return df[col_to_debias] - cv_pred + df[col_to_debias].mean()
 
     return df.assign(**{c + suffix: get_cv_resid(c) for c in cols_to_debias})
