@@ -25,16 +25,20 @@ def _validate_test_and_control_groups(
     return test_group_name > control_group_name
 
 
-def cate_mean_by_bin(
+def cate_mean_by_segment(
     test_data: pd.DataFrame,
     group_column: str,
-    test_after_control: bool,
+    control_group_name: str,
     bin_column: str,
     n_bins: int,
     allow_dropped_bins: bool,
     prediction_column: str,
     target_column: str,
 ) -> pd.DataFrame:
+    test_after_control = _validate_test_and_control_groups(
+        test_data, group_column, control_group_name
+    )
+
     quantile_column = bin_column + "_q" + str(n_bins)
     duplicates = "drop" if allow_dropped_bins else "raise"
     test_data_binned = test_data.assign(
@@ -57,7 +61,7 @@ def cate_mean_by_bin(
 
 
 @curry
-def cate_mean_by_bin_meta_evaluator(
+def cate_mean_by_segment_meta_evaluator(
     test_data: pd.DataFrame,
     group_column: str,
     control_group_name: str,
@@ -69,13 +73,11 @@ def cate_mean_by_bin_meta_evaluator(
     prediction_column: str = "prediction",
     target_column: str = "target",
 ) -> EvalReturnType:
-    test_after_control = _validate_test_and_control_groups(test_data, group_column, control_group_name)
-
     try:
-        gb = cate_mean_by_bin(
+        gb = cate_mean_by_segment(
             test_data,
             group_column,
-            test_after_control,
+            control_group_name,
             bin_column,
             n_bins,
             allow_dropped_bins,
@@ -91,7 +93,7 @@ def cate_mean_by_bin_meta_evaluator(
 
     if eval_name is None:
         eval_name = (
-            "cate_mean_by_bin_"
+            "cate_mean_by_segment_"
             + bin_column
             + "[{}q]".format(n_bins)
             + "__"
