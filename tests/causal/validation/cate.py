@@ -1,8 +1,8 @@
 import pandas as pd
 
 from fklearn.causal.validation.cate import (
-    cate_mean_by_segment,
-    cate_mean_by_segment_meta_evaluator,
+    _cate_mean_by_bin,
+    cate_mean_by_bin_meta_evaluator,
 )
 from fklearn.validation.evaluators import r2_evaluator
 import pytest
@@ -24,7 +24,7 @@ def test_delta_mean_by_group_and_bin():
         {"prediction_column": [3.0, -4.0], "target_column": [35.0, 10.0]}
     )
 
-    df_result = cate_mean_by_segment(
+    df_result = _cate_mean_by_bin(
         df_input,
         "group_column",
         "1",
@@ -38,7 +38,7 @@ def test_delta_mean_by_group_and_bin():
 
 
 def test_cate_mean_by_bin_meta_evaluator():
-    evaluation = cate_mean_by_segment_meta_evaluator(
+    evaluation = cate_mean_by_bin_meta_evaluator(
         test_data=df_input,
         group_column="group_column",
         control_group_name="1",
@@ -56,7 +56,7 @@ def test_cate_mean_by_bin_meta_evaluator():
 
 def test_cate_mean_by_bin_meta_evaluator_errors():
     with pytest.raises(ValueError):
-        cate_mean_by_segment_meta_evaluator(
+        cate_mean_by_bin_meta_evaluator(
             test_data=df_input,
             group_column="group_column",
             control_group_name="3",  # invalid control group name
@@ -70,7 +70,7 @@ def test_cate_mean_by_bin_meta_evaluator_errors():
         )
 
     with pytest.raises(RuntimeError):
-        cate_mean_by_segment_meta_evaluator(
+        cate_mean_by_bin_meta_evaluator(
             test_data=df_input.assign(
                 group_column="2"
             ),  # everyone belongs to the same group
@@ -86,7 +86,7 @@ def test_cate_mean_by_bin_meta_evaluator_errors():
         )
 
     with pytest.raises(ValueError):
-        cate_mean_by_segment_meta_evaluator(
+        cate_mean_by_bin_meta_evaluator(
             test_data=df_input.assign(
                 group_column=["1", "1", "1", "1", "1", "1", "1", "2"]
             ),

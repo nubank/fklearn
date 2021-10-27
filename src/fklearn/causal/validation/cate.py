@@ -6,7 +6,27 @@ from fklearn.types import EvalReturnType, UncurriedEvalFnType
 
 def _validate_test_and_control_groups(
     test_data: pd.DataFrame, group_column: str, control_group_name: str
-) -> bool:
+) -> str:
+    """
+    Checks whether `test_data` has data on exactly two different experiment groups: test and control. Also returns the
+    name of the test group.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with `group_column` as a column.
+
+    group_column : String
+        The name of the column that tells whether rows belong to the test or control group.
+
+    control_group_name : String
+        The name of the control group.
+
+    Returns
+    ----------
+    test_group_name: String
+        The name of the test group.
+    """
     unique_values = test_data[group_column].unique()
 
     if control_group_name not in unique_values:
@@ -19,13 +39,12 @@ def _validate_test_and_control_groups(
                 n_groups
             )
         )
-    test_group_name = (
+    return (
         unique_values[0] if control_group_name == unique_values[1] else unique_values[1]
     )
-    return test_group_name > control_group_name
 
 
-def cate_mean_by_segment(
+def _cate_mean_by_bin(
     test_data: pd.DataFrame,
     group_column: str,
     control_group_name: str,
@@ -35,9 +54,45 @@ def cate_mean_by_segment(
     prediction_column: str,
     target_column: str,
 ) -> pd.DataFrame:
-    test_after_control = _validate_test_and_control_groups(
+    """
+    Computes a dataframe with predicted and actual CATEs by bins of a given column.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with `group_column` as a column.
+
+    group_column : String
+        The name of the column that tells whether rows belong to the test or control group.
+
+    control_group_name : String
+        The name of the control group.
+
+    bin_column : String
+        The name of the column from which the quantiles will be created.
+
+    n_bins : String
+        The number of bins to be created.
+
+    allow_dropped_bins : bool
+        Whether to allow the function to drop duplicated quantiles.
+
+    prediction_column : String
+        The name of the column containing the predictions from the model being evaluated.
+
+    target_column : String
+        The name of the column containing the actual outcomes of the treatment.
+
+    Returns
+    ----------
+    gb: pd.DataFrame
+        The grouped dataframe with actual and predicted CATEs by bin.
+    """
+    test_group_name = _validate_test_and_control_groups(
         test_data, group_column, control_group_name
     )
+
+    test_after_control = test_group_name > control_group_name
 
     quantile_column = bin_column + "_q" + str(n_bins)
     duplicates = "drop" if allow_dropped_bins else "raise"
@@ -61,7 +116,7 @@ def cate_mean_by_segment(
 
 
 @curry
-def cate_mean_by_segment_meta_evaluator(
+def cate_mean_by_bin_meta_evaluator(
     test_data: pd.DataFrame,
     group_column: str,
     control_group_name: str,
@@ -73,8 +128,52 @@ def cate_mean_by_segment_meta_evaluator(
     prediction_column: str = "prediction",
     target_column: str = "target",
 ) -> EvalReturnType:
+    """
+    Evaluates the predictions of a causal model that outputs treatment outcomes w.r.t. its capabilities to predict the
+    CATE.
+
+    Due to the fundamental lack of counterfactual data, the CATEs are computed for bins of a given column. This function
+    then applies a fklearn-like evaluator on top of the aggregated dataframe.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with `group_column` as a column.
+
+    group_column : String
+        The name of the column that tells whether rows belong to the test or control group.
+
+    control_group_name : String
+        The name of the control group.
+
+    bin_column : String
+        The name of the column from which the quantiles will be created.
+
+    n_bins : String
+        The number of bins to be created.
+
+    allow_dropped_bins : bool
+        Whether to allow the function to drop duplicated quantiles.
+
+    inner_evaluator : UncurriedEvalFnType
+        An instance of a fklearn-like evaluator, which will be applied to the .
+
+    eval_name : String, optional (default=None)
+        The name of the evaluator as it will appear in the logs.
+
+    prediction_column : String
+        The name of the column containing the predictions from the model being evaluated.
+
+    target_column : String
+        The name of the column containing the actual outcomes of the treatment.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the evaluation by `inner_evaluator`
+    """
     try:
-        gb = cate_mean_by_segment(
+        gb = _cate_mean_by_bin(
             test_data,
             group_column,
             control_group_name,
@@ -93,7 +192,7 @@ def cate_mean_by_segment_meta_evaluator(
 
     if eval_name is None:
         eval_name = (
-            "cate_mean_by_segment_"
+            "cate_mean_by_bin_"
             + bin_column
             + "[{}q]".format(n_bins)
             + "__"
