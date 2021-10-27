@@ -2,6 +2,7 @@ import pandas as pd
 from toolz import curry
 
 from fklearn.types import EvalReturnType, UncurriedEvalFnType
+from fklearn.validation.evaluators import r2_evaluator
 
 
 def _validate_test_and_control_groups(
@@ -122,8 +123,8 @@ def cate_mean_by_bin_meta_evaluator(
     control_group_name: str,
     bin_column: str,
     n_bins: int,
-    allow_dropped_bins: bool,
-    inner_evaluator: UncurriedEvalFnType,
+    allow_dropped_bins: bool = False,
+    inner_evaluator: UncurriedEvalFnType = r2_evaluator,
     eval_name: str = None,
     prediction_column: str = "prediction",
     target_column: str = "target",
@@ -152,19 +153,19 @@ def cate_mean_by_bin_meta_evaluator(
     n_bins : String
         The number of bins to be created.
 
-    allow_dropped_bins : bool
+    allow_dropped_bins : bool, optional (default=False)
         Whether to allow the function to drop duplicated quantiles.
 
-    inner_evaluator : UncurriedEvalFnType
+    inner_evaluator : UncurriedEvalFnType, optional (default=r2_evaluator)
         An instance of a fklearn-like evaluator, which will be applied to the .
 
     eval_name : String, optional (default=None)
         The name of the evaluator as it will appear in the logs.
 
-    prediction_column : String
+    prediction_column : String, optional (default=None)
         The name of the column containing the predictions from the model being evaluated.
 
-    target_column : String
+    target_column : String, optional (default=None)
         The name of the column containing the actual outcomes of the treatment.
 
     Returns
