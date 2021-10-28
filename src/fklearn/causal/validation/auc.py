@@ -23,7 +23,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
      df : Pandas' DataFrame
          A Pandas' DataFrame with target and prediction scores.
 
-     treatment : Strings
+     treatment : str
          The name of the treatment column in `df`.
 
      outcome : Strings
