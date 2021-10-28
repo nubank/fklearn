@@ -15,18 +15,18 @@ def _validate_test_and_control_groups(
 
     Parameters
     ----------
-    test_data : Pandas' DataFrame
+    test_data : DataFrame
         A Pandas' DataFrame with `group_column` as a column.
 
-    group_column : String
+    group_column : str
         The name of the column that tells whether rows belong to the test or control group.
 
-    control_group_name : String
+    control_group_name : str
         The name of the control group.
 
     Returns
     ----------
-    test_group_name: String
+    test_group_name: str
         The name of the test group.
     """
     unique_values = test_data[group_column].unique()
