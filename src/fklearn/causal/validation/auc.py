@@ -32,7 +32,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
      prediction : Strings
          The name of the prediction column in `df`.
 
-     min_rows : Integer
+     min_rows : int
          Minimum number of observations needed to have a valid result.
 
      steps : Integer
