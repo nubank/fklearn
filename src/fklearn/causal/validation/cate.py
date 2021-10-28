@@ -5,10 +5,9 @@ from fklearn.types import EvalReturnType, UncurriedEvalFnType
 from fklearn.validation.evaluators import r2_evaluator
 
 
-def _validate_test_and_control_groups(
-    test_data: pd.DataFrame,
-    group_column: str,
-    control_group_name: str) -> str:
+def _validate_test_and_control_groups(test_data: pd.DataFrame,
+                                      group_column: str,
+                                      control_group_name: str) -> str:
     """
     Checks whether `test_data` has data on exactly two different experiment groups: test and control. Also returns the
     name of the test group.
@@ -46,17 +45,18 @@ def _validate_test_and_control_groups(
     )
 
 
-def _cate_mean_by_bin(
-    test_data: pd.DataFrame,
-    group_column: str,
-    control_group_name: str,
-    bin_column: str,
-    n_bins: int,
-    allow_dropped_bins: bool,
-    prediction_column: str,
-    target_column: str) -> pd.DataFrame:
+def cate_mean_by_bin(test_data: pd.DataFrame,
+                     group_column: str,
+                     control_group_name: str,
+                     bin_column: str,
+                     n_bins: int,
+                     allow_dropped_bins: bool,
+                     prediction_column: str,
+                     target_column: str) -> pd.DataFrame:
     """
     Computes a dataframe with predicted and actual CATEs by bins of a given column.
+
+    This is primarily an auxiliary function, but can be used to visualize the CATEs.
 
     Parameters
     ----------
@@ -118,15 +118,15 @@ def _cate_mean_by_bin(
 
 @curry
 def cate_mean_by_bin_meta_evaluator(test_data: pd.DataFrame,
-                                                                  group_column: str,
-                                                                  control_group_name: str,
-                                                                  bin_column: str,
-                                                                  n_bins: int,
-                                                                  allow_dropped_bins: bool = False,
-                                                                  inner_evaluator: UncurriedEvalFnType = r2_evaluator,
-                                                                 eval_name: str = None,
-                                                                 prediction_column: str = "prediction",
-                                                                 target_column: str = "target") -> EvalReturnType:
+                                    group_column: str,
+                                    control_group_name: str,
+                                    bin_column: str,
+                                    n_bins: int,
+                                    allow_dropped_bins: bool = False,
+                                    inner_evaluator: UncurriedEvalFnType = r2_evaluator,
+                                    eval_name: str = None,
+                                    prediction_column: str = "prediction",
+                                    target_column: str = "target") -> EvalReturnType:
     """
     Evaluates the predictions of a causal model that outputs treatment outcomes w.r.t. its capabilities to predict the
     CATE.
@@ -172,7 +172,7 @@ def cate_mean_by_bin_meta_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the evaluation by `inner_evaluator`
     """
     try:
-        gb = _cate_mean_by_bin(
+        gb = cate_mean_by_bin(
             test_data,
             group_column,
             control_group_name,
