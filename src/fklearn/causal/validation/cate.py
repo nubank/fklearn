@@ -61,33 +61,33 @@ def _cate_mean_by_bin(
 
     Parameters
     ----------
-    test_data : Pandas' DataFrame
+    test_data : DataFrame
         A Pandas' DataFrame with `group_column` as a column.
 
-    group_column : String
+    group_column : str
         The name of the column that tells whether rows belong to the test or control group.
 
-    control_group_name : String
+    control_group_name : str
         The name of the control group.
 
-    bin_column : String
+    bin_column : str
         The name of the column from which the quantiles will be created.
 
-    n_bins : String
+    n_bins : str
         The number of bins to be created.
 
     allow_dropped_bins : bool
         Whether to allow the function to drop duplicated quantiles.
 
-    prediction_column : String
+    prediction_column : str
         The name of the column containing the predictions from the model being evaluated.
 
-    target_column : String
+    target_column : str
         The name of the column containing the actual outcomes of the treatment.
 
     Returns
     ----------
-    gb: pd.DataFrame
+    gb: DataFrame
         The grouped dataframe with actual and predicted CATEs by bin.
     """
     test_group_name = _validate_test_and_control_groups(
