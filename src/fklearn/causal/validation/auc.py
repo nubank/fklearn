@@ -98,7 +98,7 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
 
      Returns
      ----------
-     area under the cumulative gain curve: float
+     area_under_the_cumulative_gain_curve: float
          The area under the cumulative gain curve according to the predictions ordering.
      """
 
