@@ -54,8 +54,7 @@ def _cate_mean_by_bin(
     n_bins: int,
     allow_dropped_bins: bool,
     prediction_column: str,
-    target_column: str,
-) -> pd.DataFrame:
+    target_column: str) -> pd.DataFrame:
     """
     Computes a dataframe with predicted and actual CATEs by bins of a given column.
 
