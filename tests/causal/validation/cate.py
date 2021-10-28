@@ -1,13 +1,14 @@
 import pandas as pd
+import pytest
 
 from fklearn.causal.validation.cate import (
     _cate_mean_by_bin,
     cate_mean_by_bin_meta_evaluator,
 )
 from fklearn.validation.evaluators import r2_evaluator
-import pytest
 
-df_input = pd.DataFrame(
+
+DF_INPUT = pd.DataFrame(
     {
         "group_column": ["1", "1", "1", "1", "2", "2", "2", "2"],
         "bin_column": [1, 1, 2, 2, 1, 1, 2, 2],
@@ -18,14 +19,12 @@ df_input = pd.DataFrame(
 
 
 def test_delta_mean_by_group_and_bin():
-    # [(5, 3) -> 4 ~ (8, 6) -> 7] -> 3 vs [(4, 7) -> 5.5 ~ (1, 2) -> 1.5] -> -4
-    # [(10, 20) -> 15 ~ (70, 30) -> 50] -> 35 vs [(50, 40) -> 45 ~ (50, 60) -> 55] -> 10
     df_expected = pd.DataFrame(
         {"prediction_column": [3.0, -4.0], "target_column": [35.0, 10.0]}
     )
 
     df_result = _cate_mean_by_bin(
-        df_input,
+        DF_INPUT,
         "group_column",
         "1",
         "bin_column",
@@ -39,7 +38,7 @@ def test_delta_mean_by_group_and_bin():
 
 def test_cate_mean_by_bin_meta_evaluator():
     evaluation = cate_mean_by_bin_meta_evaluator(
-        test_data=df_input,
+        test_data=DF_INPUT,
         group_column="group_column",
         control_group_name="1",
         bin_column="bin_column",
@@ -57,7 +56,7 @@ def test_cate_mean_by_bin_meta_evaluator():
 def test_cate_mean_by_bin_meta_evaluator_errors():
     with pytest.raises(ValueError):
         cate_mean_by_bin_meta_evaluator(
-            test_data=df_input,
+            test_data=DF_INPUT,
             group_column="group_column",
             control_group_name="3",  # invalid control group name
             bin_column="bin_column",
@@ -71,7 +70,7 @@ def test_cate_mean_by_bin_meta_evaluator_errors():
 
     with pytest.raises(RuntimeError):
         cate_mean_by_bin_meta_evaluator(
-            test_data=df_input.assign(
+            test_data=DF_INPUT.assign(
                 group_column="2"
             ),  # everyone belongs to the same group
             group_column="group_column",
@@ -87,7 +86,7 @@ def test_cate_mean_by_bin_meta_evaluator_errors():
 
     with pytest.raises(ValueError):
         cate_mean_by_bin_meta_evaluator(
-            test_data=df_input.assign(
+            test_data=DF_INPUT.assign(
                 group_column=["1", "1", "1", "1", "1", "1", "1", "2"]
             ),
             group_column="group_column",
