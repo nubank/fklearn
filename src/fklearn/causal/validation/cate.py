@@ -6,8 +6,9 @@ from fklearn.validation.evaluators import r2_evaluator
 
 
 def _validate_test_and_control_groups(
-    test_data: pd.DataFrame, group_column: str, control_group_name: str
-) -> str:
+    test_data: pd.DataFrame,
+    group_column: str,
+    control_group_name: str) -> str:
     """
     Checks whether `test_data` has data on exactly two different experiment groups: test and control. Also returns the
     name of the test group.
