@@ -118,18 +118,16 @@ def _cate_mean_by_bin(
 
 
 @curry
-def cate_mean_by_bin_meta_evaluator(
-    test_data: pd.DataFrame,
-    group_column: str,
-    control_group_name: str,
-    bin_column: str,
-    n_bins: int,
-    allow_dropped_bins: bool = False,
-    inner_evaluator: UncurriedEvalFnType = r2_evaluator,
-    eval_name: str = None,
-    prediction_column: str = "prediction",
-    target_column: str = "target",
-) -> EvalReturnType:
+def cate_mean_by_bin_meta_evaluator(test_data: pd.DataFrame,
+                                                                  group_column: str,
+                                                                  control_group_name: str,
+                                                                  bin_column: str,
+                                                                  n_bins: int,
+                                                                  allow_dropped_bins: bool = False,
+                                                                  inner_evaluator: UncurriedEvalFnType = r2_evaluator,
+                                                                 eval_name: str = None,
+                                                                 prediction_column: str = "prediction",
+                                                                 target_column: str = "target") -> EvalReturnType:
     """
     Evaluates the predictions of a causal model that outputs treatment outcomes w.r.t. its capabilities to predict the
     CATE.
