@@ -3,7 +3,7 @@
 ## [1.23.0] - 2021-10-29
 - **New**
     - Add common causal evaluation techniques
-    - Add methods to debias a dataframe with a treatment t and confounders x
+    - Add methods to debias a dataframe with a treatment T and confounders X
 
 ## [1.22.2] - 2021-09-01
 - **Bug fix**
