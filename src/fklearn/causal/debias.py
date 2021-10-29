@@ -35,19 +35,19 @@ def debias_with_regression_formula(df: pd.DataFrame,
     df : Pandas DataFrame
         A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment_column : String
+    treatment_column : str
         The name of the column in `df` with the treatment.
 
-    outcome_column : String
+    outcome_column : str
         The name of the column in `df` with the outcome.
 
-    confounder_formula : String
+    confounder_formula : str
         An R formula modeling the confounders. Check https://www.statsmodels.org/dev/example_formulas.html for examples.
 
-    suffix : String
+    suffix : str
         A suffix to append to the returning debiased column names.
 
-    denoise : Bool (Default=True)
+    denoise : bool (Default=True)
         If it should denoise the outcome using the confounders or not
 
     Returns
@@ -89,19 +89,19 @@ def debias_with_regression(df: pd.DataFrame,
     df : Pandas DataFrame
         A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment_column : String
+    treatment_column : str
         The name of the column in `df` with the treatment.
 
-    outcome_column : String
+    outcome_column : str
         The name of the column in `df` with the outcome.
 
-    confounder_columns : List of String
+    confounder_columns : list of str
         A list of confounder present in df
 
-    suffix : String
+    suffix : str
         A suffix to append to the returning debiased column names.
 
-    denoise : Bool (Default=True)
+    denoise : bool (Default=True)
         If it should denoise the outcome using the confounders or not
 
     Returns
@@ -139,21 +139,21 @@ def debias_with_fixed_effects(df: pd.DataFrame,
     df : Pandas DataFrame
         A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment_column : String
+    treatment_column : str
         The name of the column in `df` with the treatment.
 
-    outcome_column : String
+    outcome_column : str
         The name of the column in `df` with the outcome.
 
-    confounder_columns : List of String
+    confounder_columns : list of str
         Confounders are categorical groups we wish to explain away. Some examples are units (ex: customers),
         and time (day, months...). We perform a group by on these columns, so they should not be continuous
         variables.
 
-    suffix : String
+    suffix : str
         A suffix to append to the returning debiased column names.
 
-    denoise : Bool (Default=True)
+    denoise : bool (Default=True)
         If it should denoise the outcome using the confounders or not
 
     Returns
@@ -199,13 +199,13 @@ def debias_with_double_ml(df: pd.DataFrame,
     df : Pandas DataFrame
         A Pandas' DataFrame with with treatment, outcome and confounder columns
 
-    treatment_column : String
+    treatment_column : str
         The name of the column in `df` with the treatment.
 
-    outcome_column : String
+    outcome_column : str
         The name of the column in `df` with the outcome.
 
-    confounder_columns : List of String
+    confounder_columns : list of str
         A list of confounder present in df
 
     ml_regressor : Sklearn's RegressorMixin
@@ -217,10 +217,10 @@ def debias_with_double_ml(df: pd.DataFrame,
     cv : int
         The number of folds to cross predict
 
-    suffix : String
+    suffix : str
         A suffix to append to the returning debiased column names.
 
-    denoise : Bool (Default=True)
+    denoise : bool (Default=True)
         If it should denoise the outcome using the confounders or not
 
     seed : int
