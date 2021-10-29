@@ -12,7 +12,7 @@ def test_linear_effect():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    result = linear_effect(df, treatment_column="t", outcome="y")
+    result = linear_effect(df, treatment_column="t", outcome_column="y")
     expected = 2.0
 
     assert expected == result
@@ -25,7 +25,7 @@ def test_spearman_effect():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    result = spearman_effect(df, treatment="t", outcome_column="y")
+    result = spearman_effect(df, treatment_column="t", outcome_column="y")
     assert round(result, 3) == 0.888
 
 

@@ -23,10 +23,10 @@ def linear_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) 
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment_column : Strings
+    treatment_column : str
         The name of the treatment column in `df`.
 
-    outcome_column : Strings
+    outcome_column : str
         The name of the outcome column in `df`.
 
 
@@ -48,10 +48,10 @@ def spearman_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment_column : Strings
+    treatment_column : str
         The name of the treatment column in `df`.
 
-    outcome_column : Strings
+    outcome_column : str
         The name of the outcome column in `df`.
 
 
@@ -74,10 +74,10 @@ def pearson_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str)
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment_column : Strings
+    treatment_column : str
         The name of the treatment column in `df`.
 
-    outcome_column : Strings
+    outcome_column : str
         The name of the outcome column in `df`.
 
 
@@ -101,10 +101,10 @@ def exponential_coefficient_effect(df: pd.DataFrame, treatment_column: str, outc
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment_column : Strings
+    treatment_column : str
         The name of the treatment column in `df`.
 
-    outcome_column : Strings
+    outcome_column : str
         The name of the outcome column in `df`.
 
 
@@ -128,10 +128,10 @@ def logistic_coefficient_effect(df: pd.DataFrame, treatment_column: str, outcome
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment_column : Strings
+    treatment_column : str
         The name of the treatment column in `df`.
 
-    outcome_column : Strings
+    outcome_column : str
         The name of the outcome column in `df`.
 
 
