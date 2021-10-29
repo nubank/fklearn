@@ -43,7 +43,7 @@ def effect_by_segment(df: pd.DataFrame,
         The effect stored in a Pandas' series were the indexes are the segments
     """
 
-    effect_fn_partial = partial(effect_fn, treatment=treatment, outcome=outcome)
+    effect_fn_partial = partial(effect_fn, treatment_column=treatment, outcome_column=outcome)
     return (df
             .assign(**{f"{prediction}_band": pd.qcut(df[prediction], q=segments)})
             .groupby(f"{prediction}_band")
