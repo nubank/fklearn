@@ -9,4 +9,4 @@ activate_venv
 
 venv/bin/python3 -m pip install -r docs/requirements.txt
 
-cd docs/ && make html
+cd docs/ && make apidoc && make html
