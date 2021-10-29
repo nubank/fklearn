@@ -12,7 +12,7 @@ def test_linear_effect():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    result = linear_effect(df, treatment="t", outcome="y")
+    result = linear_effect(df, treatment_column="t", outcome="y")
     expected = 2.0
 
     assert expected == result
@@ -25,7 +25,7 @@ def test_spearman_effect():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    result = spearman_effect(df, treatment="t", outcome="y")
+    result = spearman_effect(df, treatment="t", outcome_column="y")
     assert round(result, 3) == 0.888
 
 
@@ -36,7 +36,7 @@ def test_pearson_effect():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    result = pearson_effect(df, treatment="t", outcome="y")
+    result = pearson_effect(df, treatment_column="t", outcome_column="y")
     assert round(result, 3) == 0.840
 
 
@@ -50,7 +50,7 @@ def test_exponential_coefficient_effect():
         y=np.exp(a0 + a1 * t)
     ))
 
-    result = exponential_coefficient_effect(df, treatment="t", outcome="y")
+    result = exponential_coefficient_effect(df, treatment_column="t", outcome_column="y")
     assert round(result, 3) == a1
 
 
@@ -61,5 +61,5 @@ def test_logistic_coefficient_effect():
         y=[0, 0, 0, 0, 0, 0, 1, 1, 1]
     ))
 
-    result = logistic_coefficient_effect(df, treatment="t", outcome="y")
+    result = logistic_coefficient_effect(df, treatment_column="t", outcome_column="y")
     assert round(result, 3) == 20.645

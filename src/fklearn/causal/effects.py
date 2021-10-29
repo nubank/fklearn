@@ -3,10 +3,18 @@ from toolz import curry
 
 from fklearn.validation.evaluators import (spearman_evaluator, correlation_evaluator, linear_coefficient_evaluator,
                                            exponential_coefficient_evaluator, logistic_coefficient_evaluator)
+from fklearn.types import UncurriedEvalFnType
+
+
+def _apply_effect(evaluator: UncurriedEvalFnType,
+                  df: pd.DataFrame,
+                  treatment_column: str,
+                  outcome_column: str) -> float:
+    return evaluator(df, treatment_column, outcome_column, eval_name="effect").get("effect")
 
 
 @curry
-def linear_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+def linear_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) -> float:
     """
     Computes the linear coefficient from regressing the outcome on the treatment: cov(outcome, treatment)/var(treatment)
 
@@ -15,10 +23,10 @@ def linear_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment : Strings
+    treatment_column : Strings
         The name of the treatment column in `df`.
 
-    outcome : Strings
+    outcome_column : Strings
         The name of the outcome column in `df`.
 
 
@@ -27,11 +35,11 @@ def linear_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     effect: float
         The linear coefficient from regressing the outcome on the treatment: cov(outcome, treatment)/var(treatment)
     """
-    return linear_coefficient_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+    return _apply_effect(linear_coefficient_evaluator, df, treatment_column, outcome_column)
 
 
 @curry
-def spearman_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+def spearman_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) -> float:
     """
     Computes the Spearman correlation between the treatment and the outcome
 
@@ -40,10 +48,10 @@ def spearman_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment : Strings
+    treatment_column : Strings
         The name of the treatment column in `df`.
 
-    outcome : Strings
+    outcome_column : Strings
         The name of the outcome column in `df`.
 
 
@@ -53,11 +61,11 @@ def spearman_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
         The Spearman correlation between the treatment and the outcome
     """
 
-    return spearman_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+    return _apply_effect(spearman_evaluator, df, treatment_column, outcome_column)
 
 
 @curry
-def pearson_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+def pearson_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) -> float:
     """
     Computes the Pearson correlation between the treatment and the outcome
 
@@ -66,10 +74,10 @@ def pearson_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment : Strings
+    treatment_column : Strings
         The name of the treatment column in `df`.
 
-    outcome : Strings
+    outcome_column : Strings
         The name of the outcome column in `df`.
 
 
@@ -78,11 +86,11 @@ def pearson_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
     effect: float
         The Pearson correlation between the treatment and the outcome
     """
-    return correlation_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+    return _apply_effect(correlation_evaluator, df, treatment_column, outcome_column)
 
 
 @curry
-def exponential_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+def exponential_coefficient_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) -> float:
     """
     Computes the exponential coefficient between the treatment and the outcome. Finds a1 in the following equation
     outcome = exp(a0 + a1 treatment) + error
@@ -93,10 +101,10 @@ def exponential_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: st
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment : Strings
+    treatment_column : Strings
         The name of the treatment column in `df`.
 
-    outcome : Strings
+    outcome_column : Strings
         The name of the outcome column in `df`.
 
 
@@ -105,11 +113,11 @@ def exponential_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: st
     effect: float
         The exponential coefficient between the treatment and the outcome
     """
-    return exponential_coefficient_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+    return _apply_effect(exponential_coefficient_evaluator, df, treatment_column, outcome_column)
 
 
 @curry
-def logistic_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: str) -> float:
+def logistic_coefficient_effect(df: pd.DataFrame, treatment_column: str, outcome_column: str) -> float:
     """
     Computes the logistic coefficient between the treatment and the outcome. Finds a1 in the following equation
     outcome = logistic(a0 + a1 treatment)
@@ -120,10 +128,10 @@ def logistic_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: str) 
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    treatment : Strings
+    treatment_column : Strings
         The name of the treatment column in `df`.
 
-    outcome : Strings
+    outcome_column : Strings
         The name of the outcome column in `df`.
 
 
@@ -132,4 +140,4 @@ def logistic_coefficient_effect(df: pd.DataFrame, treatment: str, outcome: str) 
     effect: float
         The logistic coefficient between the treatment and the outcome
     """
-    return logistic_coefficient_evaluator(df, treatment, outcome, eval_name="effect").get("effect")
+    return _apply_effect(logistic_coefficient_evaluator, df, treatment_column, outcome_column)
