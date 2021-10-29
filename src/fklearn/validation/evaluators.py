@@ -168,7 +168,7 @@ def precision_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : pandas.DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     threshold : float
         A threshold for the prediction column above which samples
@@ -207,7 +207,7 @@ def recall_evaluator(test_data: pd.DataFrame,
     ----------
 
     test_data : pandas.DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     threshold : float
         A threshold for the prediction column above which samples
@@ -248,7 +248,7 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
     ----------
 
     test_data : pandas.DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     threshold : float
         A threshold for the prediction column above which samples
@@ -291,7 +291,7 @@ def logloss_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction scores.
@@ -325,7 +325,7 @@ def brier_score_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction scores.
@@ -385,7 +385,7 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction scores.
@@ -449,7 +449,7 @@ def r2_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction.
+        A Pandas' DataFrame with target and prediction.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction.
@@ -482,7 +482,7 @@ def mse_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and predictions.
+        A Pandas' DataFrame with target and predictions.
 
     prediction_column : Strings
         The name of the column in `test_data` with the predictions.
@@ -544,7 +544,7 @@ def correlation_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction.
+        A Pandas' DataFrame with target and prediction.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction.
@@ -617,7 +617,7 @@ def spearman_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and prediction.
+        A Pandas' DataFrame with target and prediction.
 
     prediction_column : Strings
         The name of the column in `test_data` with the prediction.
@@ -657,7 +657,7 @@ def ndcg_evaluator(test_data: pd.DataFrame,
     ----------
 
     test_data : Pandas DataFrame
-        A Pandas' DataFrame with with target and prediction scores.
+        A Pandas' DataFrame with target and prediction scores.
 
     prediction_column : String
         The name of the column in `test_data` with the prediction scores.
@@ -744,7 +744,7 @@ def split_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and predictions.
+        A Pandas' DataFrame with target and predictions.
 
     eval_fn : function DataFrame -> Log Dict
         A partially applied evaluation function.
@@ -791,7 +791,7 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target and predictions.
+        A Pandas' DataFrame with target and predictions.
 
     eval_fn : function DataFrame -> Log Dict
         A partially applied evaluation function.
@@ -847,7 +847,7 @@ def permutation_evaluator(test_data: pd.DataFrame,
     Parameters
     ----------
     test_data : Pandas' DataFrame
-        A Pandas' DataFrame with with target, predictions and features.
+        A Pandas' DataFrame with target, predictions and features.
 
     predict_fn : function DataFrame -> DataFrame
         Function that receives the input dataframe and returns a dataframe with the pipeline predictions.
