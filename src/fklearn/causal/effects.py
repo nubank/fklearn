@@ -1,16 +1,16 @@
 import pandas as pd
 from toolz import curry
+from typing import Dict, Callable
 
 from fklearn.validation.evaluators import (spearman_evaluator, correlation_evaluator, linear_coefficient_evaluator,
                                            exponential_coefficient_evaluator, logistic_coefficient_evaluator)
-from fklearn.types import UncurriedEvalFnType, Union, Dict, Any
 
 
-def _apply_effect(evaluator: UncurriedEvalFnType,
+def _apply_effect(evaluator: Callable[..., Dict[str, float]],
                   df: pd.DataFrame,
                   treatment_column: str,
-                  outcome_column: str) -> Union[float, Dict[Any, Any], None]:
-    return evaluator(df, treatment_column, outcome_column, eval_name="effect").get("effect", None)
+                  outcome_column: str) -> float:
+    return evaluator(df, treatment_column, outcome_column, eval_name="effect")["effect"]
 
 
 @curry
