@@ -21,5 +21,5 @@ Contents
 
    getting_started
    examples/index
-   api
+   api/modules
    contributing
