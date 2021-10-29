@@ -9,7 +9,9 @@ from sklearn.metrics import (average_precision_score, brier_score_loss,
                              fbeta_score, log_loss, mean_absolute_error,
                              mean_squared_error, precision_score, r2_score,
                              recall_score, roc_auc_score)
-from toolz import curry
+from toolz import curry, last, first
+from scipy import optimize
+from sklearn.linear_model import LogisticRegression
 
 from fklearn.types import (EvalFnType, EvalReturnType, PredictFnType,
                            UncurriedEvalFnType)
@@ -567,6 +569,42 @@ def correlation_evaluator(test_data: pd.DataFrame,
 
 
 @curry
+def linear_coefficient_evaluator(test_data: pd.DataFrame,
+                                 prediction_column: str = "prediction",
+                                 target_column: str = "target",
+                                 eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the linear coefficient from regressing the outcome on the prediction
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and prediction.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction.
+
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the linear coefficient from regressing the outcome on the prediction
+    """
+
+    if eval_name is None:
+        eval_name = "linear_coefficient_evaluator__" + target_column
+
+    cov_mat = test_data[[prediction_column, target_column]].cov()
+    score = cov_mat.iloc[0, 1] / cov_mat.iloc[0, 0]
+    return {eval_name: score}
+
+
+@curry
 def spearman_evaluator(test_data: pd.DataFrame,
                        prediction_column: str = "prediction",
                        target_column: str = "target",
@@ -912,3 +950,78 @@ def hash_evaluator(test_data: pd.DataFrame,
         return calculate_dataframe_hash(eval_data.set_index(np.zeros(len(eval_data), dtype="int")), eval_name)
 
     return calculate_dataframe_hash(eval_data, eval_name)
+
+
+@curry
+def exponential_coefficient_evaluator(test_data: pd.DataFrame,
+                                      prediction_column: str = "prediction",
+                                      target_column: str = "target",
+                                      eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the exponential coefficient between prediction and target. Finds a1 in the following equation
+    target = exp(a0 + a1 prediction)
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and prediction.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction.
+
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the exponential coefficient
+    """
+
+    if eval_name is None:
+        eval_name = "exponential_coefficient_evaluator__" + target_column
+
+    score = last(first(optimize.curve_fit(lambda t, a0, a1: a0 * np.exp(a1 * t),
+                                          test_data[prediction_column], test_data[target_column])))
+    return {eval_name: score}
+
+
+@curry
+def logistic_coefficient_evaluator(test_data: pd.DataFrame,
+                                   prediction_column: str = "prediction",
+                                   target_column: str = "target",
+                                   eval_name: str = None) -> EvalReturnType:
+    """
+    Computes the logistic coefficient between prediction and target. Finds a1 in the following equation
+    target = logistic(a0 + a1 prediction)
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with with target and prediction.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction.
+
+    target_column : String
+        The name of the column in `test_data` with the continuous target.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the logistic coefficient
+    """
+
+    if eval_name is None:
+        eval_name = "logistic_coefficient_evaluator__" + target_column
+
+    score = LogisticRegression(penalty="none", multi_class="ovr").fit(test_data[[prediction_column]],
+                                                                      test_data[target_column]).coef_[0][0]
+
+    return {eval_name: score}

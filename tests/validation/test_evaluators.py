@@ -10,8 +10,8 @@ from fklearn.validation.evaluators import (
     fbeta_score_evaluator, hash_evaluator, logloss_evaluator,
     mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
     pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
-    roc_auc_evaluator, spearman_evaluator, ndcg_evaluator, split_evaluator,
-    temporal_split_evaluator)
+    roc_auc_evaluator, spearman_evaluator, linear_coefficient_evaluator, ndcg_evaluator, split_evaluator,
+    temporal_split_evaluator, exponential_coefficient_evaluator, logistic_coefficient_evaluator)
 
 
 def test_combined_evaluators():
@@ -277,6 +277,19 @@ def test_spearman_evaluator():
     assert result['spearman_evaluator__target'] == 1.0
 
 
+def test_linear_coefficient_evaluator():
+    predictions = pd.DataFrame(
+        {
+            'target': [1, 2, 3],
+            'prediction': [2, 4, 6]
+        }
+    )
+
+    result = linear_coefficient_evaluator(predictions)
+
+    assert result['linear_coefficient_evaluator__target'] == 0.5
+
+
 @pytest.mark.parametrize("exponential_gain", [False, True])
 def test_ndcg_evaluator(exponential_gain):
     predictions = pd.DataFrame(
@@ -440,3 +453,32 @@ def test_hash_evaluator():
     assert eval_fn_all(df1)["eval_name"] == -6356943988420224450
     assert eval_fn_all(df2)["eval_name"] == -4865376220991082723
     assert eval_fn_all(df3)["eval_name"] == 141388279445698461
+
+
+def test_exponential_coefficient_evaluator():
+
+    a1 = -10
+    a0 = -2
+
+    prediction = np.array([0.0, 0.02, 0.04, 0.06, 0.08, 0.1])
+
+    predictions = pd.DataFrame(dict(
+        prediction=prediction,
+        target=np.exp(a0 + a1 * prediction)
+    ))
+
+    result = exponential_coefficient_evaluator(predictions)
+
+    assert result['exponential_coefficient_evaluator__target'] == a1
+
+
+def test_logistic_coefficient_evaluator():
+
+    predictions = pd.DataFrame(dict(
+        prediction=[1, 1, 1, 2, 2, 2, 3, 3, 3],
+        target=[0, 0, 0, 0, 0, 0, 1, 1, 1]
+    ))
+
+    result = logistic_coefficient_evaluator(predictions)
+
+    assert round(result['logistic_coefficient_evaluator__target'], 3) == 20.645

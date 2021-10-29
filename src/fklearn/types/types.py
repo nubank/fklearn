@@ -38,3 +38,6 @@ ColumnWisePerturbFnType = Callable[[pd.Series], pd.Series]
 
 # Extractor types
 ExtractorFnType = Callable[[str], float]
+
+# Effect Functions
+EffectFnType = Callable[[pd.DataFrame, str, str], float]
