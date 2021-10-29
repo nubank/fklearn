@@ -16,14 +16,14 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
                                            effect_fn: EffectFnType = linear_effect) -> float:
     """
      Orders the dataset by prediction and computes the area under the cumulative effect curve, according to that
-      ordering.
+     ordering.
 
      Parameters
      ----------
      df : Pandas' DataFrame
          A Pandas' DataFrame with target and prediction scores.
 
-     treatment : Strings
+     treatment : str
          The name of the treatment column in `df`.
 
      outcome : Strings
@@ -32,7 +32,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
      prediction : Strings
          The name of the prediction column in `df`.
 
-     min_rows : Integer
+     min_rows : int
          Minimum number of observations needed to have a valid result.
 
      steps : Integer
@@ -45,7 +45,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
 
      Returns
      ----------
-     area under the cumulative gain curve: float
+     area_under_the_cumulative_gain_curve: float
          The area under the cumulative gain curve according to the predictions ordering.
      """
 
@@ -98,7 +98,7 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
 
      Returns
      ----------
-     area under the cumulative gain curve: float
+     area_under_the_cumulative_gain_curve: float
          The area under the cumulative gain curve according to the predictions ordering.
      """
 
