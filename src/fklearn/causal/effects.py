@@ -10,7 +10,7 @@ def _apply_effect(evaluator: UncurriedEvalFnType,
                   df: pd.DataFrame,
                   treatment_column: str,
                   outcome_column: str) -> float:
-    return evaluator(df, treatment_column, outcome_column, eval_name="effect").get("effect")
+    return float(evaluator(df, treatment_column, outcome_column, eval_name="effect").get("effect"))
 
 
 @curry
