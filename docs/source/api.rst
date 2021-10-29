@@ -234,6 +234,15 @@ Validator (fklearn.validation.validator)
    validator
    validator_iteration
 
+Causal (fklearn.causal)
+########################################
+
+.. currentmodule:: fklearn.causal
+
+.. autosummary::
+   debias
+   effects
+
 Definitions
 -----------
 
@@ -304,4 +313,7 @@ Definitions
    :members:
 
 .. automodule:: fklearn.validation.validator
+   :members:
+
+.. automodule:: fklearn.causal
    :members:
