@@ -49,8 +49,8 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
     t_hat, mts = _cv_estimate(debias_model, df, features, treatment_column, cv_splits)
     y_hat, mys = _cv_estimate(denoise_model, df, features, outcome_column, cv_splits)
 
-    y_res = df[treatment_column] - y_hat
-    t_res = df[outcome_column] - t_hat
+    y_res = df[outcome_column] - y_hat
+    t_res = df[treatment_column] - t_hat
 
     final_target = y_res / t_res
     weights = t_res ** 2
@@ -69,7 +69,7 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
         'prediction_column': prediction_column,
         'package': "sklearn",
         'package_version': sk_version,
-        'feature_importance': None,
+        'feature_importance': dict(zip(features, model_final_fitted.feature_importances_)),
         'training_samples': len(df)},
         'debias_models': mts,
         'denoise_models': mys,
