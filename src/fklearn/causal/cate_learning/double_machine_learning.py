@@ -45,8 +45,6 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
                                      final_model_feature_columns: List[str] = None,
                                      prediction_column: str = "prediction",
                                      cv_splits: int = 2,
-
-
                                      encode_extra_cols: bool = True) -> LearnerReturnType:
     """
     Fits an Non-Parametric Double/ML Meta Learner for Conditional Average Treatment Effect Estimation. It implements the
