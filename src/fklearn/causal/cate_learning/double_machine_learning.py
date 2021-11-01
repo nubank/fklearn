@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ def _cv_estimate(model: RegressorMixin,
                  train_data: pd.DataFrame,
                  features: List[str],
                  y: str,
-                 n_splits: int):
+                 n_splits: int) -> Tuple[pd.Series, List[RegressorMixin]]:
 
     cv = KFold(n_splits=n_splits)
     models = []
