@@ -2,7 +2,26 @@ from collections import Counter
 
 import pandas as pd
 import numpy as np
-from fklearn.causal.cate_learning.double_machine_learning import non_parametric_double_ml_learner
+from fklearn.causal.cate_learning.double_machine_learning import non_parametric_double_ml_learner, _cv_estimate
+from sklearn.linear_model import LinearRegression
+
+
+def test__cv_estimate():
+
+    df_train = pd.DataFrame(dict(
+        x=[1, 1, 2, 2, 3, 3],
+        y=[1., 1, 2, 2, 3, 3],
+    ))
+
+    np.random.seed(123)
+    y_pred, models = _cv_estimate(model=LinearRegression(),
+                                  train_data=df_train,
+                                  features=["x"],
+                                  y="y",
+                                  n_splits=3)
+
+    assert (df_train["y"] == y_pred).all()
+    assert np.all([isinstance(m, LinearRegression) for m in models])
 
 
 def test_non_parametric_double_ml_learner():
