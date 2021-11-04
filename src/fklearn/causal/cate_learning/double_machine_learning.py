@@ -7,6 +7,7 @@ from sklearn.base import RegressorMixin
 from sklearn.model_selection import KFold
 from sklearn.ensemble import GradientBoostingRegressor
 from toolz import curry
+from typing import Union
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
 from fklearn.training.utils import log_learner_time, expand_features_encoded
@@ -37,11 +38,11 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
                                      feature_columns: List[str],
                                      treatment_column: str,
                                      outcome_column: str,
-                                     debias_model: RegressorMixin = GradientBoostingRegressor(),
+                                     debias_model: Union[RegressorMixin, None] = None,
                                      debias_feature_columns: List[str] = None,
-                                     denoise_model: RegressorMixin = GradientBoostingRegressor(),
+                                     denoise_model: Union[RegressorMixin, None] = None,
                                      denoise_feature_columns: List[str] = None,
-                                     final_model: RegressorMixin = GradientBoostingRegressor(),
+                                     final_model: Union[RegressorMixin, None] = None,
                                      final_model_feature_columns: List[str] = None,
                                      prediction_column: str = "prediction",
                                      cv_splits: int = 2,
@@ -76,26 +77,26 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
         The name of the column in `df` that should be used as outcome for the double-ml model. It will learn the impact
         of the treatment column on this outcome column.
 
-    debias_model : RegressorMixin (default GradientBoostingRegressor())
+    debias_model : RegressorMixin (default None)
         The estimator for fitting the treatment from the features. Must implement fit and predict methods. It can be an
-        scikit-learn regressor.
+        scikit-learn regressor. When None, defaults to GradientBoostingRegressor.
 
     debias_feature_columns : list of str (default None)
         A list os column names to be used only for the debias model. If not None, it will replace feature_columns when
         fitting the debias model.
 
-    denoise_model : RegressorMixin (default GradientBoostingRegressor())
+    denoise_model : RegressorMixin (default None)
         The estimator for fitting the outcome from the features. Must implement fit and predict methods. It can be an
-        scikit-learn regressor.
+        scikit-learn regressor. When None, defaults to GradientBoostingRegressor.
 
     denoise_feature_columns : list of str (default None)
         A list os column names to be used only for the denoise model. If not None, it will replace feature_columns when
         fitting the denoise model.
 
-    final_model : RegressorMixin (default GradientBoostingRegressor())
+    final_model : RegressorMixin (default None)
         The estimator for fitting the outcome residuals from the treatment residuals. Must implement fit and predict
         methods. It can be an arbitrary scikit-learn regressor. The fit method must accept sample_weight as a keyword
-        argument.
+        argument. When None, defaults to GradientBoostingRegressor.
 
     final_model_feature_columns : list of str (default None)
         A list os column names to be used only for the final model. If not None, it will replace feature_columns when
@@ -112,6 +113,10 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
     """
 
     features = feature_columns if not encode_extra_cols else expand_features_encoded(df, feature_columns)
+
+    debias_model = GradientBoostingRegressor() if not debias_model else debias_model
+    denoise_model = GradientBoostingRegressor() if not denoise_model else denoise_model
+    final_model = GradientBoostingRegressor() if not final_model else final_model
 
     t_hat, mts = _cv_estimate(debias_model, df,
                               features if debias_feature_columns is None else debias_feature_columns,
