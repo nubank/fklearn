@@ -6,6 +6,7 @@ from sklearn import __version__ as sk_version
 from sklearn.base import RegressorMixin
 from sklearn.model_selection import KFold
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.base import clone
 from toolz import curry
 from typing import Union
 
@@ -25,7 +26,7 @@ def _cv_estimate(model: RegressorMixin,
     cv_pred = pd.Series(np.nan, index=train_data.index)
 
     for train, test in cv.split(train_data):
-        m = model.fit(train_data[features].iloc[train], train_data[y].iloc[train])
+        m = clone(model, safe=False).fit(train_data[features].iloc[train], train_data[y].iloc[train])
         cv_pred.iloc[test] = m.predict(train_data[features].iloc[test])
         models += [m]
 
@@ -114,9 +115,9 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
 
     features = feature_columns if not encode_extra_cols else expand_features_encoded(df, feature_columns)
 
-    debias_model = GradientBoostingRegressor() if not debias_model else debias_model
-    denoise_model = GradientBoostingRegressor() if not denoise_model else denoise_model
-    final_model = GradientBoostingRegressor() if not final_model else final_model
+    debias_model = GradientBoostingRegressor() if debias_model is None else clone(debias_model, safe=False)
+    denoise_model = GradientBoostingRegressor() if denoise_model is None else clone(denoise_model, safe=False)
+    final_model = GradientBoostingRegressor() if final_model is None else clone(final_model, safe=False)
 
     t_hat, mts = _cv_estimate(debias_model, df,
                               features if debias_feature_columns is None else debias_feature_columns,
@@ -151,7 +152,7 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
         'prediction_column': prediction_column,
         'package': "sklearn",
         'package_version': sk_version,
-        'feature_importance': dict(zip(features, model_final_fitted.feature_importances_)),
+        'feature_importance': None,
         'training_samples': len(df)},
         'debias_models': mts,
         'denoise_models': mys,
