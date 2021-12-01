@@ -1,5 +1,6 @@
 import pandas as pd
 
+from fklearn.training.transformation import capper
 from fklearn.preprocessing.schema import feature_duplicator
 
 
@@ -45,3 +46,8 @@ def test_feature_duplicator():
             input_df.copy(),
             columns_mapping={'b': 'c'},
         )[1])
+
+
+def test_column_duplicatable_naming():
+    assert capper.__name__ == 'capper'
+    assert capper().__name__ == 'capper'
