@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
 
 from fklearn.causal.effects import linear_effect
 from fklearn.causal.validation.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
@@ -79,14 +78,14 @@ def test_effect_curves():
 
     expected = pd.DataFrame({
         "samples_count": [3, 4, 5, 6, 7, 8, 9],
-        "samples_fraction": [0.3333333, 0.4444444, 0.5555555, 0.6666666, 0.7777777, 0.8888888, 1.],
         "cumulative_effect_curve": [3., 3., 2.92857143, 2.5, 2.5, 2.46153846, 2.],
+        "samples_fraction": [0.3333333, 0.4444444, 0.5555555, 0.6666666, 0.7777777, 0.8888888, 1.],
         "cumulative_gain_curve": [1., 1.33333333, 1.62698413, 1.66666667, 1.94444444, 2.18803419, 2.],
-        "relative_cumulative_gain_curve": [0.33333333, 0.44444444, 0.51587302, 0.33333333, 0.38888889, 0.41025641, 0.],
         "random_model_cumulative_gain_curve": [0.6666666, 0.8888888, 1.1111111, 1.3333333, 1.5555555, 1.7777777, 2.],
+        "relative_cumulative_gain_curve": [0.33333333, 0.44444444, 0.51587302, 0.33333333, 0.38888889, 0.41025641, 0.],
     })
 
     result = effect_curves(df, prediction="x", outcome="y", treatment="t", min_rows=3, steps=df.shape[0],
                            effect_fn=linear_effect)
 
-    assert_frame_equal(result, expected, rtol=1e-07)
+    pd.testing.assert_frame_equal(result, expected, atol=1e-07)
