@@ -220,7 +220,7 @@ def effect_curves(
      Creates a dataset summarizing the effect curves: cumulative effect, cumulative gain and
      relative cumulative gain. The dataset also contains two columns referencing the data
      used to compute the curves at each step: number of samples and fraction of samples used.
-     Moreover one column indicating the cumulative gain for a corresponding random model is 
+     Moreover one column indicating the cumulative gain for a corresponding random model is
      also included as a benchmark.
 
      Parameters
@@ -272,5 +272,7 @@ def effect_curves(
         samples_fraction=lambda x: x["samples_count"] / size,
         cumulative_gain_curve=lambda x: x["samples_fraction"] * x["cumulative_effect_curve"],
         random_model_cumulative_gain_curve=lambda x: x["samples_fraction"] * ate,
-        relative_cumulative_gain_curve=lambda x: x["samples_fraction"] * x["cumulative_effect_curve"] - x["random_model_cumulative_gain_curve"],
+        relative_cumulative_gain_curve=lambda x: (
+            x["samples_fraction"] * x["cumulative_effect_curve"] - x["random_model_cumulative_gain_curve"]
+        ),
     )
