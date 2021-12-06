@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 from toolz import curry, partial
@@ -202,3 +204,75 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
                                          min_rows=min_rows, steps=steps, effect_fn=effect_fn)
 
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
+
+
+@curry
+def effect_curves(
+    df: pd.DataFrame,
+    treatment: str,
+    outcome: str,
+    prediction: str,
+    min_rows: int = 30,
+    steps: int = 100,
+    effect_fn: EffectFnType = linear_effect,
+) -> pd.DataFrame:
+    """
+     Creates a dataset summarizing the effect curves: cumulative effect, cumulative gain and
+     relative cumulative gain. The dataset also contains two columns referencing the data
+     used to compute the curves at each step: number of samples and fraction of samples used.
+     Moreover one column indicating the cumulative gain for a corresponding random model is
+     also included as a benchmark.
+
+     Parameters
+     ----------
+     df : Pandas' DataFrame
+         A Pandas' DataFrame with target and prediction scores.
+
+     treatment : Strings
+         The name of the treatment column in `df`.
+
+     outcome : Strings
+         The name of the outcome column in `df`.
+
+     prediction : Strings
+         The name of the prediction column in `df`.
+
+     min_rows : Integer
+         Minimum number of observations needed to have a valid result.
+
+     steps : Integer
+         The number of cumulative steps to iterate when accumulating the effect
+
+     effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
+         A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
+         of the outcome column.
+
+
+     Returns
+     ----------
+     summary curves dataset: pd.DataFrame
+         The dataset with the results for multiple validation causal curves according to the predictions ordering.
+    """
+
+    size: int = df.shape[0]
+    n_rows: List[int] = list(range(min_rows, size, size // steps)) + [size]
+
+    cum_effect: np.ndarray = cumulative_effect_curve(
+        df=df,
+        treatment=treatment,
+        outcome=outcome,
+        prediction=prediction,
+        min_rows=min_rows,
+        steps=steps,
+        effect_fn=effect_fn,
+    )
+    ate: float = cum_effect[-1]
+
+    return pd.DataFrame({"samples_count": n_rows, "cumulative_effect_curve": cum_effect}).assign(
+        samples_fraction=lambda x: x["samples_count"] / size,
+        cumulative_gain_curve=lambda x: x["samples_fraction"] * x["cumulative_effect_curve"],
+        random_model_cumulative_gain_curve=lambda x: x["samples_fraction"] * ate,
+        relative_cumulative_gain_curve=lambda x: (
+            x["samples_fraction"] * x["cumulative_effect_curve"] - x["random_model_cumulative_gain_curve"]
+        ),
+    )
