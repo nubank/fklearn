@@ -93,7 +93,7 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
         `columns_to_bind` parameter from the decorated learner
     """
 
-    def _decorator(child: Callable) -> Callable:
+    def _decorator(child: toolz.curry) -> Callable:
         mixin = feature_duplicator
 
         def _init(
@@ -102,45 +102,53 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
         ) -> Union[Callable, LearnerReturnType]:
             mixin_spec = inspect.getfullargspec(mixin)
             mixin_named_args = set(mixin_spec.args) | set(mixin_spec.kwonlyargs)
+            mixin_kwargs = {
+                key: value
+                for key, value in kwargs.items()
+                if key in mixin_named_args
+            }
 
             child_spec = inspect.getfullargspec(child)
             child_named_args = set(child_spec.args) | set(child_spec.kwonlyargs)
+            child_kwargs: Dict[str, Any] = {
+                key: value
+                for key, value in kwargs.items()
+                if key in child_named_args
+            }
 
-            def _learn(df: pd.DataFrame) -> LearnerReturnType:
-                mixin_kwargs = {
-                    key: value
-                    for key, value in kwargs.items()
-                    if key in mixin_named_args
-                }
+            child_arg_names = list(inspect.signature(child).parameters.keys())
+            columns_to_bind_idx = child_arg_names.index(columns_to_bind)
 
-                if 'prefix' in kwargs.keys() or 'suffix' in kwargs.keys():
-                    columns_to_duplicate: Any = (kwargs[columns_to_bind] if columns_to_bind in
-                                                 kwargs.keys() else
-                                                 args[child_spec.args.index(columns_to_bind)])
-                    mixin_kwargs['columns_to_duplicate'] = columns_to_duplicate
+            curry_is_ready = not child._should_curry(args, child_kwargs)
 
-                mixin_fn, mixin_df, mixin_log = mixin(df, **mixin_kwargs)
+            if curry_is_ready:
+                columns_to_duplicate = (
+                    kwargs[columns_to_bind]
+                    if columns_to_bind in kwargs
+                    else args[columns_to_bind_idx]
+                )
+                mixin_fn, mixin_df, mixin_log = mixin(
+                    args[0],
+                    **mixin_kwargs,
+                    columns_to_duplicate=columns_to_duplicate)
+                child_fn, child_df, child_log = child(
+                    mixin_df,
+                    *args[1:],
+                    **child_kwargs)
 
-                child_kwargs: Dict[str, Any] = {
-                    key: value
-                    for key, value in kwargs.items()
-                    if key in child_named_args
-                }
-                child_fn, child_df, child_log = child(mixin_df, *args[1:], **child_kwargs)
+                return (
+                    toolz.compose(child_fn, mixin_fn),
+                    child_df,
+                    {**mixin_log, **child_log}
+                )
 
-                child_kwargs[columns_to_bind] = \
-                    list(mixin_log['feature_duplicator']['columns_final_mapping'].values())
-
-                return toolz.compose(child_fn, mixin_fn), child_df, {**mixin_log, **child_log}
-
-            if not len(args):
-                _learn.__doc__ = child.__doc__
-                return _learn
             else:
-                return _learn(args[0])
+                return functools.update_wrapper(
+                    functools.partial(
+                        _init, *args, **kwargs),
+                    child(*args[1:], **child_kwargs))
 
-        callable_fn = functools.wraps(child)(_init)
-        callable_fn.__doc__ = child.__doc__
+        callable_fn = functools.update_wrapper(_init, child)
 
         return callable_fn
 
