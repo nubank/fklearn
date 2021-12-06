@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.24.0] - 2021-12-06
+- **New**
+    - Add causal curves summary
+- **Bug fix**
+    - Set correct learner name for learners with column_duplicatable decorator
+
 ## [1.23.0] - 2021-10-29
 - **New**
     - Add common causal evaluation techniques
