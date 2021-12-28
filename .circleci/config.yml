@@ -2,6 +2,8 @@
 
   docker-image: &docker-image circleci/python:3.6
 
+  docker-image-python39: &docker-image-python39 circleci/python:3.9
+
   working_directory: &working-directory ~/repo
 
   # Download and cache dependencies
@@ -63,7 +65,6 @@
         command: . scripts/lint.sh
     - save_cache: *save-cache
 
-
 .test-steps: &test-steps
   docker:
     - image: *docker-image
@@ -77,6 +78,11 @@
     - run:
         name: Run tests
         command: . scripts/run_tests.sh
+
+.test-steps-python39: &test-steps-python39
+  << : *test-steps
+  docker:
+    - image: *docker-image-python39
 
 .pip-check: &pip-check
   docker:
@@ -165,6 +171,8 @@ jobs:
     <<: *lint-steps
   test:
     <<: *test-steps
+  test-python39:
+    <<: *test-steps-python39
   pip-check:
     <<: *pip-check
   build:
@@ -184,6 +192,8 @@ workflows:
       - lint:
           <<: *master-branch-filter
       - test:
+          <<: *requires-lint
+      - test-python39:
           <<: *requires-lint
       - pip-check:
           <<: *requires-lint
