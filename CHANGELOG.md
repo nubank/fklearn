@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.0] - 2021-12-28
+- **Possible breaking changes**
+    - Allow greater versions of `catboost`, `lightgbm`, `xgboost`, `shap`, `swifter`
+    (mostly due to deprecation of support to Python 3.5 and older versions). Libraries depending on
+    `fklearn` can still restrict the versions of the aforementioned libraries, keeping the previous
+    behavior.
+
 ## [1.24.0] - 2021-12-06
 - **New**
     - Add causal curves summary
