@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 MODULE_NAME = 'fklearn'         # package name used to install via pip (as shown in `pip freeze` or `conda list`)
 MODULE_NAME_IMPORT = 'fklearn'  # this is how this module is imported in Python (name of the folder inside `src`)
-REPO_NAME = 'fklearn'        # repository name
+REPO_NAME = 'fklearn'           # repository name
 
 
 def requirements_from_pip(filename='requirements.txt'):
@@ -42,7 +42,6 @@ setup(name=MODULE_NAME,
                       "tools": tools_deps,
                       "devel": devel_deps,
                       "all_models": all_models_deps,
-                      "devel": devel_deps,
                       "all": all_deps},
       include_package_data=True,
       zip_safe=False,
