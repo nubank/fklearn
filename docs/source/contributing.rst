@@ -214,7 +214,7 @@ From ``docs/`` folder, install `requirments.txt` and run
 
 This command will build the documentation inside ``docs/build/html`` and you can check locally how it looks, and if everything worked.
 
-Send you changes to Fklearn repo
+Send your changes to Fklearn repo
 ================================
 
 Commit your changes
