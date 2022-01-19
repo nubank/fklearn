@@ -5,25 +5,30 @@ Getting started
 Installation
 ------------
 
-The fklearn library is Python 3.6 compatible only. In order to install it using pip, run::
+The fklearn library is Python 3.6 compatible only. In order to install it using pip, run:
+
+.. code-block:: bash
 
     pip install fklearn
 
+You can also install from the source:
 
-You can also install from the source::
+.. code-block:: bash
 
     # clone the repository
-    $ git clone -b master https://github.com/nubank/fklearn.git --depth=1
+    git clone -b master https://github.com/nubank/fklearn.git --depth=1
     
     # open the folder
-    $ cd fklearn
+    cd fklearn
     
     # install the dependencies
-    $ pip install -e .
+    pip install -e .
 
 
-If you are a MacOs user, you may need to install some dependencies in order to use LGBM. If you have brew installed,
-run the following command from the root dir::
+If you are a macOS user, you may need to install some dependencies in order to use LGBM. If you have brew installed,
+run the following command from the root dir:
+
+.. code-block:: bash
 
     brew bundle
 
@@ -45,13 +50,15 @@ The **transformed training data** is usually just the prediction function applie
 
 The **log** is a dictionary, and can include any information that is relevant for inspecting or debugging the learner, e.g., what features were used, how many samples there were in the training set, feature importance or coefficients.
 
-Learner functions are usually partially initialized (curried) before being passed to pipelines or applied to data::
+Learner functions are usually partially initialized (curried) before being passed to pipelines or applied to data:
+
+.. code-block:: python
 
     from fklearn.training.regression import linear_regression_learner
     from fklearn.training.transformation import capper, floorer, prediction_ranger
 
     # initialize several learner functions
-    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50,000})
+    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50_000})
     regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
     ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
 
@@ -63,7 +70,9 @@ Available learner functions in fklearn can be found inside the ``fklearn.trainin
 Pipelines
 #########
 
-Learner functions are usually composed into pipelines that apply them in order to data::
+Learner functions are usually composed into pipelines that apply them in order to data:
+
+.. code-block:: python
 
     from fklearn.training.pipeline import build_pipeline
 
@@ -76,7 +85,9 @@ Pipelines behave exactly as individual learner functions. They  guarantee that a
 Validation
 ##########
 
-Once we have our pipeline defined, we can use fklearn's validation tools to evaluate the performance of our model in different scenarios and using multiple metrics::
+Once we have our pipeline defined, we can use fklearn's validation tools to evaluate the performance of our model in different scenarios and using multiple metrics:
+
+.. code-block:: python
 
     from fklearn.validation.evaluators import r2_evaluator, spearman_evaluator, combined_evaluators
     from fklearn.validation.validator import validator
