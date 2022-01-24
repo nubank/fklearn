@@ -1,0 +1,47 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches-ignore:
+      - "master"
+jobs:
+  lint:
+    name: Linting project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+          architecture: x64
+      - name: Restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
+      - name: Create virtual environment
+        run: . scripts/create_venv.sh
+      - name: Check code style
+        run: . scripts/lint.sh
+  test:
+    name: Testing project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+          architecture: x64
+      - name: Restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
+      - name: Create virtual environment
+        run: . scripts/create_venv.sh
+      - name: Install package
+        run: . scripts/helpers.sh && install_package [devel]
+      - name: Run tests
+        run: . scripts/run_tests.sh
