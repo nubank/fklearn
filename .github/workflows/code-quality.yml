@@ -117,7 +117,7 @@ jobs:
       - name: Install pandoc
         run: sudo apt-get install -y pandoc
       - name: Install package
-        run: . scripts/helper.sh \
+        run: . scripts/helpers.sh \
           install_package [devel]
       - name: Build documentation
         run: . scripts/build_docs.sh
