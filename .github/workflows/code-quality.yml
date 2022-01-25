@@ -95,3 +95,29 @@ jobs:
         run: . scripts/helpers.sh \
           activate_venv \
           pip check
+  build-docs:
+    name: Build documentation
+    needs:
+      - "lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+          architecture: x64
+      - name: Restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
+      - name: Create virtual environment
+        run: . scripts/create_venv.sh
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
+      - name: Install package
+        run: . scripts/helper.sh \
+          install_package [devel]
+      - name: Build documentation
+        run: . scripts/build_docs.sh

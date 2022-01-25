@@ -2,8 +2,6 @@ name: Code Quality Checks
 
 on:
   push:
-    branches:
-      - "master"
     tags:
       - "**"
 
@@ -32,38 +30,11 @@ jobs:
         with:
           name: stored-package
           path: dist
-  build-docs:
-    name: Build documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-          architecture: x64
-      - name: Restoring cache
-        uses: actions/cache@v2
-        with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Install pandoc
-        run: sudo apt-get install -y pandoc
-      - name: Install package
-        run: . scripts/helper.sh \
-          install_package [devel]
-      - name: Build documentation
-        run: . scripts/build_docs.sh
-
-      # TODO: Maybe we can add here an artifact for the build-docs step?
   release:
     name: Release package
     runs-on: ubuntu-latest
     needs:
       - "build"
-      - "build-docs"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -79,6 +50,9 @@ jobs:
       - name: Create virtual environment
         run: . scripts/create_venv.sh
       - name: Init .pypirc
+        env:
+          PYPI_USER: ${{ secrets.PYPI_USER }}
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: . scripts/init_pypirc.sh
       - name: Download a single artifact
         uses: actions/download-artifact@v2
