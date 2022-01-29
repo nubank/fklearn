@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from numpy import nan, round, sqrt, floor, log as ln
 from numpy.testing import assert_almost_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from fklearn.training.transformation import (
     selector,
