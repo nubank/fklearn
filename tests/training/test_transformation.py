@@ -1354,7 +1354,7 @@ def test_custom_transformer():
         columns_mapping={"feat2": "feat2_raw"},
     )
 
-    assert expected3.equals(data1)
+    assert expected3.equals(data1.round(1))
     assert pd.concat(
         [expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1
     ).equals(data2)
