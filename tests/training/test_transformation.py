@@ -1354,37 +1354,16 @@ def test_custom_transformer():
         columns_mapping={"feat2": "feat2_raw"},
     )
 
-    print('test2')
-    exp2 = pd.concat(
+    assert expected3.equals(data1.round(1))
+    assert pd.concat(
         [expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1
-    )
-    print(exp2)
-    print(data2)
-
-    print('test3')
-    exp3 = pd.concat(
+    ).equals(data2)
+    assert pd.concat(
         [expected3, input_df[["feat2"]].copy().add_prefix("prefix_")], axis=1
-    )
-    print(exp3)
-    print(data3)
-
-    print('test4')
-    exp4 = pd.concat(
+    ).equals(data3)
+    assert pd.concat(
         [expected3, input_df[["feat2"]].copy().add_suffix("_raw")], axis=1
-    )
-    print(exp4)
-    print(data4)
-
-    # assert expected3.equals(data1.round(1))
-    # assert pd.concat(
-    #     [expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1
-    # ).equals(data2)
-    # assert pd.concat(
-    #     [expected3, input_df[["feat2"]].copy().add_prefix("prefix_")], axis=1
-    # ).equals(data3)
-    # assert pd.concat(
-    #     [expected3, input_df[["feat2"]].copy().add_suffix("_raw")], axis=1
-    # ).equals(data4)
+    ).equals(data4)
 
     # the transformed input df should contain the floor value of the feat1 column
     pred_fn1, data1, log = custom_transformer(
@@ -1404,43 +1383,16 @@ def test_custom_transformer():
         columns_mapping={"feat3": "feat3_raw"},
     )
 
-    print('test1-2')
-    print(expected4)
-    print(data1)
-
-    print('test2-2')
-    exp2 = pd.concat(
+    assert expected4.equals(data1)
+    assert pd.concat(
         [expected4, input_df[["feat3"]].copy().add_suffix("_suffix")], axis=1
-    )
-    print(exp2)
-    print(data2)
-
-    print('test3-2')
-    exp3 = pd.concat(
+    ).equals(data2)
+    assert pd.concat(
         [expected4, input_df[["feat3"]].copy().add_prefix("prefix_")], axis=1
-    )
-    print(exp3)
-    print(data3)
-
-    print('test4-2')
-    exp4 = pd.concat(
+    ).equals(data3)
+    assert pd.concat(
         [expected4, input_df[["feat3"]].copy().add_suffix("_raw")], axis=1
-    )
-    print(exp4)
-    print(data4)
-
-    assert False
-
-    # assert expected4.equals(data1)
-    # assert pd.concat(
-    #     [expected4, input_df[["feat3"]].copy().add_suffix("_suffix")], axis=1
-    # ).equals(data2)
-    # assert pd.concat(
-    #     [expected4, input_df[["feat3"]].copy().add_prefix("prefix_")], axis=1
-    # ).equals(data3)
-    # assert pd.concat(
-    #     [expected4, input_df[["feat3"]].copy().add_suffix("_raw")], axis=1
-    # ).equals(data4)
+    ).equals(data4)
 
 
 def test_null_injector():
