@@ -1,4 +1,0 @@
-[flake8]
-max-line-length = 120
-exclude=.circleci, .tox
-ignore = E731, W503
