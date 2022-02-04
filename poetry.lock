@@ -1861,8 +1861,8 @@ xgboost = ["xgboost"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "3.6.2"
-content-hash = "1c334f0d332a8e2956e5e7177d9d0ae6447a5734c1ef9dff917bbac3dd882ae7"
+python-versions = "~3.6.2"
+content-hash = "f00d073139e78b1f1a961990806f33f41ca28f953821a07ab969cc0caa53ba2c"
 
 [metadata.files]
 alabaster = [
