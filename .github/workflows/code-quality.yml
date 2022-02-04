@@ -46,7 +46,7 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
-        run: poetry update
+        run: poetry install -E all
       - name: Run tests
         run: poetry run tox
   type-check:
@@ -115,10 +115,10 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
-        run: |
-          poetry config virtualenvs.create false
-          poetry install --no-root -E docs
+        run: poetry install -E docs
       - name: Install Pandoc
         run: sudo apt-get install -y -qq pandoc
       - name: Build documentation
-        run: cd docs/ && make html
+        run: |
+          cd docs/
+          poetry run sphinx-build -b html source build

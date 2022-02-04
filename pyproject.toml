@@ -63,7 +63,6 @@ build-editable = true
 [tools.mypy]
 ignore_missing_imports = true
 
-
 [[tool.mypy.overrides]]
 module = "fklearn.*"
 disallow_untyped_defs = true
@@ -76,14 +75,17 @@ ignore_errors = true
 adopts = "-l --color=yes"
 
 [tool.black]
-line-length = 79
-target-version = ['py36', 'py37', 'py38', 'py39']
+line-length = 120
+target-version = ['py36']
 skip-string-normalization = true
+experimental-string-processing = true
 include = '\.pyi?$'
 exclude = '''
 /(
-    \.git
-  | .eggs
+    /.git
+  | /.mypy_cache
+  | buck-out
   | build
+  | dist
 )/
 '''
