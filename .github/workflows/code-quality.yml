@@ -92,7 +92,7 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
-        run: poetry update
+        run: poetry install -E all
       - name: Run pip check
         run: poetry run pip check
   build-docs:
