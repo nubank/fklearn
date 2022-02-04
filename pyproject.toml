@@ -1,8 +1,14 @@
 [tool.poetry]
 name = "fklearn"
 version = "2.1.0"
-description = ""
+description = "Functional machine learning"
 authors = ["Nubank"]
+repository = "https://github.com/nubank/fklearn"
+documentation = "https://fklearn.readthedocs.io/en/latest/"
+classifiers = ["Programming Language :: Python :: 3.6"]
+packages = [
+  { include = "fklearn", from = "src" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4"
@@ -12,6 +18,26 @@ pandas = ">=0.24.1,<2"
 scikit-learn = ">=0.21.2,<0.24.0"
 statsmodels = ">=0.9.0,<1"
 toolz = ">=0.9.0,<1"
+
+lightgbm = { version = ">=2.2.2,<4", optional = true }
+xgboost = { version = ">=0.82,<1.5", optional = true }
+catboost = { version = ">=0.14.2,<2", optional = true }
+shap = { version = ">=0.31.0,<=0.40", optional = true }
+swifter = { version = ">=0.284,<2", optional = true }
+matplotlib = { version = ">=3.0.2,<4", optional = true }
+tqdm = { version = ">=4.32.1,<5", optional = true }
+scipy = { version = ">=1.2.1,<2", optional = true }
+
+
+[tool.poetry.extras]
+lgbm = ["lightgbm"]
+xgboost = ["xgboost"]
+catboost = ["catboost"]
+tools = ["shap", "swifter"]
+demos = ["matplotlib", "tqdm", "scipy"]
+all_models = ["lightgbm", "xgboost", "catboost"]
+all = ["lgbm", "xgboost", "catboost", "shap", "swifter", "matplotlib", "tqdm", "scipy"]
+
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.1"
@@ -24,6 +50,10 @@ pytest-xdist = ">=1.26.1,<3"
 mypy = ">=0.670,<1"
 codecov = ">=2.0,<3"
 hypothesis = ">= 5.5.4,<7"
+nbsphinx = ">=0.4.2,<1"
+Sphinx = ">=1.7.1,<2"
+sphinx-rtd-theme = ">=0.4.3,<1"
+
 
 
 [build-system]
