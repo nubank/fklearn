@@ -15,15 +15,17 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry update
       - name: Check code style
-        run: . scripts/lint.sh
+        run: poetry run flake8 src tests
   test:
     name: Run tests
     needs:
@@ -36,17 +38,17 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Install package
-        run: . scripts/helpers.sh && install_package [devel]
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry update
       - name: Run tests
-        run: . scripts/run_tests.sh
+        run: poetry run tox
   type-check:
     name: Mypy check
     needs:
@@ -59,17 +61,17 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Install package
-        run: . scripts/helpers.sh && install_package [devel]
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry update
       - name: Run type checking
-        run: . scripts/run_type_check.sh
+        run: poetry run mypy src tests
   pip-check:
     name: Pip check
     needs:
@@ -82,17 +84,17 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Install package
-        run: . scripts/helpers.sh && install_package [devel]
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry update
       - name: Run pip check
-        run: . scripts/helpers.sh && activate_venv && pip check
+        run: poetry run pip check
   build-docs:
     name: Build documentation
     needs:
@@ -105,16 +107,18 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Install pandoc
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: poetry install -E docs
+      - name: Install Pandoc
         run: sudo apt-get install -y -qq pandoc
-      - name: Install package
-        run: . scripts/helpers.sh && install_package [devel]
+      - name: Activate Virtualenv
+        run: poetry shell
       - name: Build documentation
-        run: . scripts/build_docs.sh
+        run: cd docs/ && make html
