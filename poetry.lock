@@ -181,7 +181,7 @@ python-versions = ">=3.6.1"
 
 [[package]]
 name = "charset-normalizer"
-version = "2.0.10"
+version = "2.0.11"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "main"
 optional = false
@@ -304,11 +304,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "entrypoints"
-version = "0.3"
+version = "0.4"
 description = "Discover and load entry points from installed packages."
 category = "main"
 optional = true
-python-versions = ">=2.7"
+python-versions = ">=3.6"
 
 [[package]]
 name = "execnet"
@@ -1312,7 +1312,7 @@ python-versions = "*"
 
 [[package]]
 name = "pywinpty"
-version = "2.0.1"
+version = "2.0.2"
 description = "Pseudo terminal support for Windows from Python."
 category = "main"
 optional = true
@@ -1616,7 +1616,7 @@ test = ["pytest", "pathlib2"]
 
 [[package]]
 name = "threadpoolctl"
-version = "3.0.0"
+version = "3.1.0"
 description = "threadpoolctl"
 category = "main"
 optional = false
@@ -1828,8 +1828,8 @@ xgboost = ["xgboost"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.6.2"
-content-hash = "a7e9cda3302fe0004b155a830ca67a285d5e0c0180c9ee0097bd60a5ccfef321"
+python-versions = ">=3.6.2,<3.11"
+content-hash = "80c77ffc272773a58e014a907f4e41659a72ec2a70aa3bfd541c3713314e803c"
 
 [metadata.files]
 alabaster = [
@@ -1977,8 +1977,8 @@ cfgv = [
     {file = "cfgv-3.3.1.tar.gz", hash = "sha256:f5a830efb9ce7a445376bb66ec94c638a9787422f96264c98edc6bdeed8ab736"},
 ]
 charset-normalizer = [
-    {file = "charset-normalizer-2.0.10.tar.gz", hash = "sha256:876d180e9d7432c5d1dfd4c5d26b72f099d503e8fcc0feb7532c9289be60fcbd"},
-    {file = "charset_normalizer-2.0.10-py3-none-any.whl", hash = "sha256:cb957888737fc0bbcd78e3df769addb41fd1ff8cf950dc9e7ad7793f1bf44455"},
+    {file = "charset-normalizer-2.0.11.tar.gz", hash = "sha256:98398a9d69ee80548c762ba991a4728bfc3836768ed226b3945908d1a688371c"},
+    {file = "charset_normalizer-2.0.11-py3-none-any.whl", hash = "sha256:2842d8f5e82a1f6aa437380934d5e1cd4fcf2003b06fed6940769c164a480a45"},
 ]
 cloudpickle = [
     {file = "cloudpickle-2.0.0-py3-none-any.whl", hash = "sha256:6b2df9741d06f43839a3275c4e6632f7df6487a1f181f5f46a052d3c917c3d11"},
@@ -2071,8 +2071,8 @@ docutils = [
     {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
 ]
 entrypoints = [
-    {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
-    {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
+    {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
+    {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},
 ]
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
@@ -2709,11 +2709,11 @@ pywin32 = [
     {file = "pywin32-303-cp39-cp39-win_amd64.whl", hash = "sha256:79cbb862c11b9af19bcb682891c1b91942ec2ff7de8151e2aea2e175899cda34"},
 ]
 pywinpty = [
-    {file = "pywinpty-2.0.1-cp310-none-win_amd64.whl", hash = "sha256:ec7d4841c82980519f31d2c61b7f93db4b773a66fce489a8a72377045fe04c4b"},
-    {file = "pywinpty-2.0.1-cp37-none-win_amd64.whl", hash = "sha256:29550aafda86962b3b68e3454c11e26c1b8cf646dfafec33a4325c8d70ab4f36"},
-    {file = "pywinpty-2.0.1-cp38-none-win_amd64.whl", hash = "sha256:dfdbcd0407c157c2024b0ea91b855caae25510fcf6c4da21c075253f05991a3a"},
-    {file = "pywinpty-2.0.1-cp39-none-win_amd64.whl", hash = "sha256:c7cd0b30da5edd3e0b967842baa2aef1d205d991aa63a13c05afdb95d0812e69"},
-    {file = "pywinpty-2.0.1.tar.gz", hash = "sha256:14e7321c6d43743af0de175fca9f111c5cc8d0a9f7c608c9e1cc69ec0d6ac146"},
+    {file = "pywinpty-2.0.2-cp310-none-win_amd64.whl", hash = "sha256:4b421379b407bf2f52a64a4c58f61deffe623b5add02d871acb290b771bb6227"},
+    {file = "pywinpty-2.0.2-cp37-none-win_amd64.whl", hash = "sha256:238b75fc456a6bc558761a89c9e6b3c8f2f54d79db03ae28997a68313c24b2ca"},
+    {file = "pywinpty-2.0.2-cp38-none-win_amd64.whl", hash = "sha256:344858a0b956fdc64a547d5e1980b0257b47f5433ed7cb89bf7b6268cb280c6c"},
+    {file = "pywinpty-2.0.2-cp39-none-win_amd64.whl", hash = "sha256:a4a066eaf2e30944d3028d946883ceb7883a499b53c4b89ca2d54bd7a4210550"},
+    {file = "pywinpty-2.0.2.tar.gz", hash = "sha256:20ec117183f79642eff555ce0dd1823f942618d65813fb6122d14b6e34b5d05a"},
 ]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
@@ -2956,8 +2956,8 @@ testpath = [
     {file = "testpath-0.5.0.tar.gz", hash = "sha256:1acf7a0bcd3004ae8357409fc33751e16d37ccc650921da1094a86581ad1e417"},
 ]
 threadpoolctl = [
-    {file = "threadpoolctl-3.0.0-py3-none-any.whl", hash = "sha256:4fade5b3b48ae4b1c30f200b28f39180371104fccc642e039e0f2435ec8cc211"},
-    {file = "threadpoolctl-3.0.0.tar.gz", hash = "sha256:d03115321233d0be715f0d3a5ad1d6c065fe425ddc2d671ca8e45e9fd5d7a52a"},
+    {file = "threadpoolctl-3.1.0-py3-none-any.whl", hash = "sha256:8b99adda265feb6773280df41eece7b2e6561b772d21ffd52e372f999024907b"},
+    {file = "threadpoolctl-3.1.0.tar.gz", hash = "sha256:a335baacfaa4400ae1f0d8e3a58d6674d2f8828e3716bb2802c44955ad391380"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

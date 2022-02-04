@@ -1,7 +1,7 @@
 default_stages: [commit, push]
 repos:
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.8.0
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
     hooks:
       - id: isort
         name: isort (python)
@@ -17,11 +17,6 @@ repos:
       - id: requirements-txt-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
-  - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-        name: isort (python)
   - repo: https://github.com/pre-commit/mirrors-autopep8
     rev: "v1.6.0"
     hooks:

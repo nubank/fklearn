@@ -11,7 +11,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6.2"
+python = ">=3.6.2,<3.11"
 joblib = ">=0.13.2,<2"
 numpy = "^1.16.4"
 pandas = ">=0.24.1,<2"
@@ -60,7 +60,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 build-editable = true
 
-[tools.mypy]
+[tool.mypy]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -73,3 +73,6 @@ ignore_errors = true
 
 [tool.pytest.ini_options]
 adopts = "-l --color=yes"
+
+[tool.isort]
+line_length = 120
