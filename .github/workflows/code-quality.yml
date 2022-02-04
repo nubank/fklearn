@@ -18,12 +18,14 @@ jobs:
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
+        id: cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install dependencies
-        run: poetry update
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry install
       - name: Check code style
         run: poetry run flake8 src tests
   test:
@@ -41,11 +43,13 @@ jobs:
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
+        id: cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install dependencies
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: poetry install -E all
       - name: Run tests
         run: poetry run tox
@@ -64,12 +68,14 @@ jobs:
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
+        id: cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install dependencies
-        run: poetry update
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry install
       - name: Run type checking
         run: poetry run mypy src tests
   pip-check:
@@ -87,11 +93,13 @@ jobs:
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
+        id: cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install dependencies
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: poetry install -E all
       - name: Run pip check
         run: poetry run pip check
@@ -110,12 +118,13 @@ jobs:
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
+        id: cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install dependencies
-        run: poetry install -E docs
+      - name: Install Dependencies
+        run: poetry install -E all
       - name: Install Pandoc
         run: sudo apt-get install -y -qq pandoc
       - name: Build documentation
