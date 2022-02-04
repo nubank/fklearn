@@ -16,15 +16,15 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Build package
-        run: . scripts/build.sh
+        run: poetry build
       - name: Store build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -42,21 +42,18 @@ jobs:
         with:
           python-version: "3.6"
           architecture: x64
+      - name: Set up Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Restoring cache
         uses: actions/cache@v2
         with:
-          path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
-        run: . scripts/create_venv.sh
-      - name: Init .pypirc
-        env:
-          PYPI_USER: ${{ secrets.PYPI_USER }}
-          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: . scripts/init_pypirc.sh
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Download a single artifact
         uses: actions/download-artifact@v2
         with:
           name: stored-package
-      - name: Release package
-        run: . scripts/release.sh dist
+      - name: Config PyPI credentials
+        run: poetry config pypi-token.pypi "${{ secrets.PYPI_API_KEY }}"
+      - name: Publish package
+        run: poetry publish
