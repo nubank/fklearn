@@ -1,12 +1,10 @@
-name: code-quality
-
 on:
   push:
     branches-ignore:
       - "master"
 jobs:
-  install-deps:
-    name: Install dependencies
+  lint:
+    name: Linter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,29 +24,6 @@ jobs:
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: poetry install -E all
-      - name: Store build artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: dependencies
-          path: ~/.cache/pypoetry/virtualenvs
-  lint:
-    name: Linter
-    needs:
-      - "install-deps"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dependencies
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-          architecture: x64
-      - name: Set up Poetry
-        uses: Gr1N/setup-poetry@v7
       - name: Check code style
         run: poetry run flake8 src tests
   test:
@@ -58,10 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -69,6 +40,15 @@ jobs:
           architecture: x64
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
+      - name: Restoring cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry update
       - name: Run tests
         run: poetry run tox
   type-check:
@@ -78,10 +58,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -89,6 +65,15 @@ jobs:
           architecture: x64
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
+      - name: Restoring cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry update
       - name: Run type checking
         run: poetry run mypy src tests
   pip-check:
@@ -98,10 +83,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -109,6 +90,15 @@ jobs:
           architecture: x64
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
+      - name: Restoring cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry update
       - name: Run pip check
         run: poetry run pip check
   build-docs:
@@ -118,10 +108,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -129,6 +115,15 @@ jobs:
           architecture: x64
       - name: Set up Poetry
         uses: Gr1N/setup-poetry@v7
+      - name: Restoring cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: poetry update
       - name: Install Pandoc
         run: sudo apt-get install -y -qq pandoc
       - name: Build documentation
