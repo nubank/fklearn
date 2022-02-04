@@ -2,11 +2,11 @@ name: Code Quality Checks
 
 on:
   push:
-    branches-ignore:
+    branches:
       - "master"
 jobs:
   lint:
-    name: Linting project
+    name: Linter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,7 +25,9 @@ jobs:
       - name: Check code style
         run: . scripts/lint.sh
   test:
-    name: Testing project
+    name: Run tests
+    needs:
+      - "lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -45,3 +47,51 @@ jobs:
         run: . scripts/helpers.sh && install_package [devel]
       - name: Run tests
         run: . scripts/run_tests.sh
+  type-check:
+    name: Mypy check
+    needs:
+      - "lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+          architecture: x64
+      - name: Restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
+      - name: Create virtual environment
+        run: . scripts/create_venv.sh
+      - name: Install package
+        run: . scripts/helpers.sh && install_package [devel]
+      - name: Run type checking
+        run: . scripts/run_type_check.sh
+  pip-check:
+    name: Pip check
+    needs:
+      - "lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+          architecture: x64
+      - name: Restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
+      - name: Create virtual environment
+        run: . scripts/create_venv.sh
+      - name: Install package
+        run: . scripts/helpers.sh && install_package [devel]
+      - name: Run pip check
+        run: . scripts/helpers.sh \
+          activate_venv \
+          pip check
