@@ -92,9 +92,7 @@ jobs:
       - name: Install package
         run: . scripts/helpers.sh && install_package [devel]
       - name: Run pip check
-        run: . scripts/helpers.sh \
-          activate_venv \
-          pip check
+        run: . scripts/helpers.sh && activate_venv && pip check
   build-docs:
     name: Build documentation
     needs:
@@ -115,9 +113,8 @@ jobs:
       - name: Create virtual environment
         run: . scripts/create_venv.sh
       - name: Install pandoc
-        run: sudo apt-get install -y pandoc
+        run: sudo apt-get install -y -qq pandoc
       - name: Install package
-        run: . scripts/helpers.sh \
-          install_package [devel]
+        run: . scripts/helpers.sh && install_package [devel]
       - name: Build documentation
         run: . scripts/build_docs.sh
