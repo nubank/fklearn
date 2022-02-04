@@ -115,10 +115,10 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
-        run: poetry install -E docs
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root -E docs
       - name: Install Pandoc
         run: sudo apt-get install -y -qq pandoc
-      - name: Activate Virtualenv
-        run: poetry shell
       - name: Build documentation
         run: cd docs/ && make html
