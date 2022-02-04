@@ -12,13 +12,12 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.2,<3.11"
-joblib = ">=0.13.2,<2"
 numpy = "^1.16.4"
-pandas = ">=0.24.1,<2"
-scikit-learn = ">=0.21.2,<0.24.0"
-statsmodels = "^0.9.0"
 toolz = "^0.9.0"
-cython = "^0.29.27"
+joblib = ">=0.13.2,<2"
+pandas = ">=0.24.1,<2"
+statsmodels = "^0.10.0"
+scikit-learn = ">=0.21.2,<0.24.0"
 
 lightgbm = { version = ">=2.2.2,<4", optional = true }
 xgboost = { version = ">=0.82,<1.5", optional = true }
