@@ -11,22 +11,22 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6.2,<4"
+python = "3.6.2"
 joblib = ">=0.13.2,<2"
-numpy = ">=1.16.4,<2"
+numpy = "^1.16.4"
 pandas = ">=0.24.1,<2"
 scikit-learn = ">=0.21.2,<0.24.0"
-statsmodels = ">=0.9.0,<1"
-toolz = ">=0.9.0,<1"
+statsmodels = "^0.9.0"
+toolz = "^0.9.0"
 
 lightgbm = { version = ">=2.2.2,<4", optional = true }
 xgboost = { version = ">=0.82,<1.5", optional = true }
 catboost = { version = ">=0.14.2,<2", optional = true }
 shap = { version = ">=0.31.0,<=0.40", optional = true }
 swifter = { version = ">=0.284,<2", optional = true }
-matplotlib = { version = ">=3.0.2,<4", optional = true }
-tqdm = { version = ">=4.32.1,<5", optional = true }
-scipy = { version = ">=1.2.1,<2", optional = true }
+matplotlib = { version = "^3.0.2", optional = true }
+tqdm = { version = "^4.32.1", optional = true }
+scipy = { version = "^1.2.1", optional = true }
 
 
 [tool.poetry.extras]
