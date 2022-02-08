@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 import pandas as pd
 from hypothesis import given
 from hypothesis.extra.pandas import columns, data_frames, range_indexes
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from fklearn.preprocessing.splitting import space_time_split_dataset, time_split_dataset, stratified_split_dataset
 

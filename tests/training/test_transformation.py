@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from numpy import nan, round, sqrt, floor, log as ln
 from numpy.testing import assert_almost_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from fklearn.training.transformation import (
     selector,
@@ -1354,16 +1354,16 @@ def test_custom_transformer():
         columns_mapping={"feat2": "feat2_raw"},
     )
 
-    assert expected3.equals(data1)
-    assert pd.concat(
+    assert_frame_equal(expected3, data1)
+    assert_frame_equal(pd.concat(
         [expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
+    ), data2)
+    assert_frame_equal(pd.concat(
         [expected3, input_df[["feat2"]].copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
+    ), data3)
+    assert_frame_equal(pd.concat(
         [expected3, input_df[["feat2"]].copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
+    ), data4)
 
     # the transformed input df should contain the floor value of the feat1 column
     pred_fn1, data1, log = custom_transformer(
