@@ -5,7 +5,7 @@ set -e
 cur_dir=$(dirname ${BASH_SOURCE[0]})
 source $cur_dir/helpers.sh
 
-python3 -m venv venv
+/usr/bin/env python3 -m venv venv
 
 activate_venv
 
