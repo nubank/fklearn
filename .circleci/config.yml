@@ -3,8 +3,6 @@ orbs:
   python: circleci/python@1.0.0
 
 .common-values:
-  working_directory: &working-directory ~/repo
-
   install-pandoc: &install-pandoc
     name: Install pandoc
     command: sudo apt-get install -y -qq pandoc
@@ -33,7 +31,6 @@ orbs:
 
 .lint-steps: &lint-steps
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
@@ -44,7 +41,6 @@ orbs:
 
 .test-steps: &test-steps
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
@@ -55,7 +51,6 @@ orbs:
 
 .pip-check: &pip-check
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
@@ -66,7 +61,6 @@ orbs:
 
 .build: &build
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
@@ -75,13 +69,12 @@ orbs:
         name: Build package
         command: poetry build
     - persist_to_workspace:
-        root: ~/repo
+        root: .
         paths:
           - dist
 
 .build-docs: &build-docs
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
@@ -94,7 +87,6 @@ orbs:
 
 .release: &release
   executor: python/default
-  working_directory: *working-directory
   steps:
     - attach_workspace:
         at: /tmp/package
@@ -107,7 +99,6 @@ orbs:
 
 .type-check: &type-check
   executor: python/default
-  working_directory: *working-directory
   steps:
     - checkout
     - python/install-packages:
