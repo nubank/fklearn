@@ -38,8 +38,7 @@ orbs:
         command: poetry run flake8 src tests
 
 .test-steps: &test-steps
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - checkout
@@ -50,8 +49,7 @@ orbs:
         command: poetry run tox
 
 .pip-check: &pip-check
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - checkout
@@ -62,8 +60,7 @@ orbs:
         command: poetry run pip check
 
 .build: &build
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - checkout
@@ -78,8 +75,7 @@ orbs:
           - dist
 
 .build-docs: &build-docs
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - checkout
@@ -92,8 +88,7 @@ orbs:
 
 
 .release: &release
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - attach_workspace:
@@ -106,8 +101,7 @@ orbs:
         command: poetry publish -u $PYPI_USER -p $PYPI_PASSWORD
 
 .type-check: &type-check
-  docker:
-    - image: *docker-image
+  executor: python/default
   working_directory: *working-directory
   steps:
     - checkout
