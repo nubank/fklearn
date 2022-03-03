@@ -26,6 +26,11 @@ orbs:
     - lint
   <<: *master-branch-filter
 
+.requires-build: &requires-build
+  requires:
+    - build
+  <<: *tags-only-filter
+
 .lint-steps: &lint-steps
   executor: python/default
   working_directory: *working-directory
