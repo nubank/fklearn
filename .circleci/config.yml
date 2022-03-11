@@ -36,6 +36,7 @@ orbs:
     - checkout
     - python/install-packages:
         pkg-manager: poetry
+        args: "-E all"
     - run:
         name: Check code style (PEP8)
         command: poetry run flake8 src tests
@@ -86,7 +87,6 @@ orbs:
     - run:
         name: Build documentation
         command: poetry run sphinx-build -b html source build
-
 
 .release: &release
   executor: python/default
