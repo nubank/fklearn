@@ -738,7 +738,7 @@ def onehot_categorizer(df: pd.DataFrame,
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: ('fklearn_feat__' + col + '==' + str(categ),
+        make_dummies = lambda col: dict(map(lambda categ: (f'fklearn_feat__{col}=={categ}',
                                                            (new_df[col] == categ).astype(int)),
                                             vec[col][int(drop_first_column):]))
 

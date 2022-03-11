@@ -70,7 +70,7 @@ def logistic_classification_learner(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         pred = clf.predict_proba(new_df[features].values)
         if merged_params['multi_class'] == 'multinomial':
-            col_dict = {prediction_column + '_' + str(key): value for (key, value) in enumerate(pred.T)}
+            col_dict = {f'{prediction_column}_{key}': value for key, value in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
         else:
             col_dict = {prediction_column: pred[:, 1]}
@@ -180,8 +180,8 @@ def xgb_classification_learner(df: pd.DataFrame,
 
         pred = bst.predict(dtest)
         if params['objective'] == 'multi:softprob':
-            col_dict = {f'{prediction_column}_{str(key)}': value
-                        for (key, value) in enumerate(pred.T)}
+            col_dict = {f'{prediction_column}_{key}': value
+                        for key, value in enumerate(pred.T)}
             col_dict[prediction_column] = pred.argmax(axis=1)
         else:
             col_dict = {prediction_column: pred}
@@ -356,10 +356,8 @@ def catboost_classification_learner(df: pd.DataFrame,
 
         pred = cbr.predict_proba(new_df[features])
         if params['objective'] == 'MultiClass':
-            col_dict = {
-                f'{prediction_column}_{str(key)}': value
-                for (key, value) in enumerate(pred.T)
-            }
+            col_dict = {f'{prediction_column}_{key}': value
+                         for key, value in enumerate(pred.T)}
 
             col_dict[prediction_column] = pred.argmax(axis=1)
         else:
@@ -466,20 +464,12 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
 
-        predict_text_df = (
-            new_df[text_feature_cols].apply(lambda x: f'{x} ', axis=1).sum(axis=1)
-        )
-
+        predict_text_df = new_df[text_feature_cols].apply(lambda x: f'{x} ', axis=1).sum(axis=1)
         predict_sparse_vect = vect.transform(predict_text_df)
 
         if merged_logistic_params['multi_class'] == 'multinomial':
-            col_dict = {
-                f'{prediction_column}_{str(key)}': value
-                for (key, value) in enumerate(
-                    clf.predict_proba(predict_sparse_vect).T
-                )
-            }
-
+            col_dict = {f'{prediction_column}_{key}': value
+                         for key, value in enumerate(clf.predict_proba(predict_sparse_vect).T)}
         else:
             col_dict = {prediction_column: clf.predict_proba(predict_sparse_vect)[:, 1]}
 
@@ -588,13 +578,8 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         if params['objective'] == 'multiclass':
-            col_dict = {
-                f'{prediction_column}_{str(key)}': value
-                for (key, value) in enumerate(
-                    bst.predict(new_df[features].values).T
-                )
-            }
-
+            col_dict = {f'{prediction_column}_{key}': value
+                         for key, value in enumerate(bst.predict(new_df[features].values).T)}
         else:
             col_dict = {prediction_column: bst.predict(new_df[features].values)}
 

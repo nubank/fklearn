@@ -767,7 +767,7 @@ def split_evaluator(test_data: pd.DataFrame,
     if eval_name is None:
         eval_name = f'split_evaluator__{split_col}'
 
-    return {f'{eval_name}_{str(value)}': eval_fn(test_data.loc[lambda df: df[split_col] == value])
+    return {f'{eval_name}_{value}': eval_fn(test_data.loc[lambda df: df[split_col] == value])
             for value in split_values}
 
 
@@ -823,7 +823,7 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
     elif any(sv not in unique_values for sv in split_values):
         raise ValueError('All split values must be present in the column (after date formatting it')
 
-    return {f'{eval_name}_{str(value)}': eval_fn(test_data.loc[lambda df: formatted_time_col == value])
+    return {f'{eval_name}_{value}': eval_fn(test_data.loc[lambda df: formatted_time_col == value])
             for value in split_values}
 
 
