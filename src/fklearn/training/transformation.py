@@ -743,8 +743,9 @@ def onehot_categorizer(df: pd.DataFrame,
                                             vec[col][int(drop_first_column):]))
 
         oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {f'fklearn_feat__{col}==nan': (~new_df[col].isin(vec[col])).astype(int)}
-                                                if hardcode_nans else {},).items(), columns_to_categorize))
+                                                {f'fklearn_feat__{col}==nan':
+                                                    (~new_df[col].isin(vec[col])).astype(int)}
+                                                if hardcode_nans else {}).items(), columns_to_categorize))
 
         return new_df.assign(**oh_cols).drop(columns_to_categorize, axis=1)
 

@@ -92,8 +92,7 @@ def stop_by_no_improvement(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name))
-        <= threshold
+        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
         for log in limited_logs[:-1]
     )
 
@@ -139,8 +138,7 @@ def stop_by_no_improvement_parallel(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name))
-        <= threshold
+        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
         for log in limited_logs[:-1]
     )
 
