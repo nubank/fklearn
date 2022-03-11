@@ -29,7 +29,7 @@ def rebalance_by_categorical(dataset: pd.DataFrame, categ_column: str, max_lines
     """
 
     categs = dataset[categ_column].value_counts().to_dict()
-    max_lines_by_categ = max_lines_by_categ if max_lines_by_categ else min(categs.values())
+    max_lines_by_categ = max_lines_by_categ or min(categs.values())
 
     return pd.concat([(dataset
                        .loc[dataset[categ_column] == categ, :]
@@ -69,11 +69,11 @@ def rebalance_by_continuous(dataset: pd.DataFrame, continuous_column: str, bucke
         A dataset with fewer lines than dataset, but with the same number of lines per category in  categ_column
     """
 
-    bin_fn = partial(pd.qcut, q=buckets, duplicates="drop") if by_quantile else partial(pd.cut, bins=buckets)
+    bin_fn = partial(pd.qcut, q=buckets, duplicates='drop') if by_quantile else partial(pd.cut, bins=buckets)
 
     return (dataset
             .assign(bins=bin_fn(dataset[continuous_column]))
-            .pipe(rebalance_by_categorical(categ_column="bins",
+            .pipe(rebalance_by_categorical(categ_column='bins',
                                            max_lines_by_categ=max_lines_by_categ,
                                            seed=seed))
-            .drop(columns=["bins"]))
+            .drop(columns=['bins']))

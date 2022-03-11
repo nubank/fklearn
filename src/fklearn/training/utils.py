@@ -1,11 +1,11 @@
+import re
 from functools import reduce, wraps
 from time import time
-import re
 from typing import Any, List
 
 import pandas as pd
-from toolz import curry
 import toolz as fp
+from toolz import curry
 
 from fklearn.types import LearnerReturnType, UncurriedLearnerFnType
 
@@ -16,7 +16,7 @@ def log_learner_time(learner: UncurriedLearnerFnType, learner_name: str) -> Uncu
     def timed_learner(*args: Any, **kwargs: Any) -> LearnerReturnType:
         t0 = time()
         (p, d, l) = learner(*args, **kwargs)
-        return p, d, fp.assoc_in(l, [learner_name, 'running_time'], "%2.3f s" % (time() - t0))
+        return p, d, fp.assoc_in(l, [learner_name, 'running_time'], '%2.3f s' % (time() - t0))
 
     return timed_learner
 
@@ -33,7 +33,6 @@ def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> Unc
 
 def expand_features_encoded(df: pd.DataFrame,
                             features: List[str]) -> List[str]:
-
     """
     Expand the list of features to include features created automatically
     by fklearn in encoders such as Onehot-encoder.
@@ -59,17 +58,18 @@ def expand_features_encoded(df: pd.DataFrame,
     """
 
     def fklearn_features(df: pd.DataFrame) -> List[str]:
-        return list(filter(lambda col: col.startswith("fklearn_feat__"), df.columns))
+        return list(filter(lambda col: col.startswith('fklearn_feat__'), df.columns))
 
     def feature_prefix(feature: str) -> str:
-        return feature.split("==")[0]
+        return feature.split('==')[0]
 
     def filter_non_listed_features(fklearn_features: List[str], features: List[str]) -> List[str]:
-        possible_prefixes_with_listed_features = ["fklearn_feat__" + f for f in features]
+        possible_prefixes_with_listed_features = [f'fklearn_feat__{f}' for f in features]
+
         return list(filter(lambda col: feature_prefix(col) in possible_prefixes_with_listed_features, fklearn_features))
 
     def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
-        expr = r"fklearn_feat__(.*)=="
+        expr = r'fklearn_feat__(.*)=='
         original_preencoded_features: List[str] = reduce(lambda x, y: x + y,
                                                          (map(lambda x: re.findall(expr, x),
                                                               encoded_features)),

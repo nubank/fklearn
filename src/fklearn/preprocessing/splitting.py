@@ -1,8 +1,8 @@
 from typing import Optional, Tuple
 
 import numpy as np
-from numpy.random import RandomState
 import pandas as pd
+from numpy.random import RandomState
 from sklearn.model_selection import StratifiedShuffleSplit
 from toolz import curry
 
@@ -57,7 +57,7 @@ def time_split_dataset(dataset: pd.DataFrame,
         The out of ID sample and in time hold out set.
     """
 
-    holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
+    holdout_start_date = holdout_start_date or train_end_date
 
     train_set = dataset[
         (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
@@ -143,7 +143,7 @@ def space_time_split_dataset(dataset: pd.DataFrame,
     outime_outspace_hdout : pandas.DataFrame
         The out of ID sample and out of time hold out set.
     """
-    holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
+    holdout_start_date = holdout_start_date or train_end_date
 
     in_time_mask = (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)
     out_time_mask = (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)

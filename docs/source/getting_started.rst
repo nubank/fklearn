@@ -14,10 +14,10 @@ You can also install from the source::
 
     # clone the repository
     $ git clone -b master https://github.com/nubank/fklearn.git --depth=1
-    
+
     # open the folder
     $ cd fklearn
-    
+
     # install the dependencies
     $ pip install -e .
 

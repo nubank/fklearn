@@ -1,9 +1,10 @@
 import functools
 import inspect
+from typing import Any, Callable, Dict, List, Optional, Union
+
 import pandas as pd
 import toolz
 
-from typing import Any, Callable, Dict, List, Optional, Union
 from fklearn.types import LearnerLogType, LearnerReturnType
 
 
@@ -121,32 +122,26 @@ def column_duplicatable(columns_to_bind: str) -> Callable:
 
             curry_is_ready = not child._should_curry(args, child_kwargs)
 
-            if curry_is_ready:
-                columns_to_duplicate = (
-                    kwargs[columns_to_bind]
-                    if columns_to_bind in kwargs
-                    else args[columns_to_bind_idx]
-                )
-                mixin_fn, mixin_df, mixin_log = mixin(
-                    args[0],
-                    **mixin_kwargs,
-                    columns_to_duplicate=columns_to_duplicate)
-                child_fn, child_df, child_log = child(
-                    mixin_df,
-                    *args[1:],
-                    **child_kwargs)
-
-                return (
-                    toolz.compose(child_fn, mixin_fn),
-                    child_df,
-                    {**mixin_log, **child_log}
-                )
-
-            else:
+            if not curry_is_ready:
                 return functools.update_wrapper(
                     functools.partial(
                         _init, *args, **kwargs),
                     child(*args[1:], **child_kwargs))
+            columns_to_duplicate = kwargs.get(columns_to_bind, args[columns_to_bind_idx])
+            mixin_fn, mixin_df, mixin_log = mixin(
+                args[0],
+                **mixin_kwargs,
+                columns_to_duplicate=columns_to_duplicate)
+            child_fn, child_df, child_log = child(
+                mixin_df,
+                *args[1:],
+                **child_kwargs)
+
+            return (
+                toolz.compose(child_fn, mixin_fn),
+                child_df,
+                {**mixin_log, **child_log}
+            )
 
         callable_fn = functools.update_wrapper(_init, child)
 

@@ -3,8 +3,8 @@ from datetime import datetime
 from itertools import chain, repeat
 
 import pandas as pd
-from toolz import curry
 from numpy import nan
+from toolz import curry
 
 
 @curry
@@ -21,9 +21,9 @@ def combined_evaluator_extractor(result, base_extractors):
 @curry
 def split_evaluator_extractor_iteration(split_value, result, split_col, base_extractor, eval_name=None):
     if eval_name is None:
-        eval_name = 'split_evaluator__' + split_col
+        eval_name = f'split_evaluator__{split_col}'
 
-    key = eval_name + '_' + str(split_value)
+    key = f'{eval_name}_{str(split_value)}'
 
     return (base_extractor(result.get(key, {}))
             .assign(**{eval_name: split_value}))
@@ -38,9 +38,9 @@ def split_evaluator_extractor(result, split_col, split_values, base_extractor, e
 
 
 @curry
-def temporal_split_evaluator_extractor(result, time_col, base_extractor, time_format="%Y-%m", eval_name=None):
+def temporal_split_evaluator_extractor(result, time_col, base_extractor, time_format='%Y-%m', eval_name=None):
     if eval_name is None:
-        eval_name = 'split_evaluator__' + time_col
+        eval_name = f'split_evaluator__{time_col}'
 
     split_keys = [key for key in result.keys() if eval_name in key]
     split_values = []
@@ -117,8 +117,8 @@ def extract_sc(validator_results, extractor):
 
 @curry
 def extract_param_tuning_iteration(iteration, tuning_log, base_extractor, model_learner_name):
-    iter_df = base_extractor(tuning_log[iteration]["validator_log"])
-    return iter_df.assign(**tuning_log[iteration]["train_log"][model_learner_name]["parameters"])
+    iter_df = base_extractor(tuning_log[iteration]['validator_log'])
+    return iter_df.assign(**tuning_log[iteration]['train_log'][model_learner_name]['parameters'])
 
 
 @curry
@@ -134,8 +134,8 @@ def permutation_extractor(results, base_extractor):
     df.index = results['permutation_importance'].keys()
     if 'permutation_importance_baseline' in results:  # With baseline comparison
         baseline = base_extractor(results['permutation_importance_baseline'])
-        baseline.index = ["baseline"]
+        baseline.index = ['baseline']
         df = pd.concat((df, baseline))
         for c in baseline.columns:
-            df[c + '_delta_from_baseline'] = baseline[c].iloc[0] - df[c]
+            df[f'{c}_delta_from_baseline'] = baseline[c].iloc[0] - df[c]
     return df
