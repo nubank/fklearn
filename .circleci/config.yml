@@ -1,8 +1,7 @@
 .common-values:
+  docker-image: &docker-image cimg/python:3.6
 
-  docker-image: &docker-image circleci/python:3.6
-
-  docker-image-python39: &docker-image-python39 circleci/python:3.9
+  docker-image-python39: &docker-image-python39 cimg/python:3.9
 
   working_directory: &working-directory ~/repo
 
@@ -80,7 +79,7 @@
         command: . scripts/run_tests.sh
 
 .test-steps-python39: &test-steps-python39
-  << : *test-steps
+  <<: *test-steps
   docker:
     - image: *docker-image-python39
 
@@ -183,7 +182,6 @@ jobs:
     <<: *release
   type-check:
     <<: *type-check
-
 
 workflows:
   version: 2
