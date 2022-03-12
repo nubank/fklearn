@@ -7,5 +7,5 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pip install -q twine
+venv/bin/python -m pip install -q twine
 twine upload $1/*

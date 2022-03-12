@@ -7,6 +7,6 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pip install wheel
-venv/bin/python3 setup.py sdist
-venv/bin/python3 setup.py bdist_wheel
+venv/bin/python -m pip install wheel
+venv/bin/python setup.py sdist
+venv/bin/python setup.py bdist_wheel

@@ -9,5 +9,5 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pip install -q --upgrade setuptools
-venv/bin/python3 -m pip install -q --upgrade pip
+venv/bin/python -m pip install -q --upgrade setuptools
+venv/bin/python -m pip install -q --upgrade pip

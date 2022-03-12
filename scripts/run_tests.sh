@@ -7,6 +7,6 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pytest --cov=fklearn tests/
+venv/bin/python -m pytest --cov=fklearn tests/
 
 codecov

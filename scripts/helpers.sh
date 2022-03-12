@@ -8,5 +8,5 @@ activate_venv() {
 
 install_package() {
   activate_venv
-  venv/bin/python3 -m pip install -e .$1
+  venv/bin/python -m pip install -e .$1
 }

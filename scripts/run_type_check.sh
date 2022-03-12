@@ -7,4 +7,4 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m mypy src tests --config mypy.ini
+venv/bin/python -m mypy src tests --config mypy.ini

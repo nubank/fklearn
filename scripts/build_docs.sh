@@ -7,6 +7,6 @@ source $cur_dir/helpers.sh
 
 activate_venv
 
-venv/bin/python3 -m pip install -r docs/requirements.txt
+venv/bin/python -m pip install -r docs/requirements.txt
 
 cd docs/ && make html
