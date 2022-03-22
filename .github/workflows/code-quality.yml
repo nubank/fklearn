@@ -25,27 +25,50 @@ jobs:
       - name: Check code style
         run: . scripts/lint.sh
   test:
-    name: Run tests
+    name: run tests in python3.9
     needs:
       - "lint"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: set up python
         uses: actions/setup-python@v2
         with:
           python-version: "3.6"
           architecture: x64
-      - name: Restoring cache
+      - name: restoring cache
         uses: actions/cache@v2
         with:
           path: ./venv
-          key: ${{ runner.os }}-python-${{ hashFiles('requirements.txt') }}
-      - name: Create virtual environment
+          key: ${{ runner.os }}-python-${{ hashfiles('requirements.txt') }}
+      - name: create virtual environment
         run: . scripts/create_venv.sh
-      - name: Install package
+      - name: install package
         run: . scripts/helpers.sh && install_package [devel]
-      - name: Run tests
+      - name: run tests
+        run: . scripts/run_tests.sh
+  test-py39:
+    name: run tests
+    needs:
+      - "lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+          architecture: x64
+      - name: restoring cache
+        uses: actions/cache@v2
+        with:
+          path: ./venv
+          key: ${{ runner.os }}-python-${{ hashfiles('requirements.txt') }}
+      - name: create virtual environment
+        run: . scripts/create_venv.sh
+      - name: install package
+        run: . scripts/helpers.sh && install_package [devel]
+      - name: run tests
         run: . scripts/run_tests.sh
   type-check:
     name: Mypy check
