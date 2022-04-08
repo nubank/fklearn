@@ -32,9 +32,10 @@ all_deps = all_models_deps + tools_deps
 devel_deps = test_deps + all_deps
 
 setup(name=MODULE_NAME,
-      description='Functional machine learning',
-      url=f'https://github.com/nubank/{REPO_NAME}',
-      author='Nubank',
+      description="Functional machine learning",
+      url='https://github.com/nubank/{:s}'.format(REPO_NAME),
+      python_requires='>=3.6.2',
+      author="Nubank",
       package_dir={'': 'src'},
       packages=find_packages('src'),
       version=(open(join('src', MODULE_NAME, 'resources', 'VERSION'))

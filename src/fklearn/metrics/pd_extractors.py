@@ -1,4 +1,4 @@
-import collections
+import collections.abc
 from datetime import datetime
 from itertools import chain, repeat
 
@@ -74,7 +74,7 @@ def stability_curve_evaluator_extractor(result, base_extractor):
 
 @curry
 def repeat_split_log(split_log, results_len):
-    if isinstance(split_log, collections.Iterable):
+    if isinstance(split_log, collections.abc.Iterable):
         n_repeat = results_len // len(split_log)
         # The logic below makes [1, 2, 3] into [1, 1, 1, 2, 2, 2, 3, 3, 3] for n_repeat=3
         return list(chain.from_iterable(zip(*repeat(split_log, n_repeat))))
