@@ -5,13 +5,13 @@ import numpy as np
 import pandas as pd
 import toolz as fp
 from pandas.util import hash_pandas_object
+from scipy import optimize
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (average_precision_score, brier_score_loss,
                              fbeta_score, log_loss, mean_absolute_error,
                              mean_squared_error, precision_score, r2_score,
                              recall_score, roc_auc_score)
-from toolz import curry, last, first
-from scipy import optimize
-from sklearn.linear_model import LogisticRegression
+from toolz import curry, first, last
 
 from fklearn.types import (EvalFnType, EvalReturnType, PredictFnType,
                            UncurriedEvalFnType)
@@ -36,8 +36,8 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
     """
 
     def p(test_data: pd.DataFrame,
-          prediction_column: str = "prediction",
-          target_column: str = "target",
+          prediction_column: str = 'prediction',
+          target_column: str = 'target',
           eval_name: str = None,
           **kwargs: Any) -> EvalReturnType:
         try:
@@ -56,8 +56,8 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
 
 @curry
 def auc_evaluator(test_data: pd.DataFrame,
-                  prediction_column: str = "prediction",
-                  target_column: str = "target",
+                  prediction_column: str = 'prediction',
+                  target_column: str = 'target',
                   eval_name: str = None) -> EvalReturnType:
     """
     Computes the ROC AUC score, given true label and prediction scores.
@@ -82,17 +82,17 @@ def auc_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the ROC AUC Score
     """
 
-    warnings.warn("The method `auc_evaluator` will be renamed to `roc_auc_evaluator` in the next major release 2.0.0."
-                  " Please use `roc_auc_evaluator` instead of `auc_evaluator` for Area Under the Curve of the"
-                  " Receiver Operating Characteristics curve.")
+    warnings.warn('The method `auc_evaluator` will be renamed to `roc_auc_evaluator` in the next major release 2.0.0.'
+                  ' Please use `roc_auc_evaluator` instead of `auc_evaluator` for Area Under the Curve of the'
+                  ' Receiver Operating Characteristics curve.')
 
     return roc_auc_evaluator(test_data, prediction_column, target_column, eval_name)
 
 
 @curry
 def roc_auc_evaluator(test_data: pd.DataFrame,
-                      prediction_column: str = "prediction",
-                      target_column: str = "target",
+                      prediction_column: str = 'prediction',
+                      target_column: str = 'target',
                       eval_name: str = None) -> EvalReturnType:
     """
     Computes the ROC AUC score, given true label and prediction scores.
@@ -117,7 +117,7 @@ def roc_auc_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the ROC AUC Score
     """
 
-    eval_fn = generic_sklearn_evaluator("roc_auc_evaluator__", roc_auc_score)
+    eval_fn = generic_sklearn_evaluator('roc_auc_evaluator__', roc_auc_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -125,8 +125,8 @@ def roc_auc_evaluator(test_data: pd.DataFrame,
 
 @curry
 def pr_auc_evaluator(test_data: pd.DataFrame,
-                     prediction_column: str = "prediction",
-                     target_column: str = "target",
+                     prediction_column: str = 'prediction',
+                     target_column: str = 'target',
                      eval_name: str = None) -> EvalReturnType:
     """
     Computes the PR AUC score, given true label and prediction scores.
@@ -150,7 +150,7 @@ def pr_auc_evaluator(test_data: pd.DataFrame,
     A log-like dictionary with the PR AUC Score
     """
 
-    eval_fn = generic_sklearn_evaluator("pr_auc_evaluator__", average_precision_score)
+    eval_fn = generic_sklearn_evaluator('pr_auc_evaluator__', average_precision_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -159,8 +159,8 @@ def pr_auc_evaluator(test_data: pd.DataFrame,
 @curry
 def precision_evaluator(test_data: pd.DataFrame,
                         threshold: float = 0.5,
-                        prediction_column: str = "prediction",
-                        target_column: str = "target",
+                        prediction_column: str = 'prediction',
+                        target_column: str = 'target',
                         eval_name: str = None) -> EvalReturnType:
     """
     Computes the precision score, given true label and prediction scores.
@@ -188,7 +188,7 @@ def precision_evaluator(test_data: pd.DataFrame,
     log: dict
         A log-like dictionary with the Precision Score
     """
-    eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
+    eval_fn = generic_sklearn_evaluator('precision_evaluator__', precision_score)
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -197,8 +197,8 @@ def precision_evaluator(test_data: pd.DataFrame,
 @curry
 def recall_evaluator(test_data: pd.DataFrame,
                      threshold: float = 0.5,
-                     prediction_column: str = "prediction",
-                     target_column: str = "target",
+                     prediction_column: str = 'prediction',
+                     target_column: str = 'target',
                      eval_name: str = None) -> EvalReturnType:
     """
     Computes the recall score, given true label and prediction scores.
@@ -229,7 +229,7 @@ def recall_evaluator(test_data: pd.DataFrame,
     """
 
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
-    eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
+    eval_fn = generic_sklearn_evaluator('recall_evaluator__', recall_score)
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
 
@@ -238,8 +238,8 @@ def recall_evaluator(test_data: pd.DataFrame,
 def fbeta_score_evaluator(test_data: pd.DataFrame,
                           threshold: float = 0.5,
                           beta: float = 1.0,
-                          prediction_column: str = "prediction",
-                          target_column: str = "target",
+                          prediction_column: str = 'prediction',
+                          target_column: str = 'target',
                           eval_name: str = None) -> EvalReturnType:
     """
     Computes the F-beta score, given true label and prediction scores.
@@ -275,15 +275,15 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
     """
 
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
-    eval_fn = generic_sklearn_evaluator("fbeta_evaluator__", fbeta_score)
+    eval_fn = generic_sklearn_evaluator('fbeta_evaluator__', fbeta_score)
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name, beta=beta)
 
 
 @curry
 def logloss_evaluator(test_data: pd.DataFrame,
-                      prediction_column: str = "prediction",
-                      target_column: str = "target",
+                      prediction_column: str = 'prediction',
+                      target_column: str = 'target',
                       eval_name: str = None) -> EvalReturnType:
     """
     Computes the logloss score, given true label and prediction scores.
@@ -308,7 +308,7 @@ def logloss_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the logloss score.
     """
 
-    eval_fn = generic_sklearn_evaluator("logloss_evaluator__", log_loss)
+    eval_fn = generic_sklearn_evaluator('logloss_evaluator__', log_loss)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -316,8 +316,8 @@ def logloss_evaluator(test_data: pd.DataFrame,
 
 @curry
 def brier_score_evaluator(test_data: pd.DataFrame,
-                          prediction_column: str = "prediction",
-                          target_column: str = "target",
+                          prediction_column: str = 'prediction',
+                          target_column: str = 'target',
                           eval_name: str = None) -> EvalReturnType:
     """
     Computes the Brier score, given true label and prediction scores.
@@ -342,7 +342,7 @@ def brier_score_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the Brier score.
     """
 
-    eval_fn = generic_sklearn_evaluator("brier_score_evaluator__", brier_score_loss)
+    eval_fn = generic_sklearn_evaluator('brier_score_evaluator__', brier_score_loss)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
     return eval_fn(eval_data, prediction_column, target_column, eval_name)
@@ -350,11 +350,11 @@ def brier_score_evaluator(test_data: pd.DataFrame,
 
 @curry
 def expected_calibration_error_evaluator(test_data: pd.DataFrame,
-                                         prediction_column: str = "prediction",
-                                         target_column: str = "target",
+                                         prediction_column: str = 'prediction',
+                                         target_column: str = 'target',
                                          eval_name: str = None,
                                          n_bins: int = 100,
-                                         bin_choice: str = "count") -> EvalReturnType:
+                                         bin_choice: str = 'count') -> EvalReturnType:
     """
     Computes the expected calibration error (ECE), given true label and prediction scores.
     See "On Calibration of Modern Neural Networks"(https://arxiv.org/abs/1706.04599) for more information.
@@ -414,34 +414,31 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "expected_calibration_error_evaluator__" + target_column
+        eval_name = f'expected_calibration_error_evaluator__{target_column}'
 
-    if bin_choice == "count":
+    if bin_choice == 'count':
         bins = pd.qcut(test_data[prediction_column], q=n_bins)
-    elif bin_choice == "prob":
+    elif bin_choice == 'prob':
         bins = pd.cut(test_data[prediction_column], bins=n_bins)
     else:
-        raise AttributeError("Invalid bin_choice")
+        raise AttributeError('Invalid bin_choice')
 
-    metric_df = pd.DataFrame({"bins": bins,
-                              "predictions": test_data[prediction_column],
-                              "actuals": test_data[target_column]})
+    metric_df = pd.DataFrame({'bins': bins,
+                              'predictions': test_data[prediction_column],
+                              'actuals': test_data[target_column]})
 
-    agg_df = metric_df.groupby("bins").agg({"bins": "count", "predictions": "mean", "actuals": "mean"})
+    agg_df = metric_df.groupby('bins').agg({'bins': 'count', 'predictions': 'mean', 'actuals': 'mean'})
 
-    sample_weight = None
-    if bin_choice == "prob":
-        sample_weight = agg_df["bins"].values
-
-    distance = mean_absolute_error(agg_df["actuals"].values, agg_df["predictions"].values, sample_weight=sample_weight)
+    sample_weight = agg_df['bins'].values if bin_choice == 'prob' else None
+    distance = mean_absolute_error(agg_df['actuals'].values, agg_df['predictions'].values, sample_weight=sample_weight)
 
     return {eval_name: distance}
 
 
 @curry
 def r2_evaluator(test_data: pd.DataFrame,
-                 prediction_column: str = "prediction",
-                 target_column: str = "target",
+                 prediction_column: str = 'prediction',
+                 target_column: str = 'target',
                  eval_name: str = None) -> EvalReturnType:
     """
     Computes the R2 score, given true label and predictions.
@@ -466,15 +463,15 @@ def r2_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the R2 Score
     """
 
-    eval_fn = generic_sklearn_evaluator("r2_evaluator__", r2_score)
+    eval_fn = generic_sklearn_evaluator('r2_evaluator__', r2_score)
 
     return eval_fn(test_data, prediction_column, target_column, eval_name)
 
 
 @curry
 def mse_evaluator(test_data: pd.DataFrame,
-                  prediction_column: str = "prediction",
-                  target_column: str = "target",
+                  prediction_column: str = 'prediction',
+                  target_column: str = 'target',
                   eval_name: str = None) -> EvalReturnType:
     """
     Computes the Mean Squared Error, given true label and predictions.
@@ -498,14 +495,14 @@ def mse_evaluator(test_data: pd.DataFrame,
     log: dict
         A log-like dictionary with the MSE Score
     """
-    eval_fn = generic_sklearn_evaluator("mse_evaluator__", mean_squared_error)
+    eval_fn = generic_sklearn_evaluator('mse_evaluator__', mean_squared_error)
 
     return eval_fn(test_data, prediction_column, target_column, eval_name)
 
 
 @curry
 def mean_prediction_evaluator(test_data: pd.DataFrame,
-                              prediction_column: str = "prediction",
+                              prediction_column: str = 'prediction',
                               eval_name: str = None) -> EvalReturnType:
     """
     Computes mean for the specified column.
@@ -528,15 +525,15 @@ def mean_prediction_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = 'mean_evaluator__' + prediction_column
+        eval_name = f'mean_evaluator__{prediction_column}'
 
     return {eval_name: test_data[prediction_column].mean()}
 
 
 @curry
 def correlation_evaluator(test_data: pd.DataFrame,
-                          prediction_column: str = "prediction",
-                          target_column: str = "target",
+                          prediction_column: str = 'prediction',
+                          target_column: str = 'target',
                           eval_name: str = None) -> EvalReturnType:
     """
     Computes the Pearson correlation between prediction and target.
@@ -562,16 +559,16 @@ def correlation_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "correlation_evaluator__" + target_column
+        eval_name = f'correlation_evaluator__{target_column}'
 
-    score = test_data[[prediction_column, target_column]].corr(method="pearson").iloc[0, 1]
+    score = test_data[[prediction_column, target_column]].corr(method='pearson').iloc[0, 1]
     return {eval_name: score}
 
 
 @curry
 def linear_coefficient_evaluator(test_data: pd.DataFrame,
-                                 prediction_column: str = "prediction",
-                                 target_column: str = "target",
+                                 prediction_column: str = 'prediction',
+                                 target_column: str = 'target',
                                  eval_name: str = None) -> EvalReturnType:
     """
     Computes the linear coefficient from regressing the outcome on the prediction
@@ -597,7 +594,7 @@ def linear_coefficient_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "linear_coefficient_evaluator__" + target_column
+        eval_name = f'linear_coefficient_evaluator__{target_column}'
 
     cov_mat = test_data[[prediction_column, target_column]].cov()
     score = cov_mat.iloc[0, 1] / cov_mat.iloc[0, 0]
@@ -606,8 +603,8 @@ def linear_coefficient_evaluator(test_data: pd.DataFrame,
 
 @curry
 def spearman_evaluator(test_data: pd.DataFrame,
-                       prediction_column: str = "prediction",
-                       target_column: str = "target",
+                       prediction_column: str = 'prediction',
+                       target_column: str = 'target',
                        eval_name: str = None) -> EvalReturnType:
     """
     Computes the Spearman correlation between prediction and target.
@@ -635,16 +632,16 @@ def spearman_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "spearman_evaluator__" + target_column
+        eval_name = f'spearman_evaluator__{target_column}'
 
-    score = test_data[[prediction_column, target_column]].corr(method="spearman").iloc[0, 1]
+    score = test_data[[prediction_column, target_column]].corr(method='spearman').iloc[0, 1]
     return {eval_name: score}
 
 
 @curry
 def ndcg_evaluator(test_data: pd.DataFrame,
-                   prediction_column: str = "prediction",
-                   target_column: str = "target",
+                   prediction_column: str = 'prediction',
+                   target_column: str = 'target',
                    k: int = None,
                    exponential_gain: bool = True,
                    eval_name: str = None) -> EvalReturnType:
@@ -684,10 +681,10 @@ def ndcg_evaluator(test_data: pd.DataFrame,
     """
 
     if isinstance(k, (int, float)) and not 0 < k <= len(test_data[prediction_column]):
-        raise ValueError("k must be between [1, len(test_data[prediction_column])].")
+        raise ValueError('k must be between [1, len(test_data[prediction_column])].')
 
     if eval_name is None:
-        eval_name = f"ndcg_evaluator__{target_column}"
+        eval_name = f'ndcg_evaluator__{target_column}'
 
     rel = np.argsort(test_data[prediction_column])[::-1][:k]
     cum_gain = test_data[target_column][rel]
@@ -768,9 +765,9 @@ def split_evaluator(test_data: pd.DataFrame,
         split_values = test_data[split_col].unique()
 
     if eval_name is None:
-        eval_name = 'split_evaluator__' + split_col
+        eval_name = f'split_evaluator__{split_col}'
 
-    return {eval_name + "_" + str(value): eval_fn(test_data.loc[lambda df: df[split_col] == value])
+    return {f'{eval_name}_{value}': eval_fn(test_data.loc[lambda df: df[split_col] == value])
             for value in split_values}
 
 
@@ -778,7 +775,7 @@ def split_evaluator(test_data: pd.DataFrame,
 def temporal_split_evaluator(test_data: pd.DataFrame,
                              eval_fn: EvalFnType,
                              time_col: str,
-                             time_format: str = "%Y-%m",
+                             time_format: str = '%Y-%m',
                              split_values: Iterable[str] = None,
                              eval_name: str = None) -> EvalReturnType:
     """
@@ -819,15 +816,14 @@ def temporal_split_evaluator(test_data: pd.DataFrame,
     unique_values = formatted_time_col.unique()
 
     if eval_name is None:
-        eval_name = 'split_evaluator__' + time_col
+        eval_name = f'split_evaluator__{time_col}'
 
     if split_values is None:
         split_values = unique_values
-    else:
-        if not (all(sv in unique_values for sv in split_values)):
-            raise ValueError('All split values must be present in the column (after date formatting it')
+    elif any(sv not in unique_values for sv in split_values):
+        raise ValueError('All split values must be present in the column (after date formatting it')
 
-    return {eval_name + "_" + str(value): eval_fn(test_data.loc[lambda df: formatted_time_col == value])
+    return {f'{eval_name}_{value}': eval_fn(test_data.loc[lambda df: formatted_time_col == value])
             for value in split_values}
 
 
@@ -943,19 +939,19 @@ def hash_evaluator(test_data: pd.DataFrame,
         return {eval_name: hash_pandas_object(df).sum()}
 
     if eval_name is None:
-        eval_name = "hash_evaluator__" + "_".join(sorted(hash_columns))
+        eval_name = 'hash_evaluator__' + '_'.join(sorted(hash_columns))
     eval_data = test_data[hash_columns]
 
     if not consider_index:  # set 0 for all indexes
-        return calculate_dataframe_hash(eval_data.set_index(np.zeros(len(eval_data), dtype="int")), eval_name)
+        return calculate_dataframe_hash(eval_data.set_index(np.zeros(len(eval_data), dtype='int')), eval_name)
 
     return calculate_dataframe_hash(eval_data, eval_name)
 
 
 @curry
 def exponential_coefficient_evaluator(test_data: pd.DataFrame,
-                                      prediction_column: str = "prediction",
-                                      target_column: str = "target",
+                                      prediction_column: str = 'prediction',
+                                      target_column: str = 'target',
                                       eval_name: str = None) -> EvalReturnType:
     """
     Computes the exponential coefficient between prediction and target. Finds a1 in the following equation
@@ -982,7 +978,7 @@ def exponential_coefficient_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "exponential_coefficient_evaluator__" + target_column
+        eval_name = f'exponential_coefficient_evaluator__{target_column}'
 
     score = last(first(optimize.curve_fit(lambda t, a0, a1: a0 * np.exp(a1 * t),
                                           test_data[prediction_column], test_data[target_column])))
@@ -991,8 +987,8 @@ def exponential_coefficient_evaluator(test_data: pd.DataFrame,
 
 @curry
 def logistic_coefficient_evaluator(test_data: pd.DataFrame,
-                                   prediction_column: str = "prediction",
-                                   target_column: str = "target",
+                                   prediction_column: str = 'prediction',
+                                   target_column: str = 'target',
                                    eval_name: str = None) -> EvalReturnType:
     """
     Computes the logistic coefficient between prediction and target. Finds a1 in the following equation
@@ -1019,9 +1015,9 @@ def logistic_coefficient_evaluator(test_data: pd.DataFrame,
     """
 
     if eval_name is None:
-        eval_name = "logistic_coefficient_evaluator__" + target_column
+        eval_name = f'logistic_coefficient_evaluator__{target_column}'
 
-    score = LogisticRegression(penalty="none", multi_class="ovr").fit(test_data[[prediction_column]],
+    score = LogisticRegression(penalty='none', multi_class='ovr').fit(test_data[[prediction_column]],
                                                                       test_data[target_column]).coef_[0][0]
 
     return {eval_name: score}

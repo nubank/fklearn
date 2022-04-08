@@ -24,8 +24,7 @@ sys.path.insert(0, os.path.abspath('../../src/'))
 # -- Project information -----------------------------------------------------
 
 project = 'fklearn'
-current_year = str(datetime.now().year)
-copyright = current_year + ', Nubank Data Science Team'
+copyright = f'{datetime.now():%Y}, Nubank Data Science Team'
 author = 'Nubank Data Science Team'
 
 # The short X.Y version
@@ -73,7 +72,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ["examples/.ipynb_checkpoints/*"]
+exclude_patterns = ['examples/.ipynb_checkpoints/*']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'

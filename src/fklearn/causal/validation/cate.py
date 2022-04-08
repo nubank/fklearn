@@ -31,18 +31,12 @@ def _validate_test_and_control_groups(test_data: pd.DataFrame,
     unique_values = test_data[group_column].unique()
 
     if control_group_name not in unique_values:
-        raise ValueError("control group '{}' not found".format(control_group_name))
+        raise ValueError(f"control group '{control_group_name}' not found")
 
     n_groups = len(unique_values)
     if n_groups != 2:
-        raise RuntimeError(
-            "Exactly 2 groups are required for delta evaluations. found {}".format(
-                n_groups
-            )
-        )
-    return (
-        unique_values[0] if control_group_name == unique_values[1] else unique_values[1]
-    )
+        raise RuntimeError(f'Exactly 2 groups are required for delta evaluations. found {n_groups}')
+    return unique_values[0] if control_group_name == unique_values[1] else unique_values[1]
 
 
 def cate_mean_by_bin(test_data: pd.DataFrame,
@@ -95,8 +89,8 @@ def cate_mean_by_bin(test_data: pd.DataFrame,
 
     test_after_control = test_group_name > control_group_name
 
-    quantile_column = bin_column + "_q" + str(n_bins)
-    duplicates = "drop" if allow_dropped_bins else "raise"
+    quantile_column = f'{bin_column}_q{n_bins}'
+    duplicates = 'drop' if allow_dropped_bins else 'raise'
     test_data_binned = test_data.assign(
         **{
             quantile_column: pd.qcut(
@@ -125,8 +119,8 @@ def cate_mean_by_bin_meta_evaluator(test_data: pd.DataFrame,
                                     allow_dropped_bins: bool = False,
                                     inner_evaluator: UncurriedEvalFnType = r2_evaluator,
                                     eval_name: str = None,
-                                    prediction_column: str = "prediction",
-                                    target_column: str = "target") -> EvalReturnType:
+                                    prediction_column: str = 'prediction',
+                                    target_column: str = 'target') -> EvalReturnType:
     """
     Evaluates the predictions of a causal model that outputs treatment outcomes w.r.t. its capabilities to predict the
     CATE.
@@ -184,19 +178,12 @@ def cate_mean_by_bin_meta_evaluator(test_data: pd.DataFrame,
         )
     except ValueError:
         raise ValueError(
-            "can't create {} bins for column '{}'. use 'allow_dropped_bins=True' to drop duplicated bins".format(
-                n_bins, bin_column
-            )
+            f"can't create {n_bins} bins for column '{bin_column}'."
+            " Use 'allow_dropped_bins=True' to drop duplicated bins"
         )
 
     if eval_name is None:
-        eval_name = (
-            "cate_mean_by_bin_"
-            + bin_column
-            + "[{}q]".format(n_bins)
-            + "__"
-            + inner_evaluator.__name__
-        )
+        eval_name = f'cate_mean_by_bin_{bin_column}[{n_bins}q]__{inner_evaluator.__name__}'
 
     return inner_evaluator(
         test_data=gb,

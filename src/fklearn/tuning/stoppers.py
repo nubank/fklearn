@@ -1,10 +1,10 @@
 from typing import Callable
 
-from toolz.curried import curry, take, first
+from toolz.curried import curry, first, take
 
-from fklearn.tuning.utils import get_best_performing_log, get_avg_metric_from_extractor, get_used_features
+from fklearn.tuning.utils import (get_avg_metric_from_extractor,
+                                  get_best_performing_log, get_used_features)
 from fklearn.types import ExtractorFnType, ListLogListType
-
 
 StopFnType = Callable[[ListLogListType], bool]
 
@@ -25,7 +25,7 @@ def aggregate_stop_funcs(*stop_funcs: StopFnType) -> StopFnType:
     """
 
     def p(logs: ListLogListType) -> bool:
-        return any([stop_fn(logs) for stop_fn in stop_funcs])
+        return any(stop_fn(logs) for stop_fn in stop_funcs)
 
     return p
 
@@ -92,8 +92,8 @@ def stop_by_no_improvement(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        [(curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
-         for log in limited_logs[:-1]]
+        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
+        for log in limited_logs[:-1]
     )
 
 
@@ -138,8 +138,9 @@ def stop_by_no_improvement_parallel(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        [(curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
-         for log in limited_logs[:-1]])
+        (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
+        for log in limited_logs[:-1]
+    )
 
 
 @curry

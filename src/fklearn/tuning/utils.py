@@ -1,14 +1,15 @@
 from typing import Any, Dict, Generator, List
 
-from toolz.curried import reduce, partial, pipe, first, curry
+from toolz.curried import curry, first, partial, pipe, reduce
 
 from fklearn.metrics.pd_extractors import extract
-from fklearn.types import LogListType, LogType, ExtractorFnType, ValidatorReturnType, EvalReturnType
+from fklearn.types import (EvalReturnType, ExtractorFnType, LogListType,
+                           LogType, ValidatorReturnType)
 
 
 @curry
 def get_avg_metric_from_extractor(logs: LogType, extractor: ExtractorFnType, metric_name: str) -> float:
-    metric_folds = extract(logs["validator_log"], extractor)
+    metric_folds = extract(logs['validator_log'], extractor)
     return metric_folds[metric_name].mean()
 
 
@@ -35,22 +36,22 @@ def gen_key_avgs_from_iteration(key: str, log: Dict) -> Any:
 
 
 def gen_key_avgs_from_dicts(obj: List) -> Dict[str, float]:
-    sum_values_by_key = reduce(lambda x, y: dict((k, v + y.get(k, 0)) for k, v in x.items()), obj)
+    sum_values_by_key = reduce(lambda x, y: {k: v + y.get(k, 0) for k, v in x.items()}, obj)
+
     return {k: float(v) / len(obj) for k, v in sum_values_by_key.items()}
 
 
 def gen_dict_extract(key: str, obj: Dict) -> Generator[Any, None, None]:
-    if hasattr(obj, 'items'):
-        for k, v in obj.items():
-            if k == key:
-                yield v
-            if isinstance(v, dict):
-                for result in gen_dict_extract(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in gen_dict_extract(key, d):
-                        yield result
+    if not hasattr(obj, 'items'):
+        return
+    for k, v in obj.items():
+        if k == key:
+            yield v
+        if isinstance(v, dict):
+            yield from gen_dict_extract(key, v)
+        elif isinstance(v, list):
+            for d in v:
+                yield from gen_dict_extract(key, d)
 
 
 @curry

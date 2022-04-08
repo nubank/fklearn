@@ -46,17 +46,17 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
     def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
         no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
         if len(no_default_list) > 1:
-            raise ValueError("Learner {0} has more than one unfilled argument: {1}\n"
-                             "Make sure all learners are curried properly and only require one argument,"
-                             " which is the dataset (usually `df`)."
+            raise ValueError('Learner {0} has more than one unfilled argument: {1}\n'
+                             'Make sure all learners are curried properly and only require one argument,'
+                             ' which is the dataset (usually `df`).'
                              .format(learner.__name__, ', '.join(no_default_list)))
 
     def _no_variable_args(learner: LearnerFnType, predict_fn: PredictFnType) -> None:
         invalid_parameter_kinds = (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
         var_args = [p for p, a in signature(predict_fn).parameters.items() if a.kind in invalid_parameter_kinds]
-        if len(var_args) != 0:
-            raise ValueError("Predict function of learner {0} contains variable length arguments: {1}\n"
-                             "Make sure no predict function uses arguments like *args or **kwargs."
+        if var_args:
+            raise ValueError('Predict function of learner {0} contains variable length arguments: {1}\n'
+                             'Make sure no predict function uses arguments like *args or **kwargs.'
                              .format(learner.__name__, ', '.join(var_args)))
 
     # Check for unfilled arguments of learners
@@ -82,10 +82,10 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
             current_data = new_data
 
             model_objects = {}
-            if learner_log.get("obj"):
-                model_objects["obj"] = learner_log.pop("obj")
+            if learner_log.get('obj'):
+                model_objects['obj'] = learner_log.pop('obj')
 
-            serialisation[learner_name].append({"fn": learner_fn, "log": learner_log, **model_objects})
+            serialisation[learner_name].append({'fn': learner_fn, 'log': learner_log, **model_objects})
             logs.append(learner_log)
 
         merged_logs = fp.merge(logs)
@@ -99,10 +99,10 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
 
         serialisation_logs = {k: v if has_repeated_learners else v[-1] for k, v in serialisation.items()}
 
-        merged_logs["__fkml__"] = {"pipeline": pipeline,
-                                   "output_columns": list(current_data.columns),
-                                   "features": features,
-                                   "learners": {**serialisation_logs}}
+        merged_logs['__fkml__'] = {'pipeline': pipeline,
+                                   'output_columns': list(current_data.columns),
+                                   'features': features,
+                                   'learners': {**serialisation_logs}}
 
         return predict_fn, current_data, merged_logs
 

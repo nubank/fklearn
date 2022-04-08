@@ -2,12 +2,13 @@ from collections import OrderedDict
 from itertools import product
 from typing import Callable, List
 
-from numpy.random import seed
 import pandas as pd
+from numpy.random import seed
 from toolz import curry, partial
 
+from fklearn.types import (EvalFnType, LearnerFnType, LogType, SplitterFnType,
+                           ValidatorReturnType)
 from fklearn.validation.validator import parallel_validator, validator
-from fklearn.types import EvalFnType, LearnerFnType, LogType, SplitterFnType, ValidatorReturnType
 
 SaveIntermediaryFnType = Callable[[ValidatorReturnType], None]
 

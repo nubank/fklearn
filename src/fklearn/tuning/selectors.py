@@ -1,14 +1,20 @@
 from typing import Callable, Dict, List
 
-from toolz.curried import pipe, first, mapcat
 import pandas as pd
+from toolz.curried import first, mapcat, pipe
 
-from fklearn.tuning.samplers import remove_features_subsets, remove_by_feature_importance, remove_by_feature_shuffling
-from fklearn.tuning.stoppers import stop_by_num_features, stop_by_num_features_parallel, stop_by_iter_num, \
-    stop_by_no_improvement, stop_by_no_improvement_parallel, aggregate_stop_funcs
+from fklearn.tuning.samplers import (remove_by_feature_importance,
+                                     remove_by_feature_shuffling,
+                                     remove_features_subsets)
+from fklearn.tuning.stoppers import (aggregate_stop_funcs, stop_by_iter_num,
+                                     stop_by_no_improvement,
+                                     stop_by_no_improvement_parallel,
+                                     stop_by_num_features,
+                                     stop_by_num_features_parallel)
+from fklearn.types import (EvalFnType, ExtractorFnType, LearnerReturnType,
+                           ListLogListType, LogListType, LogType,
+                           SplitterFnType, ValidatorReturnType)
 from fklearn.validation.validator import parallel_validator
-from fklearn.types import EvalFnType, ExtractorFnType, LearnerReturnType, ListLogListType, LogListType, SplitterFnType,\
-    ValidatorReturnType, LogType
 
 SaveIntermediaryFnType = Callable[[List[ValidatorReturnType]], None]
 TuningLearnerFnType = Callable[[pd.DataFrame, List[str]], LearnerReturnType]
@@ -381,7 +387,7 @@ def backward_subset_feature_selection(train_data: pd.DataFrame,
     trainers = [lambda df: param_train_fn(df, feat) for feat in used_features]
 
     first_val_logs = [parallel_validator(train_data, split_fn, train_func, eval_fn, n_jobs) for train_func in trainers]
-    logs = [[dict(log, **{"used_subsets": list(subset)}) for log, subset in zip(first_val_logs, used_subsets)]]
+    logs = [[dict(log, **{'used_subsets': list(subset)}) for log, subset in zip(first_val_logs, used_subsets)]]
 
     while not stop_fn(logs):
         curr_log = first(logs)
@@ -393,7 +399,7 @@ def backward_subset_feature_selection(train_data: pd.DataFrame,
 
         val_logs = [parallel_validator(train_data, split_fn, train_func, eval_fn, n_jobs) for train_func in trainers]
 
-        new_logs = [dict(log, **{"used_subsets": subset}) for log, subset in zip(val_logs, new_subsets)]
+        new_logs = [dict(log, **{'used_subsets': subset}) for log, subset in zip(val_logs, new_subsets)]
 
         if save_intermediary_fn is not None:
             save_intermediary_fn(new_logs)

@@ -1,15 +1,17 @@
-from typing import Any, Callable, Dict, List, Union, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from numpy import nan
 from sklearn.preprocessing import StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
-from toolz import curry, merge, compose, mapcat
-from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
-from fklearn.training.utils import log_learner_time
-from fklearn.types import LearnerReturnType, LearnerLogType
+from toolz import compose, curry, mapcat, merge
+
+from fklearn.common_docstrings import (learner_pred_fn_docstring,
+                                       learner_return_docstring)
 from fklearn.preprocessing.schema import column_duplicatable
+from fklearn.training.utils import log_learner_time
+from fklearn.types import LearnerLogType, LearnerReturnType
 
 
 @curry
@@ -39,7 +41,7 @@ def selector(df: pd.DataFrame,
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
         return new_data_set[predict_columns]
 
-    p.__doc__ = learner_pred_fn_docstring("selector")
+    p.__doc__ = learner_pred_fn_docstring('selector')
 
     log = {'selector': {
         'training_columns': training_columns,
@@ -49,7 +51,7 @@ def selector(df: pd.DataFrame,
     return p, df[training_columns], log
 
 
-selector.__doc__ += learner_return_docstring("Selector")
+selector.__doc__ += learner_return_docstring('Selector')
 
 
 @column_duplicatable('columns_to_cap')
@@ -86,7 +88,7 @@ def capper(df: pd.DataFrame,
         capped_cols = {col: new_data_set[col].clip(upper=caps[col]) for col in caps.keys()}
         return new_data_set.assign(**capped_cols)
 
-    p.__doc__ = learner_pred_fn_docstring("capper")
+    p.__doc__ = learner_pred_fn_docstring('capper')
 
     log = {'capper': {
         'caps': caps,
@@ -96,7 +98,7 @@ def capper(df: pd.DataFrame,
     return p, p(df), log
 
 
-capper.__doc__ += learner_return_docstring("Capper")
+capper.__doc__ += learner_return_docstring('Capper')
 
 
 @column_duplicatable('columns_to_floor')
@@ -134,7 +136,7 @@ def floorer(df: pd.DataFrame,
         capped_cols = {col: new_data_set[col].clip(lower=floors[col]) for col in floors.keys()}
         return new_data_set.assign(**capped_cols)
 
-    p.__doc__ = learner_pred_fn_docstring("floorer")
+    p.__doc__ = learner_pred_fn_docstring('floorer')
 
     log = {'floorer': {
         'floors': floors,
@@ -144,15 +146,15 @@ def floorer(df: pd.DataFrame,
     return p, p(df), log
 
 
-floorer.__doc__ += learner_return_docstring("Floorer")
+floorer.__doc__ += learner_return_docstring('Floorer')
 
 
 @curry
 @log_learner_time(learner_name='ecdfer')
 def ecdfer(df: pd.DataFrame,
            ascending: bool = True,
-           prediction_column: str = "prediction",
-           ecdf_column: str = "prediction_ecdf",
+           prediction_column: str = 'prediction',
+           ecdf_column: str = 'prediction_ecdf',
            max_range: int = 1000) -> LearnerReturnType:
     """
     Learns an Empirical Cumulative Distribution Function from the specified column
@@ -192,7 +194,7 @@ def ecdfer(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return new_df.assign(**{ecdf_column: (base + sign * max_range * ecdf(new_df[prediction_column]))})
 
-    p.__doc__ = learner_pred_fn_docstring("ecdefer")
+    p.__doc__ = learner_pred_fn_docstring('ecdefer')
 
     log = {'ecdfer': {
         'nobs': len(values),
@@ -203,15 +205,15 @@ def ecdfer(df: pd.DataFrame,
     return p, p(df), log
 
 
-ecdfer.__doc__ += learner_return_docstring("ECDFer")
+ecdfer.__doc__ += learner_return_docstring('ECDFer')
 
 
 @curry
 @log_learner_time(learner_name='discrete_ecdfer')
 def discrete_ecdfer(df: pd.DataFrame,
                     ascending: bool = True,
-                    prediction_column: str = "prediction",
-                    ecdf_column: str = "prediction_ecdf",
+                    prediction_column: str = 'prediction',
+                    ecdf_column: str = 'prediction_ecdf',
                     max_range: int = 1000,
                     round_method: Callable = int) -> LearnerReturnType:
     """
@@ -256,10 +258,10 @@ def discrete_ecdfer(df: pd.DataFrame,
     df_ecdf['x'] = ecdf.x
     df_ecdf['y'] = pd.Series(base + sign * max_range * ecdf.y).apply(round_method)
 
-    boundaries = df_ecdf.groupby("y").agg((min, max))["x"]["min"].reset_index()
+    boundaries = df_ecdf.groupby('y').agg((min, max))['x']['min'].reset_index()
 
-    y = boundaries["y"]
-    x = boundaries["min"]
+    y = boundaries['y']
+    x = boundaries['min']
     side = ecdf.side
 
     log = {'discrete_ecdfer': {
@@ -285,14 +287,14 @@ def discrete_ecdfer(df: pd.DataFrame,
     return p, p(df), log
 
 
-discrete_ecdfer.__doc__ += learner_return_docstring("Discrete ECDFer")
+discrete_ecdfer.__doc__ += learner_return_docstring('Discrete ECDFer')
 
 
 @curry
 def prediction_ranger(df: pd.DataFrame,
                       prediction_min: float,
                       prediction_max: float,
-                      prediction_column: str = "prediction") -> LearnerReturnType:
+                      prediction_column: str = 'prediction') -> LearnerReturnType:
     """
     Caps and floors the specified prediction column to a set range.
 
@@ -316,7 +318,7 @@ def prediction_ranger(df: pd.DataFrame,
             **{prediction_column: new_df[prediction_column].clip(lower=prediction_min, upper=prediction_max)}
         )
 
-    p.__doc__ = learner_pred_fn_docstring("prediction_ranger")
+    p.__doc__ = learner_pred_fn_docstring('prediction_ranger')
 
     log = {'prediction_ranger': {
         'prediction_min': prediction_min,
@@ -326,7 +328,7 @@ def prediction_ranger(df: pd.DataFrame,
     return p, p(df), log
 
 
-prediction_ranger.__doc__ += learner_return_docstring("Prediction Ranger")
+prediction_ranger.__doc__ += learner_return_docstring('Prediction Ranger')
 
 
 def apply_replacements(df: pd.DataFrame,
@@ -363,7 +365,7 @@ def apply_replacements(df: pd.DataFrame,
 
 @column_duplicatable('value_maps')
 @curry
-@log_learner_time(learner_name="value_mapper")
+@log_learner_time(learner_name='value_mapper')
 def value_mapper(df: pd.DataFrame,
                  value_maps: Dict[str, Dict],
                  ignore_unseen: bool = True,
@@ -402,12 +404,12 @@ def value_mapper(df: pd.DataFrame,
     def p(df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(df, columns, value_maps, replace_unseen=replace_unseen_to)
 
-    return p, p(df), {"value_maps": value_maps}
+    return p, p(df), {'value_maps': value_maps}
 
 
 @column_duplicatable('columns_to_truncate')
 @curry
-@log_learner_time(learner_name="truncate_categorical")
+@log_learner_time(learner_name='truncate_categorical')
 def truncate_categorical(df: pd.DataFrame,
                          columns_to_truncate: List[str],
                          percentile: float,
@@ -454,7 +456,7 @@ def truncate_categorical(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(new_df, columns_to_truncate, vec, replace_unseen)
 
-    p.__doc__ = learner_pred_fn_docstring("truncate_categorical")
+    p.__doc__ = learner_pred_fn_docstring('truncate_categorical')
 
     log: LearnerLogType = {'truncate_categorical': {
         'transformed_column': columns_to_truncate,
@@ -462,17 +464,17 @@ def truncate_categorical(df: pd.DataFrame,
     }
 
     if store_mapping:
-        log["truncate_categorical"]["mapping"] = vec
+        log['truncate_categorical']['mapping'] = vec
 
     return p, p(df), log
 
 
-truncate_categorical.__doc__ += learner_return_docstring("Truncate Categorical")
+truncate_categorical.__doc__ += learner_return_docstring('Truncate Categorical')
 
 
 @column_duplicatable('columns_to_rank')
 @curry
-@log_learner_time(learner_name="rank_categorical")
+@log_learner_time(learner_name='rank_categorical')
 def rank_categorical(df: pd.DataFrame,
                      columns_to_rank: List[str],
                      replace_unseen: Union[str, float] = nan,
@@ -503,16 +505,16 @@ def rank_categorical(df: pd.DataFrame,
     col_categ_getter = lambda col: (df[col]
                                     .value_counts()
                                     .reset_index()
-                                    .sort_values([col, "index"], ascending=[False, True])
-                                    .set_index("index")[col]
-                                    .rank(method="first", ascending=False).to_dict())
+                                    .sort_values([col, 'index'], ascending=[False, True])
+                                    .set_index('index')[col]
+                                    .rank(method='first', ascending=False).to_dict())
 
     vec = {column: col_categ_getter(column) for column in columns_to_rank}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(new_df, columns_to_rank, vec, replace_unseen)
 
-    p.__doc__ = learner_pred_fn_docstring("rank_categorical")
+    p.__doc__ = learner_pred_fn_docstring('rank_categorical')
 
     log: LearnerLogType = {'rank_categorical': {
         'transformed_column': columns_to_rank,
@@ -525,7 +527,7 @@ def rank_categorical(df: pd.DataFrame,
     return p, p(df), log
 
 
-rank_categorical.__doc__ += learner_return_docstring("Rank Categorical")
+rank_categorical.__doc__ += learner_return_docstring('Rank Categorical')
 
 
 @column_duplicatable('columns_to_categorize')
@@ -565,7 +567,7 @@ def count_categorizer(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(new_df, columns_to_categorize, vec, replace_unseen)
 
-    p.__doc__ = learner_pred_fn_docstring("count_categorizer")
+    p.__doc__ = learner_pred_fn_docstring('count_categorizer')
 
     log: LearnerLogType = {'count_categorizer': {
         'transformed_column': columns_to_categorize,
@@ -578,7 +580,7 @@ def count_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-count_categorizer.__doc__ += learner_return_docstring("Count Categorizer")
+count_categorizer.__doc__ += learner_return_docstring('Count Categorizer')
 
 
 @column_duplicatable('columns_to_categorize')
@@ -621,7 +623,7 @@ def label_categorizer(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(new_df, columns_to_categorize, vec, replace_unseen)
 
-    p.__doc__ = learner_pred_fn_docstring("label_categorizer")
+    p.__doc__ = learner_pred_fn_docstring('label_categorizer')
 
     log: LearnerLogType = {'label_categorizer': {
         'transformed_column': columns_to_categorize,
@@ -634,7 +636,7 @@ def label_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-label_categorizer.__doc__ += learner_return_docstring("Label Categorizer")
+label_categorizer.__doc__ += learner_return_docstring('Label Categorizer')
 
 
 @column_duplicatable('columns_to_bin')
@@ -682,7 +684,7 @@ def quantile_biner(df: pd.DataFrame,
         bined_columns = {col: col_biner(col) for col in columns_to_bin}
         return new_df.assign(**bined_columns)
 
-    p.__doc__ = learner_pred_fn_docstring("quantile_biner")
+    p.__doc__ = learner_pred_fn_docstring('quantile_biner')
 
     log = {'quantile_biner': {
         'transformed_column': columns_to_bin,
@@ -691,7 +693,7 @@ def quantile_biner(df: pd.DataFrame,
     return p, p(df), log
 
 
-quantile_biner.__doc__ += learner_return_docstring("Quantile Biner")
+quantile_biner.__doc__ += learner_return_docstring('Quantile Biner')
 
 
 @column_duplicatable('columns_to_categorize')
@@ -736,19 +738,18 @@ def onehot_categorizer(df: pd.DataFrame,
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: ("fklearn_feat__" + col + "==" + str(categ),
+        make_dummies = lambda col: dict(map(lambda categ: (f'fklearn_feat__{col}=={categ}',
                                                            (new_df[col] == categ).astype(int)),
                                             vec[col][int(drop_first_column):]))
 
         oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {"fklearn_feat__" + col + "==" + "nan":
-                                                    (~new_df[col].isin(vec[col])).astype(int)} if hardcode_nans
-                                                else {}).items(),
-                              columns_to_categorize))
+                                                {f'fklearn_feat__{col}==nan':
+                                                    (~new_df[col].isin(vec[col])).astype(int)}
+                                                if hardcode_nans else {}).items(), columns_to_categorize))
 
         return new_df.assign(**oh_cols).drop(columns_to_categorize, axis=1)
 
-    p.__doc__ = learner_pred_fn_docstring("onehot_categorizer")
+    p.__doc__ = learner_pred_fn_docstring('onehot_categorizer')
 
     log = {'onehot_categorizer': {
         'transformed_column': columns_to_categorize,
@@ -761,7 +762,7 @@ def onehot_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
+onehot_categorizer.__doc__ += learner_return_docstring('Onehot Categorizer')
 
 
 @column_duplicatable('columns_to_categorize')
@@ -823,7 +824,7 @@ def target_categorizer(df: pd.DataFrame,
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return apply_replacements(new_df, columns_to_categorize, vec, replace_unseen)
 
-    p.__doc__ = learner_pred_fn_docstring("target_categorizer")
+    p.__doc__ = learner_pred_fn_docstring('target_categorizer')
 
     log = {'target_categorizer': {
         'transformed_columns': columns_to_categorize,
@@ -838,7 +839,7 @@ def target_categorizer(df: pd.DataFrame,
     return p, p(df), log
 
 
-target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
+target_categorizer.__doc__ += learner_return_docstring('Target Categorizer')
 
 
 @column_duplicatable('columns_to_scale')
@@ -874,7 +875,7 @@ def standard_scaler(df: pd.DataFrame,
         new_cols = pd.DataFrame(data=new_data, columns=columns_to_scale).to_dict('list')
         return new_data_set.assign(**new_cols)
 
-    p.__doc__ = learner_pred_fn_docstring("standard_scaler")
+    p.__doc__ = learner_pred_fn_docstring('standard_scaler')
 
     log = {'standard_scaler': {
         'standard_scaler': scaler.get_params(),
@@ -883,7 +884,7 @@ def standard_scaler(df: pd.DataFrame,
     return p, p(df), log
 
 
-standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
+standard_scaler.__doc__ += learner_return_docstring('Standard Scaler')
 
 
 @column_duplicatable('columns_to_transform')
@@ -922,7 +923,7 @@ def custom_transformer(df: pd.DataFrame,
 
         return df.assign(**{col: df[col].swifter.apply(transformation_function) for col in columns_to_transform})
 
-    p.__doc__ = learner_pred_fn_docstring("custom_transformer")
+    p.__doc__ = learner_pred_fn_docstring('custom_transformer')
 
     log = {'custom_transformer': {
         'transformed_column': columns_to_transform,
@@ -932,7 +933,7 @@ def custom_transformer(df: pd.DataFrame,
     return p, p(df), log
 
 
-custom_transformer.__doc__ += learner_return_docstring("Custom Transformer")
+custom_transformer.__doc__ += learner_return_docstring('Custom Transformer')
 
 
 @curry
@@ -982,24 +983,24 @@ def null_injector(df: pd.DataFrame,
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
         return new_data_set
 
-    p.__doc__ = learner_pred_fn_docstring("null_injector")
+    p.__doc__ = learner_pred_fn_docstring('null_injector')
 
     log = {'null_injector': {
-        "columns_to_inject": columns_to_inject,
-        "proportion": proportion,
-        "groups": groups
+        'columns_to_inject': columns_to_inject,
+        'proportion': proportion,
+        'groups': groups
     }}
 
     return p, null_data, log
 
 
-null_injector.__doc__ += learner_return_docstring("Null Injector")
+null_injector.__doc__ += learner_return_docstring('Null Injector')
 
 
 @curry
 @log_learner_time(learner_name='missing_warner')
 def missing_warner(df: pd.DataFrame, cols_list: List[str],
-                   new_column_name: str = "has_unexpected_missing",
+                   new_column_name: str = 'has_unexpected_missing',
                    detailed_warning: bool = False,
                    detailed_column_name: Optional[str] = None) -> LearnerReturnType:
     """
@@ -1028,7 +1029,7 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
 
     def p(dataset: pd.DataFrame) -> pd.DataFrame:
         def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> np.array:
-            cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
+            cols_with_missing = np.array([np.where(df[col].isna(), col, '') for col in cols_to_check]).T
             missing_by_row_list = np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
             if missing_by_row_list.size == 0:
                 return np.empty((df.shape[0], 0)).tolist()
@@ -1042,14 +1043,14 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
         else:
             return new_dataset
 
-    p.__doc__ = learner_pred_fn_docstring("missing_warner")
+    p.__doc__ = learner_pred_fn_docstring('missing_warner')
 
-    log = {"missing_warner": {
-        "cols_list": cols_list,
-        "cols_without_missing": cols_without_missing}
+    log = {'missing_warner': {
+        'cols_list': cols_list,
+        'cols_without_missing': cols_without_missing}
     }
 
     return p, df, log
 
 
-missing_warner.__doc__ += learner_return_docstring("Missing Alerter")
+missing_warner.__doc__ += learner_return_docstring('Missing Alerter')
