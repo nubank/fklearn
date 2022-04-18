@@ -59,7 +59,7 @@ Learner functions are usually partially initialized (curried) before being passe
     from fklearn.training.transformation import capper, floorer, prediction_ranger
 
     # initialize several learner functions
-    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50_000})
+    capper_fn = capper(columns_to_cap=["income"], precomputed_caps={"income": 50000})
     regression_fn = linear_regression_learner(features=["income", "bill_amount"], target="spend")
     ranger_fn = prediction_ranger(prediction_min=0.0, prediction_max=20000.0)
 
