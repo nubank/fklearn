@@ -184,9 +184,11 @@ def parallel_validator_iteration(train_data: pd.DataFrame,
                                  train_fn: LearnerFnType,
                                  eval_fn: EvalFnType,
                                  predict_oof: bool,
+                                 return_train_score: bool = False,
                                  verbose: bool = False) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
-    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
+    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof,
+                               return_train_score, verbose)
 
 
 @curry
@@ -196,6 +198,7 @@ def parallel_validator(train_data: pd.DataFrame,
                        eval_fn: EvalFnType,
                        n_jobs: int = 1,
                        predict_oof: bool = False,
+                       return_train_score: bool = False,
                        verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
@@ -228,6 +231,9 @@ def parallel_validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_train_score : bool
+        Whether to include train scores
+
     verbose: bool
         Whether to show more information about the cross validation or not
 
@@ -238,7 +244,8 @@ def parallel_validator(train_data: pd.DataFrame,
     folds, logs = split_fn(train_data)
 
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, verbose)
+        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, return_train_score,
+                                              verbose)
         for x in enumerate(folds))
     gc.collect()
 
