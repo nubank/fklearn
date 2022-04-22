@@ -21,7 +21,7 @@ def validator_iteration(data: pd.DataFrame,
                         train_fn: LearnerFnType,
                         eval_fn: EvalFnType,
                         predict_oof: bool = False,
-                        return_train_score : bool = False,
+                        return_train_score: bool = False,
                         verbose: bool = False) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
