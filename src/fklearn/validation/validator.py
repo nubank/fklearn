@@ -21,6 +21,7 @@ def validator_iteration(data: pd.DataFrame,
                         train_fn: LearnerFnType,
                         eval_fn: EvalFnType,
                         predict_oof: bool = False,
+                        return_train_score : bool = False,
                         verbose: bool = False) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
@@ -51,6 +52,9 @@ def validator_iteration(data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_train_score : bool
+        Whether to include train scores
+
     Returns
     ----------
     A log-like dictionary evaluations.
@@ -63,6 +67,8 @@ def validator_iteration(data: pd.DataFrame,
     warnings.warn(empty_set_warn) if train_data.shape[0] == 0 else None  # type: ignore
 
     predict_fn, train_out, train_log = train_fn(train_data)
+    if return_train_score:
+        train_log = assoc(train_log, "eval_results", eval_fn(train_out))
 
     eval_results = []
     oof_predictions = []
