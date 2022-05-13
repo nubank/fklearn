@@ -96,6 +96,8 @@ def validator(train_data: pd.DataFrame,
               perturb_fn_train: PerturbFnType = identity,
               perturb_fn_test: PerturbFnType = identity,
               predict_oof: bool = False,
+              return_train_score: bool = False,
+              return_all_train_logs: bool = False,
               verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
@@ -133,6 +135,13 @@ def validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_train_score : bool
+        Whether to include train scores
+
+    return_all_train_logs : bool
+        Whether to return the train logs corresponding to all the splits or to return
+        only the train log corresponding to the first split
+
     verbose: bool
         Whether to show more information about the cross validation or not
 
@@ -149,7 +158,7 @@ def validator(train_data: pd.DataFrame,
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
         return validator_iteration(train_data, train_index, test_indexes, fold_num,
-                                   train_fn, eval_fn, predict_oof, verbose)
+                                   train_fn, eval_fn, predict_oof, return_train_score, verbose)
 
     zipped_logs = pipe(folds,
                        enumerate,
@@ -167,16 +176,19 @@ def validator(train_data: pd.DataFrame,
         return args['cols'] if args else []
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
-    first_train_log = first(train_logs)
+    if return_all_train_logs:
+        train_logs = {"train_log": [log['train_log'] for log in train_logs]}
+    else:
+        train_logs = first(train_logs)
 
     perturbator_log = {'perturbated_train': [], 'perturbated_test': []}  # type: LogType
     if perturb_fn_train != identity:
         perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
     if perturb_fn_test != identity:
         perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
-    first_train_log = assoc(first_train_log, "perturbator_log", perturbator_log)
+    train_logs = assoc(train_logs, "perturbator_log", perturbator_log)
 
-    return assoc(first_train_log, "validator_log", list(validator_logs))
+    return assoc(train_logs, "validator_log", list(validator_logs))
 
 
 def parallel_validator_iteration(train_data: pd.DataFrame,
