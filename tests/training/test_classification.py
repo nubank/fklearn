@@ -431,6 +431,7 @@ def test_lgbm_classification_learner():
                                                  learning_rate=0.1,
                                                  num_estimators=20,
                                                  extra_params={"max_depth": 4, "seed": 42},
+                                                 categorical_features=["x2"],
                                                  prediction_column="prediction",
                                                  weight_column="w")
 
