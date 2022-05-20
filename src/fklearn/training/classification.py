@@ -502,6 +502,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 learning_rate: float = 0.1,
                                 num_estimators: int = 100,
                                 extra_params: LogType = None,
+                                categorical_features: List[str] = "auto",
                                 prediction_column: str = "prediction",
                                 weight_column: str = None,
                                 encode_extra_cols: bool = True) -> LearnerReturnType:
@@ -549,6 +550,11 @@ def lgbm_classification_learner(df: pd.DataFrame,
         https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
         If not passed, the default will be used.
 
+    categorical_features : list of str, or 'auto', optional (default="auto")
+        A list of column names that should be treated as categorical features.
+        See the categorical_feature hyper-parameter in:
+        https://github.com/Microsoft/LightGBM/blob/master/docs/Parameters.rst
+
     prediction_column : str
         The name of the column with the predictions from the model.
 
@@ -570,7 +576,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
-                          silent=True)
+                          silent=True, categorical_feature=categorical_features)
 
     bst = lgbm.train(params, dtrain, num_estimators)
 
