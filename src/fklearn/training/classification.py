@@ -575,7 +575,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
-    dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
+    dtrain = lgbm.Dataset(df[features], label=df[target], feature_name=list(map(str, features)), weight=weights,
                           silent=True, categorical_feature=categorical_features)
 
     bst = lgbm.train(params, dtrain, num_estimators)
