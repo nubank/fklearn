@@ -460,7 +460,7 @@ def test_lgbm_classification_learner():
     assert pred_test_binary.prediction.max() < 1
     assert pred_test_binary.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
-    assert log['object'].dump_model()['tree_info'][0]['num_cat'] == 0
+    assert all(tree['num_cat'] == 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test
     pred_shap = predict_fn_binary(df_test_binary, apply_shap=True)
@@ -489,7 +489,7 @@ def test_lgbm_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
-    assert log['object'].dump_model()['tree_info'][0]['num_cat'] == 0
+    assert all(tree['num_cat'] == 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test multinomial
     pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
@@ -523,7 +523,7 @@ def test_lgbm_classification_learner():
     assert pred_test_categorical.prediction.max() < 1
     assert pred_test_categorical.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
-    assert log['object'].dump_model()['tree_info'][0]['num_cat'] > 0
+    assert any(tree['num_cat'] > 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test
     pred_shap = predict_fn_categorical(df_test_categorical, apply_shap=True)
