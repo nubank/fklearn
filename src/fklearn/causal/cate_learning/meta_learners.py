@@ -8,8 +8,7 @@ from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
 from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
-from fklearn.types import (LearnerFnType, LearnerReturnType, PredictFnType,
-                           UncurriedLearnerFnType)
+from fklearn.types import (LearnerFnType, LearnerReturnType, PredictFnType)
 from toolz import curry
 
 TREATMENT_FEATURE = "is_treatment"
