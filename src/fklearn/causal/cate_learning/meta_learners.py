@@ -1,6 +1,6 @@
 import copy
 import inspect
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -8,7 +8,8 @@ from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
 from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
-from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
+from fklearn.types import (LearnerFnType, LearnerReturnType, PredictFnType,
+                           UncurriedLearnerFnType)
 from toolz import curry
 
 TREATMENT_FEATURE = "is_treatment"
@@ -77,7 +78,7 @@ def _fit_by_treatment(
 
 def _predict_for_control(
     df: pd.DataFrame, learner_fcn: PredictFnType, prediction_column: str
-) -> np.array:
+) -> np.ndarray:
     control_flag = np.zeros(df.shape[0])
     df[TREATMENT_FEATURE] = control_flag
     control_pred_df = learner_fcn(df)
@@ -86,7 +87,7 @@ def _predict_for_control(
 
 def _predict_for_treatment(
     df: pd.DataFrame, learner_fcn: PredictFnType, prediction_column: str
-) -> np.array:
+) -> np.ndarray:
     treatment_flag = np.ones(df.shape[0])
     df[TREATMENT_FEATURE] = treatment_flag
     treatment_pred_df = learner_fcn(df)
@@ -138,7 +139,7 @@ def causal_s_classification_learner(
     control_name: str,
     prediction_column: str,
     learner: LearnerFnType = None,
-    learner_transformers: List[LearnerFnType] = None,
+    learner_transformers: Union[List[LearnerFnType], LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
     Fits a Causal S-Learner classifier. The S-learner is a meta-learner which
@@ -209,7 +210,7 @@ def causal_s_classification_learner(
         treatments=unique_treatments,
     )
 
-    def p(new_df: pd.DataFrame):
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
         scored_df = _prediction_by_treatment_flag(
             df=new_df,
             treatments=unique_treatments,
