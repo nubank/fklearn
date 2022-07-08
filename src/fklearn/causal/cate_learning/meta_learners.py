@@ -8,7 +8,8 @@ from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
 from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
-from fklearn.types import (LearnerFnType, LearnerReturnType, PredictFnType)
+from fklearn.types import (LearnerFnType, LearnerMutableFeaturesFnType,
+                           LearnerReturnType, PredictFnType)
 from toolz import curry
 
 TREATMENT_FEATURE = "is_treatment"
@@ -18,7 +19,7 @@ def _append_treatment_feature(features: list, treatment_feature: str) -> list:
     return features + [treatment_feature]
 
 
-def _get_learner_features(learner: LearnerFnType) -> list:
+def _get_learner_features(learner: LearnerMutableFeaturesFnType) -> list:
     return inspect.signature(learner).parameters["features"].default
 
 
@@ -99,7 +100,6 @@ def _prediction_by_treatment_flag(
     uplift_cols = []
     scored_df = df.copy()
     for treatment in treatments:
-
         learner_fcn = learners[treatment]
 
         scored_df[
@@ -137,8 +137,8 @@ def causal_s_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerFnType = None,
-    learner_transformers: Union[List[LearnerFnType], LearnerFnType] = None,
+    learner: LearnerMutableFeaturesFnType = None,
+    learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
     Fits a Causal S-Learner classifier. The S-learner is a meta-learner which
@@ -187,9 +187,6 @@ def causal_s_classification_learner(
     features_with_treatment = _append_treatment_feature(features, TREATMENT_FEATURE)
     unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
 
-    if not isinstance(learner_transformers, list):
-        learner_transformers = [learner_transformers]
-
     if learner_transformers is not None:
         learner_transformers = copy.deepcopy(learner_transformers)
         learner_pipe = build_pipeline(
@@ -199,7 +196,7 @@ def causal_s_classification_learner(
             + learner_transformers
         )
     else:
-        learner_pipe = learner
+        learner_pipe = learner(features=features_with_treatment)
 
     fitted_learners, learners_logs = _fit_by_treatment(
         df=df,
