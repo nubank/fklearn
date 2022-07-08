@@ -137,7 +137,7 @@ def causal_s_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerMutableFeaturesFnType = None,
+    learner: LearnerMutableFeaturesFnType,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
@@ -178,11 +178,7 @@ def causal_s_classification_learner(
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
     """
 
-    if learner is None:
-        learner = copy.deepcopy(lgbm_classification_learner)
-    else:
-        learner = copy.deepcopy(learner)
-
+    learner = copy.deepcopy(learner)
     features = _get_learner_features(learner)
     features_with_treatment = _append_treatment_feature(features, TREATMENT_FEATURE)
     unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
