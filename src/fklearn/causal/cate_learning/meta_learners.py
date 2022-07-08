@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
-from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import (LearnerFnType, LearnerMutableFeaturesFnType,
                            LearnerReturnType, PredictFnType)
