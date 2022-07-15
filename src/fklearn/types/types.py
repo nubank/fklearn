@@ -18,7 +18,7 @@ LearnerReturnType = Tuple[PredictFnType, pd.DataFrame, LearnerLogType]
 
 UncurriedLearnerFnType = Callable[..., LearnerReturnType]
 LearnerFnType = Callable[[pd.DataFrame], LearnerReturnType]
-LearnerMutableFeaturesFnType = Callable[..., LearnerFnType]
+LearnerMutableParametersFnType = Callable[..., LearnerFnType]
 
 # Evaluator types
 EvalReturnType = Dict[str, Union[float, Dict]]

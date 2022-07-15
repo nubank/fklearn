@@ -7,7 +7,7 @@ import pandas as pd
 from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
 from fklearn.training.pipeline import build_pipeline
-from fklearn.types import (LearnerFnType, LearnerMutableFeaturesFnType,
+from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
                            LearnerReturnType, PredictFnType)
 from toolz import curry
 
@@ -18,7 +18,7 @@ def _append_treatment_feature(features: list, treatment_feature: str) -> list:
     return features + [treatment_feature]
 
 
-def _get_learner_features(learner: LearnerMutableFeaturesFnType) -> list:
+def _get_learner_features(learner: LearnerMutableParametersFnType) -> list:
     return inspect.signature(learner).parameters["features"].default
 
 
@@ -142,7 +142,7 @@ def causal_s_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerMutableFeaturesFnType,
+    learner: LearnerMutableParametersFnType,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
