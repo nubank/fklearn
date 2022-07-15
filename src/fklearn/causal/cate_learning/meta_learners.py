@@ -75,25 +75,25 @@ def _fit_by_treatment(
     return fitted_learners, learners_logs
 
 
-def _predict_for_control(
-    df: pd.DataFrame, learner_fcn: PredictFnType, prediction_column: str
+def _predict_by_treatment_flag(
+    df: pd.DataFrame,
+    learner_fcn: PredictFnType,
+    is_treatment: bool,
+    prediction_column: str,
 ) -> np.ndarray:
-    control_flag = np.zeros(df.shape[0])
-    df[TREATMENT_FEATURE] = control_flag
-    control_pred_df = learner_fcn(df)
-    return control_pred_df[prediction_column].values
 
+    if is_treatment:
+        treatment_flag = np.ones(df.shape[0])
+    else:
+        treatment_flag = np.zeros(df.shape[0])
 
-def _predict_for_treatment(
-    df: pd.DataFrame, learner_fcn: PredictFnType, prediction_column: str
-) -> np.ndarray:
-    treatment_flag = np.ones(df.shape[0])
     df[TREATMENT_FEATURE] = treatment_flag
-    treatment_pred_df = learner_fcn(df)
-    return treatment_pred_df[prediction_column].values
+    prediction_df = learner_fcn(df)
+
+    return prediction_df[prediction_column].values
 
 
-def _prediction_by_treatment_flag(
+def _simulate_treatment_effect(
     df: pd.DataFrame, treatments: list, learners: dict, prediction_column: str
 ) -> pd.DataFrame:
     uplift_cols = []
@@ -103,13 +103,19 @@ def _prediction_by_treatment_flag(
 
         scored_df[
             f"treatment_{treatment}__{prediction_column}_on_treatment"
-        ] = _predict_for_treatment(
-            df=scored_df, learner_fcn=learner_fcn, prediction_column=prediction_column
+        ] = _predict_by_treatment_flag(
+            df=scored_df,
+            learner_fcn=learner_fcn,
+            is_treatment=True,
+            prediction_column=prediction_column,
         )
         scored_df[
             f"treatment_{treatment}__{prediction_column}_on_control"
-        ] = _predict_for_control(
-            df=scored_df, learner_fcn=learner_fcn, prediction_column=prediction_column
+        ] = _predict_by_treatment_flag(
+            df=scored_df,
+            learner_fcn=learner_fcn,
+            is_treatment=False,
+            prediction_column=prediction_column,
         )
 
         uplift_cols.append(f"treatment_{treatment}__uplift")
@@ -202,7 +208,7 @@ def causal_s_classification_learner(
     )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        scored_df = _prediction_by_treatment_flag(
+        scored_df = _simulate_treatment_effect(
             df=new_df,
             treatments=unique_treatments,
             learners=fitted_learners,
