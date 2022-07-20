@@ -1,17 +1,21 @@
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
-
+from pandas.testing import assert_frame_equal
 from fklearn.training.classification import logistic_classification_learner
 from fklearn.causal.cate_learning.meta_learners import (
     TREATMENT_FEATURE,
     _append_treatment_feature,
+    # _get_learner_features,
     _get_unique_treatments,
     _filter_by_treatment,
     _create_treatment_flag,
     _fit_by_treatment,
     _predict_by_treatment_flag,
+    _simulate_treatment_effect,
 )
+
+from unittest.mock import create_autospec
 
 
 def test__append_treatment_feature():
@@ -204,22 +208,61 @@ def test__predict_by_treatment_flag_negative():
     assert prediction_array == expected_array
 
 
-# def test__simulate_treatment_effect():
-#     df = pd.DataFrame({
-#         'x1': [1.3, 1.0, 1.8, -0.1, 0.0, 1.0, 2.2, 0.4, -5.0],
-#         "x2": [10, 4, 15, 6, 5, 12, 14, 5, 12],
-#         "treatment": ["A", "B", "A", "A", "B", "control", "control", "B", "control"],
-#         'target': [1, 1, 1, 0, 0, 1, 0, 0, 1]
-#     })
+def test__simulate_treatment_effect():
+    df = pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1],
+            "x2": [10, 4, 15, 6],
+            "treatment": ["A", "B", "A", "control"],
+            "target": [0, 0, 0, 1],
+        }
+    )
 
-#     treatments = ["A", "B"]
+    expected = pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1],
+            "x2": [10, 4, 15, 6],
+            "treatment": ["A", "B", "A", "control"],
+            "target": [0, 0, 0, 1],
+            "treatment_A__prediction_on_treatment": [0.3, 0.3, 0.0, 1.0],
+            "treatment_A__prediction_on_control": [0.2, 0.5, 0.3, 0.0],
+            "treatment_A__uplift": [0.1, -0.2, -0.3, 1.0],
+            "treatment_B__prediction_on_treatment": [0.6, 0.7, 0.0, 1.0],
+            "treatment_B__prediction_on_control": [1.0, 0.5, 1.0, 1.0],
+            "treatment_B__uplift": [-0.4, 0.2, -1.0, 0.0],
+            "uplift": [0.1, 0.2, -0.3, 1.0],
+            "suggested_treatment": [
+                "treatment_A_",
+                "treatment_B_",
+                "treatment_A_",
+                "treatment_A_",
+            ],
+        }
+    )
 
-#     learner_binary = logistic_classification_learner(features=["x1", "x2", TREATMENT_FEATURE],
-#                                                      target="target",
-#                                                      params={"max_iter": 10})
+    treatments = ["A", "B"]
+    control_name = "control"
 
-#     learners, _ = _fit_by_treatment(df,
-#                                     learner=learner_binary,
-#                                     treatment_col="treatment",
-#                                     control_name="control",
-#                                     treatments=treatments)
+    mock_learner = create_autospec(logistic_classification_learner)
+    mock_learner.side_effect = [
+        pd.DataFrame({"prediction": [0.3, 0.3, 0.0, 1.0]}),
+        # treatment = A, apply treatment = 1
+        pd.DataFrame({"prediction": [0.2, 0.5, 0.3, 0.0]}),
+        # treatment = A, apply treatment = 0
+        pd.DataFrame({"prediction": [0.6, 0.7, 0.0, 1.0]}),
+        # treatment = B, apply treatment = 1
+        pd.DataFrame({"prediction": [1.0, 0.5, 1.0, 1.0]})
+        # treatment = B, apply treatment = 0
+    ]
+
+    learners = {"A": mock_learner, "B": mock_learner}
+
+    results = _simulate_treatment_effect(
+        df,
+        treatments=treatments,
+        control_name=control_name,
+        learners=learners,
+        prediction_column="prediction",
+    )
+
+    assert_frame_equal(results, expected)
