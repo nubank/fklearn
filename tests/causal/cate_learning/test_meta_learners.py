@@ -112,7 +112,7 @@ def test__create_treatment_flag():
         df, treatment_col="group", treatment_name="treatment"
     )
 
-    assert_frame_equal(results == expected)
+    assert_frame_equal(results, expected)
 
 
 def test__fit_by_treatment():
