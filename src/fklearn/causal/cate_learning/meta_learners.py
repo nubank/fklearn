@@ -94,7 +94,11 @@ def _predict_by_treatment_flag(
 
 
 def _simulate_treatment_effect(
-    df: pd.DataFrame, treatments: list, learners: dict, prediction_column: str
+    df: pd.DataFrame,
+    treatments: list,
+    control_name: str,
+    learners: dict,
+    prediction_column: str,
 ) -> pd.DataFrame:
     uplift_cols = []
     scored_df = df.copy()
@@ -125,7 +129,11 @@ def _simulate_treatment_effect(
         )
 
     scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
-    scored_df["suggested_treatment"] = scored_df[uplift_cols].idxmax(axis=1).values
+    scored_df["suggested_treatment"] = np.where(
+        scored_df["uplift"].values <= 0,
+        control_name,
+        scored_df[uplift_cols].idxmax(axis=1).values,
+    )
     scored_df["suggested_treatment"] = (
         scored_df["suggested_treatment"]
         .apply(lambda x: x.replace("_uplift", ""))
@@ -170,6 +178,9 @@ def causal_s_classification_learner(
     treatment_col: str
         The name of the column in `df` which contains the names of
         the treatments or control to which each data sample was subjected.
+
+    control_name: str
+        The name of the control group.
 
     prediction_column : str
         The name of the column with the predictions from the model.
