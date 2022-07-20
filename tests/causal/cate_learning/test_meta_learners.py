@@ -49,9 +49,12 @@ def test__get_unique_treatments():
         }
     )
 
-    assert _get_unique_treatments(
+    filtered = _get_unique_treatments(
         df, treatment_col="treatment", control_name="control"
-    ) == ["treatment_A", "treatment_B", "treatment_C"]
+    )
+    expected = ["treatment_A", "treatment_B", "treatment_C"]
+
+    assert sorted(filtered) == sorted(expected)
 
 
 def test__filter_by_treatment():
@@ -73,19 +76,18 @@ def test__filter_by_treatment():
         [3.0, "control", 1],
     ]
 
-    expected_df: DataFrame = pd.DataFrame(
+    expected: DataFrame = pd.DataFrame(
         data=expected_values, columns=["feat1", "treatment", "target"]
     )
 
-    assert (
-        _filter_by_treatment(
-            df,
-            treatment_col="treatment",
-            treatment_name=selected_treatment,
-            control_name="control",
-        )
-        == expected_df
+    results = _filter_by_treatment(
+        df,
+        treatment_col="treatment",
+        treatment_name=selected_treatment,
+        control_name="control",
     )
+
+    assert_frame_equal(results, expected)
 
 
 def test__create_treatment_flag():
@@ -97,7 +99,7 @@ def test__create_treatment_flag():
         }
     )
 
-    expected_df = pd.DataFrame(
+    expected = pd.DataFrame(
         {
             "feature": [1.3, 1.0, 1.8, -0.1],
             "group": ["treatment", "treatment", "control", "control"],
@@ -106,10 +108,11 @@ def test__create_treatment_flag():
         }
     )
 
-    assert (
-        _create_treatment_flag(df, treatment_col="group", treatment_name="treatment")
-        == expected_df
+    results = _create_treatment_flag(
+        df, treatment_col="group", treatment_name="treatment"
     )
+
+    assert_frame_equal(results == expected)
 
 
 def test__fit_by_treatment():
@@ -177,7 +180,7 @@ def test__predict_by_treatment_flag_positive():
     expected_array = np.array([0.79878432, 0.65191703, 0.88361953, 0.68358276])
 
     assert TREATMENT_FEATURE in df.columns
-    assert prediction_array == expected_array
+    assert np.allclose(prediction_array, expected_array, atol=1e-9)
 
 
 def test__predict_by_treatment_flag_negative():
@@ -205,7 +208,7 @@ def test__predict_by_treatment_flag_negative():
     expected_array = np.array([0.78981053, 0.63935056, 0.87785064, 0.67158357])
 
     assert TREATMENT_FEATURE in df.columns
-    assert prediction_array == expected_array
+    assert np.allclose(prediction_array, expected_array, atol=1e-9)
 
 
 def test__simulate_treatment_effect():
