@@ -6,13 +6,11 @@ from fklearn.training.classification import logistic_classification_learner
 from fklearn.causal.cate_learning.meta_learners import (
     TREATMENT_FEATURE,
     _append_treatment_feature,
-    _get_learner_features,
     _get_unique_treatments,
     _filter_by_treatment,
     _create_treatment_flag,
     _fit_by_treatment,
     _predict_by_treatment_flag,
-    _simulate_treatment_effect,
 )
 
 
