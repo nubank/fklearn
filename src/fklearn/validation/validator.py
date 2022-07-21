@@ -53,7 +53,7 @@ def validator_iteration(data: pd.DataFrame,
         Whether to return out of fold predictions on the logs
 
     return_eval_fn_on_train : bool
-        Whether to apply eval_fn to the training set and return the evaluation logs in the train log
+        Whether to apply eval_fn to the training set and return the resulting logs in the train log
 
     Returns
     ----------
@@ -136,7 +136,7 @@ def validator(train_data: pd.DataFrame,
         Whether to return out of fold predictions on the logs
 
     return_eval_fn_on_train : bool
-        Whether to apply eval_fn to the training sets and return the evaluation logs in the train logs
+        Whether to apply eval_fn to the training set of each split and return the resulting logs in the train logs
 
     return_all_train_logs : bool
         Whether to return the train logs corresponding to all the splits or to return
@@ -244,7 +244,7 @@ def parallel_validator(train_data: pd.DataFrame,
         Whether to return out of fold predictions on the logs
 
     return_eval_fn_on_train : bool
-        Whether to apply eval_fn to the training sets and return the evaluation logs in the train logs
+        Whether to apply eval_fn to the training set of each split and return the resulting logs in the train logs
 
     verbose: bool
         Whether to show more information about the cross validation or not
