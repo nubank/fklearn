@@ -42,7 +42,7 @@ def _filter_by_treatment(
     if control_name not in treatment_control_values:
         raise MissingControlError()
 
-    if treatment_col not in treatment_control_values:
+    if treatment_name not in treatment_control_values:
         raise MissingTreatmentError()
 
     treatment_control_df = df.loc[
@@ -64,7 +64,7 @@ def _create_treatment_flag(
     if control_name not in treatment_control_values:
         raise MissingControlError()
 
-    if treatment_col not in treatment_control_values:
+    if treatment_name not in treatment_control_values:
         raise MissingTreatmentError()
 
     treatment_flag = np.where(df[treatment_col] == treatment_name, 1.0, 0.0)
