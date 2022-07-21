@@ -140,7 +140,7 @@ def validator(train_data: pd.DataFrame,
 
     return_all_train_logs : bool
         Whether to return the train logs corresponding to all the splits or to return
-        only the train log corresponding to the first split
+        only the train log corresponding to the first split (default behavior = only first split)
 
     verbose: bool
         Whether to show more information about the cross validation or not
@@ -177,7 +177,7 @@ def validator(train_data: pd.DataFrame,
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     if return_all_train_logs:
-        train_logs = {"train_log": [log['train_log'] for log in train_logs]}
+        train_logs = {"train_log": [log["train_log"] for log in train_logs]}
     else:
         train_logs = first(train_logs)
 
