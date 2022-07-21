@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
+from fklearn.exceptions.exceptions import (MissingControlError,
+                                           MissingTreatmentError,
+                                           MultipleTreatmentsError)
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
                            LearnerReturnType, PredictFnType)
@@ -25,12 +28,23 @@ def _get_learner_features(learner: LearnerMutableParametersFnType) -> list:
 def _get_unique_treatments(
     df: pd.DataFrame, treatment_col: str, control_name: str
 ) -> list:
+    if control_name not in df[treatment_col].unique():
+        raise MissingControlError()
+
     return [col for col in df[treatment_col].unique() if col != control_name]
 
 
 def _filter_by_treatment(
     df: pd.DataFrame, treatment_col: str, treatment_name: str, control_name: str
 ) -> pd.DataFrame:
+    treatment_control_values = df[treatment_col].unique()
+
+    if control_name not in treatment_control_values:
+        raise MissingControlError()
+
+    if treatment_col not in treatment_control_values:
+        raise MissingTreatmentError()
+
     treatment_control_df = df.loc[
         (df[treatment_col] == treatment_name) | (df[treatment_col] == control_name), :
     ]
@@ -38,9 +52,21 @@ def _filter_by_treatment(
 
 
 def _create_treatment_flag(
-    df: pd.DataFrame, treatment_col: str, treatment_name: str
+    df: pd.DataFrame, treatment_col: str, treatment_name: str, control_name: str
 ) -> pd.DataFrame:
     df = df.copy()
+
+    treatment_control_values = df[treatment_col].unique()
+
+    if len(_get_unique_treatments(df, treatment_col, control_name)) > 1:
+        raise MultipleTreatmentsError()
+
+    if control_name not in treatment_control_values:
+        raise MissingControlError()
+
+    if treatment_col not in treatment_control_values:
+        raise MissingTreatmentError()
+
     treatment_flag = np.where(df[treatment_col] == treatment_name, 1.0, 0.0)
     df[TREATMENT_FEATURE] = treatment_flag
 
@@ -67,6 +93,7 @@ def _fit_by_treatment(
             df=treatment_control_df,
             treatment_col=treatment_col,
             treatment_name=treatment,
+            control_name=control_name,
         )
         learner_fcn, _, learner_log = learner(treatment_control_df)
         fitted_learners[treatment] = learner_fcn
@@ -81,7 +108,6 @@ def _predict_by_treatment_flag(
     is_treatment: bool,
     prediction_column: str,
 ) -> np.ndarray:
-
     if is_treatment:
         treatment_flag = np.ones(df.shape[0])
     else:
