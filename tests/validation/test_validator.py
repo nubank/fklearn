@@ -54,7 +54,7 @@ def test_validator_iteration():
     assert result['train_log']['xgb_classification_learner']['features'] == ['f1']
     assert result['eval_results'][0]['some_score'] == 1.2
 
-    # test return_train_score=True
+    # test return_eval_fn_on_train=True
     result = validator_iteration(data, train_index, test_indexes, 1, train_fn, eval_fn, False, True)
     assert result['train_log']['eval_results']['some_score'] == 1.2
 
