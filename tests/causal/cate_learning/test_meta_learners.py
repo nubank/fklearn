@@ -1,7 +1,13 @@
 import numpy as np
 import pandas as pd
+import pytest
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
+from fklearn.exceptions.exceptions import (
+    MultipleTreatmentsError,
+    MissingTreatmentError,
+    MissingControlError,
+)
 from fklearn.training.classification import logistic_classification_learner
 from fklearn.causal.cate_learning.meta_learners import (
     TREATMENT_FEATURE,
@@ -87,7 +93,88 @@ def test__filter_by_treatment():
         control_name="control",
     )
 
-    assert_frame_equal(results, expected)
+    assert_frame_equal(results.reset_index(drop=True), expected)
+
+
+def test__create_treatment_flag_missing_control():
+    with pytest.raises(Exception) as e:
+        df = pd.DataFrame(
+            {
+                "feature": [1.0, 4.0, 1.0, 5.0, 3.0],
+                "treatment": [
+                    "treatment_A",
+                    "treatment_A",
+                    "treatment_A",
+                    "treatment_A",
+                    "treatment_A",
+                ],
+                "target": [1, 1, 0, 0, 1],
+            }
+        )
+
+        _create_treatment_flag(
+            df,
+            treatment_col="treatment",
+            treatment_name="treatment_A",
+            control_name="control",
+        )
+
+    assert e.type == MissingControlError
+    assert e.value.args[0] == "Data does not contain the specified control."
+
+
+def test__create_treatment_flag_missing_treatment():
+    with pytest.raises(Exception) as e:
+        df = pd.DataFrame(
+            {
+                "feature": [1.0, 4.0, 1.0, 5.0, 3.0],
+                "treatment": [
+                    "control",
+                    "control",
+                    "control",
+                    "control",
+                    "control",
+                ],
+                "target": [1, 1, 0, 0, 1],
+            }
+        )
+
+        _create_treatment_flag(
+            df,
+            treatment_col="treatment",
+            treatment_name="treatment_A",
+            control_name="control",
+        )
+
+    assert e.type == MissingTreatmentError
+    assert e.value.args[0] == "Data does not contain the specified treatment."
+
+
+def test__create_treatment_flag_multiple_treatments():
+    with pytest.raises(Exception) as e:
+        df = pd.DataFrame(
+            {
+                "feature": [1.0, 4.0, 1.0, 5.0, 3.0],
+                "treatment": [
+                    "treatment_A",
+                    "treatment_C",
+                    "treatment_B",
+                    "treatment_A",
+                    "control",
+                ],
+                "target": [1, 1, 0, 0, 1],
+            }
+        )
+
+        _create_treatment_flag(
+            df,
+            treatment_col="treatment",
+            treatment_name="treatment_A",
+            control_name="control",
+        )
+
+    assert e.type == MultipleTreatmentsError
+    assert e.value.args[0] == "Data contains multiple treatments."
 
 
 def test__create_treatment_flag():
@@ -109,7 +196,7 @@ def test__create_treatment_flag():
     )
 
     results = _create_treatment_flag(
-        df, treatment_col="group", treatment_name="treatment"
+        df, treatment_col="group", control_name="control", treatment_name="treatment"
     )
 
     assert_frame_equal(results, expected)
@@ -237,7 +324,7 @@ def test__simulate_treatment_effect():
             "suggested_treatment": [
                 "treatment_A_",
                 "treatment_B_",
-                "treatment_A_",
+                "control",
                 "treatment_A_",
             ],
         }
