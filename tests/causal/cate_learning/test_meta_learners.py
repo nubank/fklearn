@@ -12,7 +12,6 @@ from fklearn.training.classification import logistic_classification_learner
 from fklearn.causal.cate_learning.meta_learners import (
     TREATMENT_FEATURE,
     _append_treatment_feature,
-    # _get_learner_features,
     _get_unique_treatments,
     _filter_by_treatment,
     _create_treatment_flag,
@@ -33,10 +32,6 @@ def test__append_treatment_feature():
     ]
     assert len(features) > 0
     assert treatment_feature
-
-
-# def test__get_learner_features():
-#   assert
 
 
 def test__get_unique_treatments():
@@ -242,32 +237,30 @@ def test__fit_by_treatment():
     assert len(logs) == len(treatments)
 
 
+def ones_or_zeros_model(df):
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        pred = new_df[TREATMENT_FEATURE].values
+
+        col_dict = {"prediction": pred[:]}
+
+        return new_df.assign(**col_dict)
+
+    return p(df)
+
+
 def test__predict_by_treatment_flag_positive():
     df = pd.DataFrame(
         {
             "x1": [1.3, 1.0, 1.8, -0.1],
             "x2": [10, 4, 15, 6],
-            TREATMENT_FEATURE: [1.0, 1.0, 0.0, 0.0],
             "target": [1, 1, 1, 0],
         }
     )
 
-    learner_binary = logistic_classification_learner(
-        features=["x1", "x2", TREATMENT_FEATURE],
-        target="target",
-        params={"max_iter": 10},
-    )
-
-    predict_fn, pred_df, log = learner_binary(df)
-
-    prediction_array = _predict_by_treatment_flag(
-        df, learner_fcn=predict_fn, is_treatment=True, prediction_column="prediction"
-    )
-
-    expected_array = np.array([0.79878432, 0.65191703, 0.88361953, 0.68358276])
-
-    assert TREATMENT_FEATURE in df.columns
-    assert np.allclose(prediction_array, expected_array, atol=1e-9)
+    assert (
+        _predict_by_treatment_flag(df, ones_or_zeros_model, True, "prediction")
+        == np.ones(df.shape[0])
+    ).all()
 
 
 def test__predict_by_treatment_flag_negative():
@@ -275,27 +268,14 @@ def test__predict_by_treatment_flag_negative():
         {
             "x1": [1.3, 1.0, 1.8, -0.1],
             "x2": [10, 4, 15, 6],
-            TREATMENT_FEATURE: [1.0, 1.0, 0.0, 0.0],
             "target": [1, 1, 1, 0],
         }
     )
 
-    learner_binary = logistic_classification_learner(
-        features=["x1", "x2", TREATMENT_FEATURE],
-        target="target",
-        params={"max_iter": 10},
-    )
-
-    predict_fn, pred_df, log = learner_binary(df)
-
-    prediction_array = _predict_by_treatment_flag(
-        df, learner_fcn=predict_fn, is_treatment=False, prediction_column="prediction"
-    )
-
-    expected_array = np.array([0.78981053, 0.63935056, 0.87785064, 0.67158357])
-
-    assert TREATMENT_FEATURE in df.columns
-    assert np.allclose(prediction_array, expected_array, atol=1e-9)
+    assert (
+        _predict_by_treatment_flag(df, ones_or_zeros_model, False, "prediction")
+        == np.zeros(df.shape[0])
+    ).all()
 
 
 def test__simulate_treatment_effect():
