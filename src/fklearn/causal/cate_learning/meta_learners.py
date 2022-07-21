@@ -223,6 +223,7 @@ def causal_s_classification_learner(
             df=new_df,
             treatments=unique_treatments,
             learners=fitted_learners,
+            control_name=control_name,
             prediction_column=prediction_column,
         )
         return scored_df
