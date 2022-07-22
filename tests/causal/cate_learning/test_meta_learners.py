@@ -18,9 +18,10 @@ from fklearn.causal.cate_learning.meta_learners import (
     _fit_by_treatment,
     _predict_by_treatment_flag,
     _simulate_treatment_effect,
+    causal_s_classification_learner,
 )
 
-from unittest.mock import create_autospec
+from unittest.mock import create_autospec, patch
 
 
 def test__append_treatment_feature():
@@ -336,3 +337,58 @@ def test__simulate_treatment_effect():
     )
 
     assert_frame_equal(results, expected)
+
+
+@patch("fklearn.causal.cate_learning.meta_learners._simulate_treatment_effect")
+@patch("fklearn.causal.cate_learning.meta_learners._fit_by_treatment")
+@patch("fklearn.causal.cate_learning.meta_learners._get_unique_treatments")
+@patch("fklearn.causal.cate_learning.meta_learners._append_treatment_feature")
+@patch("fklearn.causal.cate_learning.meta_learners._get_learner_features")
+def test_causal_s_classification_learner_post_fit(
+    mock_get_learner_features,
+    mock_append_treatment_feature,
+    mock_get_unique_treatments,
+    mock_fit_by_treatment,
+    mock_simulate_treatment_effect,
+):
+
+    df = pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1, 0.0, 1.0, 2.2, 0.4, -5.0],
+            "x2": [10, 4, 15, 6, 5, 12, 14, 5, 12],
+            "treatment": [
+                "A",
+                "B",
+                "A",
+                "A",
+                "B",
+                "control",
+                "control",
+                "B",
+                "control",
+            ],
+            "target": [1, 1, 1, 0, 0, 1, 0, 0, 1],
+        }
+    )
+
+    mock_model = create_autospec(logistic_classification_learner)
+    mock_fit_by_treatment.side_effect = [
+        # treatment = A
+        (ones_or_zeros_model, dict()),
+        # treatment = b
+        (ones_or_zeros_model, dict()),
+    ]
+
+    causal_s_classification_learner(
+        df,
+        treatment_col="treatment",
+        control_name="control",
+        prediction_column="prediction",
+        learner=mock_model,
+    )
+
+    mock_get_learner_features.assert_called()
+    mock_append_treatment_feature.assert_called()
+    mock_get_unique_treatments.assert_called()
+    mock_fit_by_treatment.assert_called()
+    mock_simulate_treatment_effect.assert_called()
