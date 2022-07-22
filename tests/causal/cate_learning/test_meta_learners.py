@@ -344,7 +344,7 @@ def test__simulate_treatment_effect():
 @patch("fklearn.causal.cate_learning.meta_learners._get_unique_treatments")
 @patch("fklearn.causal.cate_learning.meta_learners._append_treatment_feature")
 @patch("fklearn.causal.cate_learning.meta_learners._get_learner_features")
-def test_causal_s_classification_learner_post_fit(
+def test_causal_s_classification_learner(
     mock_get_learner_features,
     mock_append_treatment_feature,
     mock_get_unique_treatments,
