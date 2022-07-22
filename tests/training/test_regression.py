@@ -8,6 +8,7 @@ from fklearn.training.regression import \
     xgb_regression_learner, lgbm_regression_learner, catboost_regressor_learner, \
     custom_supervised_model_learner, elasticnet_regression_learner
 
+
 def test_elasticnet_regression_learner():
     df_train = pd.DataFrame({
         'id': ["id1", "id2", "id3", "id4"],
@@ -42,6 +43,7 @@ def test_elasticnet_regression_learner():
     assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
     assert (pred_test.columns == pred_train.columns).all()
     assert "prediction" in pred_test.columns
+
 
 def test_linear_regression_learner():
     df_train = pd.DataFrame({
