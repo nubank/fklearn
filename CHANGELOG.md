@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0] - 2022-07-25
+- **Enhancement**
+    - Add optional parameter `return_eval_logs_on_train` to the `validator` function,
+    enabling it to return the evaluation logs for all training folds instead of just
+    the first one
+- **Bug Fix**
+    - Fix import in `pd_extractors.py` for Python 3.10 compatibility
+    - Set a minimal version of Python (3.6.2) for Fklearn
+    - 
+- **Documentation**
+    - Fixing some typos, broken links and general improvement on the documentation
+
 ## [2.0.0] - 2021-12-28
 - **Possible breaking changes**
     - Allow greater versions of `catboost`, `lightgbm`, `xgboost`, `shap`, `swifter`
