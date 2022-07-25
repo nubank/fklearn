@@ -115,6 +115,7 @@ def _predict_by_treatment_flag(
 
     df[TREATMENT_FEATURE] = treatment_flag
     prediction_df = learner_fcn(df)
+    df.drop(columns=[TREATMENT_FEATURE], inplace=True)
 
     return prediction_df[prediction_column].values
 
@@ -165,7 +166,6 @@ def _simulate_treatment_effect(
         .apply(lambda x: x.replace("_uplift", ""))
         .values
     )
-    scored_df.drop(columns=[TREATMENT_FEATURE], inplace=True)
 
     return scored_df
 
