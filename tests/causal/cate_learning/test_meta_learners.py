@@ -314,6 +314,9 @@ def test__simulate_treatment_effect():
     treatments = ["A", "B"]
     control_name = "control"
 
+    # This test will score the model for all treatments available and for all treatment-control pairs. In this test,
+    # since we have control and treatment for treatments A and B, we expect to have 4 model outputs - two for each
+    # treatment. The output of the following data will be used to calculate the uplift.
     mock_learner = create_autospec(logistic_classification_learner)
     mock_learner.side_effect = [
         pd.DataFrame({"prediction": [0.3, 0.3, 0.0, 1.0]}),
