@@ -23,6 +23,8 @@ from fklearn.causal.cate_learning.meta_learners import (
 
 from unittest.mock import create_autospec, patch
 
+from fklearn.types import LearnerFnType
+
 
 def test__append_treatment_feature():
     features = ["feat1", "feat2", "feat3"]
@@ -236,6 +238,8 @@ def test__fit_by_treatment():
 
     assert len(learners) == len(treatments)
     assert len(logs) == len(treatments)
+    assert type(logs) == dict
+    assert type(learners) == LearnerFnType
 
 
 def ones_or_zeros_model(df):
@@ -279,7 +283,8 @@ def test__predict_by_treatment_flag_negative():
     ).all()
 
 
-def test__simulate_treatment_effect():
+@patch("fklearn.causal.cate_learning.meta_learners._predict_by_treatment_flag")
+def test__simulate_treatment_effect(mock_predict_by_treatment_flag):
     df = pd.DataFrame(
         {
             "x1": [1.3, 1.0, 1.8, -0.1],
@@ -317,19 +322,19 @@ def test__simulate_treatment_effect():
     # This test will score the model for all treatments available and for all treatment-control pairs. In this test,
     # since we have control and treatment for treatments A and B, we expect to have 4 model outputs - two for each
     # treatment. The output of the following data will be used to calculate the uplift.
-    mock_learner = create_autospec(logistic_classification_learner)
-    mock_learner.side_effect = [
-        pd.DataFrame({"prediction": [0.3, 0.3, 0.0, 1.0]}),
+
+    mock_predict_by_treatment_flag.side_effect = [
+        [0.3, 0.3, 0.0, 1.0],
         # treatment = A, apply treatment = 1
-        pd.DataFrame({"prediction": [0.2, 0.5, 0.3, 0.0]}),
+        [0.2, 0.5, 0.3, 0.0],
         # treatment = A, apply treatment = 0
-        pd.DataFrame({"prediction": [0.6, 0.7, 0.0, 1.0]}),
+        [0.6, 0.7, 0.0, 1.0],
         # treatment = B, apply treatment = 1
-        pd.DataFrame({"prediction": [1.0, 0.5, 1.0, 1.0]})
+        [1.0, 0.5, 1.0, 1.0]
         # treatment = B, apply treatment = 0
     ]
 
-    learners = {"A": mock_learner, "B": mock_learner}
+    learners = {"A": logistic_classification_learner, "B": logistic_classification_learner}
 
     results = _simulate_treatment_effect(
         df,
