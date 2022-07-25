@@ -21,6 +21,7 @@ def validator_iteration(data: pd.DataFrame,
                         train_fn: LearnerFnType,
                         eval_fn: EvalFnType,
                         predict_oof: bool = False,
+                        return_eval_logs_on_train: bool = False,
                         verbose: bool = False) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
@@ -51,6 +52,9 @@ def validator_iteration(data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_eval_logs_on_train : bool
+        Whether to apply eval_fn to the training set and return the resulting logs in the train log
+
     Returns
     ----------
     A log-like dictionary evaluations.
@@ -63,6 +67,8 @@ def validator_iteration(data: pd.DataFrame,
     warnings.warn(empty_set_warn) if train_data.shape[0] == 0 else None  # type: ignore
 
     predict_fn, train_out, train_log = train_fn(train_data)
+    if return_eval_logs_on_train:
+        train_log = assoc(train_log, "eval_results", eval_fn(train_out))
 
     eval_results = []
     oof_predictions = []
@@ -90,6 +96,8 @@ def validator(train_data: pd.DataFrame,
               perturb_fn_train: PerturbFnType = identity,
               perturb_fn_test: PerturbFnType = identity,
               predict_oof: bool = False,
+              return_eval_logs_on_train: bool = False,
+              return_all_train_logs: bool = False,
               verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
@@ -127,6 +135,13 @@ def validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_eval_logs_on_train : bool
+        Whether to apply eval_fn to the training set of each split and return the resulting logs in the train logs
+
+    return_all_train_logs : bool
+        Whether to return the train logs corresponding to all the splits or to return
+        only the train log corresponding to the first split (default behavior = only first split)
+
     verbose: bool
         Whether to show more information about the cross validation or not
 
@@ -143,7 +158,7 @@ def validator(train_data: pd.DataFrame,
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
         return validator_iteration(train_data, train_index, test_indexes, fold_num,
-                                   train_fn, eval_fn, predict_oof, verbose)
+                                   train_fn, eval_fn, predict_oof, return_eval_logs_on_train, verbose)
 
     zipped_logs = pipe(folds,
                        enumerate,
@@ -161,16 +176,19 @@ def validator(train_data: pd.DataFrame,
         return args['cols'] if args else []
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
-    first_train_log = first(train_logs)
+    if return_all_train_logs:
+        train_logs = {"train_log": [log["train_log"] for log in train_logs]}
+    else:
+        train_logs = first(train_logs)
 
     perturbator_log = {'perturbated_train': [], 'perturbated_test': []}  # type: LogType
     if perturb_fn_train != identity:
         perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
     if perturb_fn_test != identity:
         perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
-    first_train_log = assoc(first_train_log, "perturbator_log", perturbator_log)
+    train_logs = assoc(train_logs, "perturbator_log", perturbator_log)
 
-    return assoc(first_train_log, "validator_log", list(validator_logs))
+    return assoc(train_logs, "validator_log", list(validator_logs))
 
 
 def parallel_validator_iteration(train_data: pd.DataFrame,
@@ -178,9 +196,11 @@ def parallel_validator_iteration(train_data: pd.DataFrame,
                                  train_fn: LearnerFnType,
                                  eval_fn: EvalFnType,
                                  predict_oof: bool,
+                                 return_eval_logs_on_train: bool = False,
                                  verbose: bool = False) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
-    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof, verbose)
+    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof,
+                               return_eval_logs_on_train, verbose)
 
 
 @curry
@@ -190,6 +210,7 @@ def parallel_validator(train_data: pd.DataFrame,
                        eval_fn: EvalFnType,
                        n_jobs: int = 1,
                        predict_oof: bool = False,
+                       return_eval_logs_on_train: bool = False,
                        verbose: bool = False) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
@@ -222,6 +243,9 @@ def parallel_validator(train_data: pd.DataFrame,
     predict_oof : bool
         Whether to return out of fold predictions on the logs
 
+    return_eval_logs_on_train : bool
+        Whether to apply eval_fn to the training set of each split and return the resulting logs in the train logs
+
     verbose: bool
         Whether to show more information about the cross validation or not
 
@@ -232,7 +256,8 @@ def parallel_validator(train_data: pd.DataFrame,
     folds, logs = split_fn(train_data)
 
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, verbose)
+        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, return_eval_logs_on_train,
+                                              verbose)
         for x in enumerate(folds))
     gc.collect()
 
