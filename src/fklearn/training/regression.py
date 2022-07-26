@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Union
 import numpy as np
 import pandas as pd
 from toolz import merge, curry, assoc
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, ElasticNet
 from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 from sklearn import __version__ as sk_version
 
@@ -22,7 +22,7 @@ def linear_regression_learner(df: pd.DataFrame,
                               weight_column: str = None,
                               encode_extra_cols: bool = True) -> LearnerReturnType:
     """
-    Fits an linear regression classifier to the dataset. Return the predict function
+    Fits an linear regressor to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
 
     Parameters
@@ -598,3 +598,78 @@ def custom_supervised_model_learner(df: pd.DataFrame,
 
 
 custom_supervised_model_learner.__doc__ += learner_return_docstring("Custom Supervised Model Learner")
+
+
+@curry
+@log_learner_time(learner_name='elasticnet_regression_learner')
+def elasticnet_regression_learner(df: pd.DataFrame,
+                                  features: List[str],
+                                  target: str,
+                                  params: Dict[str, Any] = None,
+                                  prediction_column: str = "prediction",
+                                  weight_column: str = None,
+                                  encode_extra_cols: bool = True) -> LearnerReturnType:
+    """
+    Fits an elastic net regressor to the dataset. Return the predict function
+    for the model and the predictions for the input dataset.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    target : str
+        The name of the column in `df` that should be used as target for the model.
+        This column should be continuous, since this is a regression model.
+
+    params : dict
+        The ElasticNet parameters in the format {"par_name": param}. See:
+        https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+
+    prediction_column : str
+        The name of the column with the predictions from the model.
+
+    weight_column : str, optional
+        The name of the column with scores to weight the data.
+
+    encode_extra_cols : bool (default: True)
+        If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+    """
+
+    def_params = {"fit_intercept": True}
+    params = def_params if not params else merge(def_params, params)
+
+    weights = df[weight_column].values if weight_column else None
+
+    features = features if not encode_extra_cols else expand_features_encoded(df, features)
+
+    regr = ElasticNet(**params)
+    regr.fit(df[features].values, df[target].values, sample_weight=weights)
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        return new_df.assign(**{prediction_column: regr.predict(new_df[features].values)})
+
+    p.__doc__ = learner_pred_fn_docstring("elasticnet_regression_learner")
+
+    log = {'elasticnet_regression_learner': {
+        'features': features,
+        'target': target,
+        'parameters': params,
+        'prediction_column': prediction_column,
+        'package': "sklearn",
+        'package_version': sk_version,
+        'feature_importance': dict(zip(features, regr.coef_.flatten())),
+        'training_samples': len(df)},
+        'object': regr}
+
+    return p, p(df), log
+
+
+elasticnet_regression_learner.__doc__ += learner_return_docstring("ElasticNet Regression")
