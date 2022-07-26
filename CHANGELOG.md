@@ -8,7 +8,6 @@
 - **Bug Fix**
     - Fix import in `pd_extractors.py` for Python 3.10 compatibility
     - Set a minimal version of Python (3.6.2) for Fklearn
-    - 
 - **Documentation**
     - Fixing some typos, broken links and general improvement on the documentation
 
