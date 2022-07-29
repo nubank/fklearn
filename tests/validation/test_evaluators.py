@@ -63,6 +63,25 @@ def test_auc_evaluator():
     assert result["eval_name"] == 0.875
 
 
+def test_auc_evaluator_with_weights():
+    predictions = pd.DataFrame(
+        {
+            'target': [0, 1, 0, 1],
+            'prediction': [.2, .9, .3, .3],
+            'weights': [1, 1, 1, 3],
+        }
+    )
+
+    eval_fn = auc_evaluator(prediction_column="prediction",
+                            target_column="target",
+                            weight_column="weights",
+                            eval_name="eval_name")
+
+    result = eval_fn(predictions)
+
+    assert result["eval_name"] == 0.8125
+
+
 def test_roc_auc_evaluator():
     predictions = pd.DataFrame(
         {
