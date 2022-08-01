@@ -308,10 +308,10 @@ def test__simulate_treatment_effect(mock_predict_by_treatment_flag):
             "treatment_B__uplift": [-0.4, 0.2, -1.0, 0.0],
             "uplift": [0.1, 0.2, -0.3, 1.0],
             "suggested_treatment": [
-                "treatment_A_",
-                "treatment_B_",
+                "treatment_A",
+                "treatment_B",
                 "control",
-                "treatment_A_",
+                "treatment_A",
             ],
         }
     )
