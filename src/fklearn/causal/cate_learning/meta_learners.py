@@ -163,7 +163,7 @@ def _simulate_treatment_effect(
     )
     scored_df["suggested_treatment"] = (
         scored_df["suggested_treatment"]
-        .apply(lambda x: x.replace("_uplift", ""))
+        .apply(lambda x: x.replace("__uplift", ""))
         .values
     )
 
