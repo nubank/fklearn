@@ -209,8 +209,7 @@ def causal_s_classification_learner(
         The name of the control group.
 
     prediction_column : str
-        The name of the column with the predictions from the model.
-        If a multiclass problem, additional prediction_column_i columns will be added for i in range(0,n_classes).
+        The name of the column with the predictions from the provided learner.
 
     learner: LearnerFnType
         A fklearn classification learner function.
