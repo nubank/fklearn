@@ -325,6 +325,52 @@ def causal_t_classification_learner(
     treatment_learner: LearnerMutableParametersFnType = None,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
+    """
+    Fits a Causal T-Learner classifier. T-Learner is a meta-learner which learns the
+    Conditional Average Treatment Effect (CATE) through the use of multiple models, 
+    one for each treatment. Each model is fitted in a subset of the data, according 
+    to the treatment. The CATE $\tau$ is defined as 
+    $\tau(x_{i}) = M_{1}(X=x_{i}, T=1) - M_{0}(X=x_{i}, T=0)$, being $M_{1}$ a model 
+    fitted with treatment data and $M_{0}$ a model fitted with control data, and 
+    they can be a Machine Learning Model such as a LightGBM Classifier and $x_{i}$ 
+    the feature set of sample $i$.
+
+    References:
+    [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
+    [2] https://causalml.readthedocs.io/en/latest/methodology.html
+
+    Parameters
+    ----------
+
+    df : pd.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    treatment_col: str
+        The name of the column in `df` which contains the names of
+        the treatments or control to which each data sample was subjected.
+
+    control_name: str
+        The name of the control group.
+
+    prediction_column : str
+        The name of the column with the predictions from the provided learner.
+
+    learner: LearnerFnType
+        A fklearn classification learner function.
+    
+    control_learner: LearnerFnType
+        A fklearn classification learner function.
+
+    treatment_learner: LearnerFnType
+        A fklearn classification learner function.
+
+    learner_transformers: list
+        A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
+        This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
+    """
+
     # set the learners to use
     if control_learner is None:
         control_learner = copy.deepcopy(learner)
