@@ -4,6 +4,8 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
+from toolz import curry
+
 from fklearn.common_docstrings import (learner_pred_fn_docstring,
                                        learner_return_docstring)
 from fklearn.exceptions.exceptions import (MissingControlError,
@@ -12,7 +14,6 @@ from fklearn.exceptions.exceptions import (MissingControlError,
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
                            LearnerReturnType, PredictFnType)
-from toolz import curry
 
 TREATMENT_FEATURE = "is_treatment"
 
@@ -267,15 +268,16 @@ causal_s_classification_learner.__doc__ = learner_return_docstring(
     "Causal S-Learner Classifier"
 )
 
+
 def _get_model_fcn(
-    df: pd.DataFrame, 
-    treatment_col: str, 
-    treatment_name: str, 
-    learner: LearnerMutableParametersFnType
+    df: pd.DataFrame,
+    treatment_col: str,
+    treatment_name: str,
+    learner: LearnerMutableParametersFnType,
 ) -> LearnerMutableParametersFnType:
     df_ = df.loc[df[treatment_col] == treatment_name]
     learner_fcn, _, _ = learner(df_)
-    
+
     return learner_fcn
 
 
@@ -290,7 +292,7 @@ def _simulate_t_learner_treatment_effect(
     control_uplift = control_fcn(df)[prediction_column].values
 
     scored_df = df.copy()
-    
+
     uplift_cols = []
     for treatment in treatments:
         treatment_fcn = learners[treatment]
@@ -299,7 +301,7 @@ def _simulate_t_learner_treatment_effect(
 
         uplift_cols.append(f"treatment_{treatment}__uplift")
         scored_df[uplift_cols[-1]] = treatment_uplift - control_uplift
-    
+
     scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
     scored_df["suggested_treatment"] = np.where(
         scored_df["uplift"].values <= 0,
@@ -314,6 +316,7 @@ def _simulate_t_learner_treatment_effect(
 
     return scored_df
 
+
 @curry
 def causal_t_classification_learner(
     df: pd.DataFrame,
@@ -327,12 +330,12 @@ def causal_t_classification_learner(
 ) -> LearnerReturnType:
     """
     Fits a Causal T-Learner classifier. T-Learner is a meta-learner which learns the
-    Conditional Average Treatment Effect (CATE) through the use of multiple models, 
-    one for each treatment. Each model is fitted in a subset of the data, according 
-    to the treatment. The CATE $\tau$ is defined as 
-    $\tau(x_{i}) = M_{1}(X=x_{i}, T=1) - M_{0}(X=x_{i}, T=0)$, being $M_{1}$ a model 
-    fitted with treatment data and $M_{0}$ a model fitted with control data, and 
-    they can be a Machine Learning Model such as a LightGBM Classifier and $x_{i}$ 
+    Conditional Average Treatment Effect (CATE) through the use of multiple models,
+    one for each treatment. Each model is fitted in a subset of the data, according
+    to the treatment. The CATE $\tau$ is defined as
+    $\tau(x_{i}) = M_{1}(X=x_{i}, T=1) - M_{0}(X=x_{i}, T=0)$, being $M_{1}$ a model
+    fitted with treatment data and $M_{0}$ a model fitted with control data, and
+    they can be a Machine Learning Model such as a LightGBM Classifier and $x_{i}$
     the feature set of sample $i$.
 
     References:
@@ -359,7 +362,7 @@ def causal_t_classification_learner(
 
     learner: LearnerFnType
         A fklearn classification learner function.
-    
+
     control_learner: LearnerFnType
         A fklearn classification learner function.
 
@@ -374,7 +377,7 @@ def causal_t_classification_learner(
     # set the learners to use
     if control_learner is None:
         control_learner = copy.deepcopy(learner)
-    
+
     if treatment_learner is None:
         treatment_learner = copy.deepcopy(learner)
 
@@ -398,26 +401,30 @@ def causal_t_classification_learner(
     unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
 
     learners = {
-        "control": _get_model_fcn(df, treatment_col, control_name, control_learner_pipe),
+        "control": _get_model_fcn(
+            df, treatment_col, control_name, control_learner_pipe
+        ),
     }
 
     for treatment in unique_treatments:
-        learners[treatment] = _get_model_fcn(df, treatment_col, treatment, treatment_learner_pipe)
+        learners[treatment] = _get_model_fcn(
+            df, treatment_col, treatment, treatment_learner_pipe
+        )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-       return _simulate_t_learner_treatment_effect(
+        return _simulate_t_learner_treatment_effect(
             new_df,
             learners,
             unique_treatments,
             control_name,
             prediction_column,
-       )
-    
+        )
+
     p.__doc__ = learner_pred_fn_docstring("causal_t_classification_learner", shap=True)
     partial_log = {"causal_features": features}
 
     log = {"causal_t_classification_learner": partial_log}
-    
+
     return p, p(df), log
 
 
