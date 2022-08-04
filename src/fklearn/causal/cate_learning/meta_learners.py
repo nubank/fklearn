@@ -274,7 +274,7 @@ def _get_model_fcn(
     treatment_col: str,
     treatment_name: str,
     learner: LearnerMutableParametersFnType,
-) -> LearnerMutableParametersFnType:
+) -> PredictFnType:
     df_ = df.loc[df[treatment_col] == treatment_name]
     learner_fcn, _, _ = learner(df_)
 
