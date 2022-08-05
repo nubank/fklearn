@@ -11,7 +11,6 @@ from fklearn.common_docstrings import (learner_pred_fn_docstring,
 from fklearn.exceptions.exceptions import (MissingControlError,
                                            MissingTreatmentError,
                                            MultipleTreatmentsError)
-from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
                            LearnerReturnType, PredictFnType)
