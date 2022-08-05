@@ -323,8 +323,8 @@ def causal_t_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    control_learner: LearnerMutableParametersFnType,
-    treatment_learner: LearnerMutableParametersFnType,
+    learner: LearnerMutableParametersFnType,
+    treatment_learner: LearnerMutableParametersFnType = None,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
@@ -359,16 +359,21 @@ def causal_t_classification_learner(
     prediction_column : str
         The name of the column with the predictions from the provided learner.
 
-    control_learner: LearnerFnType
+    learner: LearnerMutableParametersFnType
         A fklearn classification learner function.
 
     treatment_learner: LearnerFnType
-        A fklearn classification learner function.
+        An optional fklearn classification learner function.
 
     learner_transformers: list
         A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
     """
+
+    control_learner = copy.deepcopy(learner)
+
+    if treatment_learner is None:
+        treatment_learner = copy.deepcopy(learner)
 
     control_features = _get_learner_features(control_learner)
     treatment_features = _get_learner_features(treatment_learner)
