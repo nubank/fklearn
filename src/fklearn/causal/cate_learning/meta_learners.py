@@ -1,6 +1,6 @@
 import copy
 import inspect
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -11,6 +11,7 @@ from fklearn.common_docstrings import (learner_pred_fn_docstring,
 from fklearn.exceptions.exceptions import (MissingControlError,
                                            MissingTreatmentError,
                                            MultipleTreatmentsError)
+from fklearn.training.classification import lgbm_classification_learner
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
                            LearnerReturnType, PredictFnType)
@@ -273,7 +274,7 @@ def _get_model_fcn(
     df: pd.DataFrame,
     treatment_col: str,
     treatment_name: str,
-    learner: LearnerMutableParametersFnType,
+    learner: LearnerFnType,
 ) -> PredictFnType:
     df_ = df.loc[df[treatment_col] == treatment_name]
     learner_fcn, _, _ = learner(df_)
@@ -323,9 +324,8 @@ def causal_t_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerMutableParametersFnType = None,
-    control_learner: LearnerMutableParametersFnType = None,
-    treatment_learner: LearnerMutableParametersFnType = None,
+    control_learner: LearnerMutableParametersFnType,
+    treatment_learner: LearnerMutableParametersFnType,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
@@ -360,9 +360,6 @@ def causal_t_classification_learner(
     prediction_column : str
         The name of the column with the predictions from the provided learner.
 
-    learner: LearnerFnType
-        A fklearn classification learner function.
-
     control_learner: LearnerFnType
         A fklearn classification learner function.
 
@@ -374,28 +371,22 @@ def causal_t_classification_learner(
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
     """
 
-    # set the learners to use
-    if control_learner is None:
-        control_learner = copy.deepcopy(learner)
-
-    if treatment_learner is None:
-        treatment_learner = copy.deepcopy(learner)
-
-    features = _get_learner_features(learner)
+    control_features = _get_learner_features(control_learner)
+    treatment_features = _get_learner_features(treatment_learner)
 
     # pipeline
     if learner_transformers is not None:
         learner_transformers = copy.deepcopy(learner_transformers)
         control_learner_pipe = build_pipeline(
-            *[control_learner(features=features)] + learner_transformers
+            *[control_learner(features=control_features)] + learner_transformers
         )
 
         treatment_learner_pipe = build_pipeline(
-            *[treatment_learner(features=features)] + learner_transformers
+            *[treatment_learner(features=treatment_features)] + learner_transformers
         )
     else:
-        control_learner_pipe = control_learner(features=features)
-        treatment_learner_pipe = treatment_learner(features=features)
+        control_learner_pipe = control_learner(features=control_features)
+        treatment_learner_pipe = treatment_learner(features=treatment_features)
 
     # learners
     unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
@@ -421,7 +412,12 @@ def causal_t_classification_learner(
         )
 
     p.__doc__ = learner_pred_fn_docstring("causal_t_classification_learner", shap=True)
-    partial_log = {"causal_features": features}
+    partial_log = {
+        "causal_features": {
+            "control": control_features,
+            "treatment": treatment_features,
+        },
+    }
 
     log = {"causal_t_classification_learner": partial_log}
 
