@@ -289,7 +289,7 @@ def _simulate_t_learner_treatment_effect(
     prediction_column: str,
 ) -> pd.DataFrame:
     control_fcn = learners[control_name]
-    control_uplift = control_fcn(df)[prediction_column].values
+    control_conversion_probability = control_fcn(df)[prediction_column].values
 
     scored_df = df.copy()
 
@@ -297,10 +297,10 @@ def _simulate_t_learner_treatment_effect(
     for treatment in treatments:
         treatment_fcn = learners[treatment]
 
-        treatment_uplift = treatment_fcn(df)[prediction_column].values
+        treatment_conversion_probability = treatment_fcn(df)[prediction_column].values
 
         uplift_cols.append(f"treatment_{treatment}__uplift")
-        scored_df[uplift_cols[-1]] = treatment_uplift - control_uplift
+        scored_df[uplift_cols[-1]] = treatment_conversion_probability - control_conversion_probability
 
     scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
     scored_df["suggested_treatment"] = np.where(
