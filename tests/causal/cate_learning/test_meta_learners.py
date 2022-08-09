@@ -1,29 +1,20 @@
+from unittest.mock import create_autospec, patch
+
 import numpy as np
 import pandas as pd
 import pytest
+from fklearn.causal.cate_learning.meta_learners import (
+    TREATMENT_FEATURE, _append_treatment_feature, _create_treatment_flag,
+    _filter_by_treatment, _fit_by_treatment, _get_unique_treatments,
+    _predict_by_treatment_flag, _simulate_treatment_effect,
+    causal_s_classification_learner)
+from fklearn.exceptions.exceptions import (MissingControlError,
+                                           MissingTreatmentError,
+                                           MultipleTreatmentsError)
+from fklearn.training.classification import logistic_classification_learner
+from fklearn.types import LearnerFnType
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
-from fklearn.exceptions.exceptions import (
-    MultipleTreatmentsError,
-    MissingTreatmentError,
-    MissingControlError,
-)
-from fklearn.training.classification import logistic_classification_learner
-from fklearn.causal.cate_learning.meta_learners import (
-    TREATMENT_FEATURE,
-    _append_treatment_feature,
-    _get_unique_treatments,
-    _filter_by_treatment,
-    _create_treatment_flag,
-    _fit_by_treatment,
-    _predict_by_treatment_flag,
-    _simulate_treatment_effect,
-    causal_s_classification_learner,
-)
-
-from unittest.mock import create_autospec, patch
-
-from fklearn.types import LearnerFnType
 
 
 def test__append_treatment_feature():
@@ -334,7 +325,10 @@ def test__simulate_treatment_effect(mock_predict_by_treatment_flag):
         # treatment = B, apply treatment = 0
     ]
 
-    learners = {"A": logistic_classification_learner, "B": logistic_classification_learner}
+    learners = {
+        "A": logistic_classification_learner,
+        "B": logistic_classification_learner,
+    }
 
     results = _simulate_treatment_effect(
         df,
