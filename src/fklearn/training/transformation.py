@@ -359,7 +359,7 @@ def apply_replacements(df: pd.DataFrame,
             [df[col].isna() | (df[col].dtype == "float"), ~df[col].isin(vec[col].keys())],
             [np.nan, replace_unseen],
             df[col].replace(vec[col])
-    )
+        )
 
     categ_columns = {col: column_categorizer(col) for col in columns}
     return df.assign(**categ_columns)
