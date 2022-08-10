@@ -426,7 +426,7 @@ def test_count_categorizer():
     expected_output_test = pd.DataFrame(
         {
             "feat1_num": [2, 20, 200, 2000],
-            "feat2_cat": [3, 1, 1, 1],  # replace unseen vars with constant (1)
+            "feat2_cat": [3.0, 1.0, 1.0, 1.0],  # replace unseen vars with constant (1)
             "feat3_cat": [nan, nan, 3, 3],
         }
     )

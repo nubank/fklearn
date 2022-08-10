@@ -354,7 +354,7 @@ def apply_replacements(df: pd.DataFrame,
         Default value to replace when original value is not present in the `vec` dict for the feature
 
     """
-    def column_categorizer(col: str):
+    def column_categorizer(col: str) -> np.ndarray:
         replaced = df[col].map(vec[col])
         unseen = df[col].notnull() & replaced.isnull()
         replaced[unseen] = replace_unseen
