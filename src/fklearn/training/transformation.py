@@ -354,9 +354,13 @@ def apply_replacements(df: pd.DataFrame,
         Default value to replace when original value is not present in the `vec` dict for the feature
 
     """
-    column_categorizer = lambda col: df[col].apply(lambda x: (np.nan
-                                                              if isinstance(x, float) and np.isnan(x)
-                                                              else vec[col].get(x, replace_unseen)))
+    def column_categorizer(col: str):
+        return np.select(
+            [df[col].isna() | (df[col].dtype == "float"), ~df[col].isin(vec[col].keys())],
+            [np.nan, replace_unseen],
+            df[col].replace(vec[col])
+    )
+
     categ_columns = {col: column_categorizer(col) for col in columns}
     return df.assign(**categ_columns)
 
