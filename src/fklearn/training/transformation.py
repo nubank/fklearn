@@ -355,11 +355,10 @@ def apply_replacements(df: pd.DataFrame,
 
     """
     def column_categorizer(col: str):
-        return np.select(
-            [df[col].isna() | (df[col].dtype == "float"), ~df[col].isin(vec[col].keys())],
-            [np.nan, replace_unseen],
-            df[col].replace(vec[col])
-        ).astype(np.array(list(vec[col].values())).dtype)
+        replaced = df[col].map(vec[col])
+        unseen = df[col].notnull() & replaced.isnull()
+        replaced[unseen] = replace_unseen
+        return replaced
 
     categ_columns = {col: column_categorizer(col) for col in columns}
     return df.assign(**categ_columns)
