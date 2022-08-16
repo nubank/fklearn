@@ -177,7 +177,7 @@ def validator(train_data: pd.DataFrame,
                        map(fold_iter),
                        partial(zip, logs))
 
-    def clean_logs(log_tuple):
+    def clean_logs(log_tuple) -> Tuple:
         split_log_error = list()
 
         new_validator_logs = list()
