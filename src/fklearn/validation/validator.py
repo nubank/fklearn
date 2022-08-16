@@ -1,11 +1,11 @@
 import gc
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Any
 import warnings
 import inspect
 
 from joblib import Parallel, delayed
 import pandas as pd
-from toolz import compose
+from toolz import compose, curry
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
 from toolz.functoolz import identity
 
@@ -177,7 +177,7 @@ def validator(train_data: pd.DataFrame,
                        map(fold_iter),
                        partial(zip, logs))
 
-    def clean_logs(log_tuple: Tuple[LogType, LogType]) -> Tuple[LogType, LogType]:
+    def clean_logs(log_tuple: Tuple[LogType, LogType]) -> tuple[zip[tuple[Any, Any]], list[Any]]:
         split_log_error = list()
 
         new_validator_logs = list()
