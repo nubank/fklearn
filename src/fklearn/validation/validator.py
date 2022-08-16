@@ -1,17 +1,17 @@
 import gc
-from typing import Dict, Tuple, List, Any
-import warnings
 import inspect
+import warnings
+from typing import Dict, Tuple, List, Any
 
-from joblib import Parallel, delayed
 import pandas as pd
-from toolz import compose, curry
+from joblib import Parallel, delayed
+from toolz import compose
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
 from toolz.functoolz import identity
+from tqdm import tqdm
 
 from fklearn.types import EvalFnType, LearnerFnType, LogType
 from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
-from tqdm import tqdm
 
 
 def validator_iteration(data: pd.DataFrame,
