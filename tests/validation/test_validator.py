@@ -13,8 +13,6 @@ from fklearn.validation.validator import (
 )
 from fklearn.validation.perturbators import perturbator, nullify
 import pytest
-import sklearn
-import lightgbm
 
 
 def train_fn(df):
