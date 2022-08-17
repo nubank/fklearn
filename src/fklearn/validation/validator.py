@@ -2,7 +2,7 @@ import gc
 import inspect
 import typing
 import warnings
-from typing import Dict, Tuple, List, Any
+from typing import Dict, Tuple, List
 
 import pandas as pd
 from joblib import Parallel, delayed
