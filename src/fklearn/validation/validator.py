@@ -1,6 +1,5 @@
 import gc
 import inspect
-import typing
 import warnings
 from typing import Dict, Tuple, List
 
@@ -178,7 +177,7 @@ def validator(train_data: pd.DataFrame,
                        map(fold_iter),
                        partial(zip, logs))
 
-    def clean_logs(log_tuple: typing.Tuple) -> (typing.Tuple, typing.List):
+    def clean_logs(log_tuple: Tuple) -> Tuple:
         split_log_error = list()
 
         new_validator_logs = list()
