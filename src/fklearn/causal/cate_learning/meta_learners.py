@@ -1,6 +1,6 @@
 import copy
 import inspect
-from typing import List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -12,8 +12,7 @@ from fklearn.exceptions.exceptions import (MissingControlError,
                                            MissingTreatmentError,
                                            MultipleTreatmentsError)
 from fklearn.training.pipeline import build_pipeline
-from fklearn.types import (LearnerFnType, LearnerMutableParametersFnType,
-                           LearnerReturnType, PredictFnType)
+from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
 TREATMENT_FEATURE = "is_treatment"
 
@@ -22,7 +21,7 @@ def _append_treatment_feature(features: list, treatment_feature: str) -> list:
     return features + [treatment_feature]
 
 
-def _get_learner_features(learner: LearnerMutableParametersFnType) -> list:
+def _get_learner_features(learner: Callable) -> list:
     return inspect.signature(learner).parameters["features"].default
 
 
@@ -109,11 +108,8 @@ def _predict_by_treatment_flag(
     is_treatment: bool,
     prediction_column: str,
 ) -> np.ndarray:
-    if is_treatment:
-        treatment_flag = np.ones(df.shape[0])
-    else:
-        treatment_flag = np.zeros(df.shape[0])
 
+    treatment_flag = np.ones(df.shape[0]) if is_treatment else np.zeros(df.shape[0])
     df[TREATMENT_FEATURE] = treatment_flag
     prediction_df = learner_fcn(df)
     df.drop(columns=[TREATMENT_FEATURE], inplace=True)
@@ -177,7 +173,7 @@ def causal_s_classification_learner(
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerMutableParametersFnType,
+    learner: Callable,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
@@ -189,32 +185,24 @@ def causal_s_classification_learner(
     of a new sample for both scenarios, i.e., with T = 0 and T = 1. The CATE τ
     is defined as τ(xi) = M(X=xi, T=1) - M(X=xi, T=0), being M a Machine Learning
     Model.
-
     References:
     [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
     [2] https://causalml.readthedocs.io/en/latest/methodology.html
-
     Parameters
     ----------
-
     df : pd.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column
         from the features.
-
     treatment_col: str
         The name of the column in `df` which contains the names of
         the treatments or control to which each data sample was subjected.
-
     control_name: str
         The name of the control group.
-
     prediction_column : str
         The name of the column with the predictions from the provided learner.
-
-    learner: LearnerFnType
+    learner: Callable
         A fklearn classification learner function.
-
     learner_transformers: list
         A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
@@ -254,17 +242,18 @@ def causal_s_classification_learner(
         )
         return scored_df
 
-    p.__doc__ = learner_pred_fn_docstring("causal_s_classification_learner", shap=True)
-
-    partial_log = {"causal_features": features_with_treatment}
-    partial_log.update(learners_logs)
-
-    log = {"causal_s_classification_learner": partial_log}
+    p.__doc__ = learner_pred_fn_docstring("causal_s_classification_learner")
+    log = {
+        "causal_s_classification_learner": {
+            **learners_logs,
+            "causal_features": features_with_treatment,
+        }
+    }
 
     return p, p(df), log
 
 
-causal_s_classification_learner.__doc__ = learner_return_docstring(
+causal_s_classification_learner.__doc__ += learner_return_docstring(
     "Causal S-Learner Classifier"
 )
 
