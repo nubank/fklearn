@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1] - 2022-08-17
+- **Bug Fix**
+  - Fix validator behavior when receiving data containing gaps and a time based split function that could generate empty 
+    training and testing folds and then break. 
+    The argument `drop_empty_folds` can be set to `True` to drop invalid folds from validation and store them in the 
+    log.
+ 
 ## [2.1.0] - 2022-07-25
 - **Enhancement**
     - Add optional parameter `return_eval_logs_on_train` to the `validator` function,

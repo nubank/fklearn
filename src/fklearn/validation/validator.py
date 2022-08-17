@@ -104,9 +104,9 @@ def validator(train_data: pd.DataFrame,
               verbose: bool = False,
               drop_empty_folds: bool = False) -> ValidatorReturnType:
     """
-    Splits the training data into folds given by the split function and
-    performs a train-evaluation sequence on each fold by calling
-    ``validator_iteration``.
+    Splits the training data into folds given by the split function and performs a train-evaluation sequence on each
+    fold by calling ``validator_iteration`` given the evaluation function. The output is a log containing, for each
+    fold, its logs and evaluator results.
 
     Parameters
     ----------
