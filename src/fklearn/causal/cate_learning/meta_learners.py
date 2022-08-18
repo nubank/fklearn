@@ -1,5 +1,4 @@
 import copy
-from enum import unique
 import inspect
 from typing import Callable, List, Tuple
 
@@ -261,6 +260,7 @@ def causal_s_classification_learner(
 causal_s_classification_learner.__doc__ += learner_return_docstring(
     "Causal S-Learner Classifier"
 )
+
 
 def _simulate_t_learner_treatment_effect(
     df: pd.DataFrame,

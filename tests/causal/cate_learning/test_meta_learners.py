@@ -1,5 +1,4 @@
 from typing import Callable
-from unittest import mock
 from unittest.mock import MagicMock, create_autospec, patch
 
 import numpy as np
@@ -431,7 +430,7 @@ def test_simulate_t_learner_treatment_effect():
 
     treatment_learner = MagicMock()
     treatment_learner.side_effect = treatment_learner_side_effect
-    
+
     learners = {
         "control": control_learner,
         "A": treatment_learner,
