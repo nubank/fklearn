@@ -1,6 +1,6 @@
 import copy
 import inspect
-from typing import Callable, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -306,8 +306,8 @@ def _get_model_fcn(
     df: pd.DataFrame,
     treatment_col: str,
     treatment_name: str,
-    learner: LearnerFnType,
-) -> PredictFnType:
+    learner: Callable,
+) -> Tuple[Callable, dict, dict]:
     """
     Returns a function that predicts the target column from the features.
     """
@@ -319,12 +319,12 @@ def _get_model_fcn(
 def _get_learners(
     df: pd.DataFrame,
     unique_treatments: list,
-    control_learner: LearnerFnType,
+    control_learner: Callable,
     control_name: str,
-    treatment_learner: LearnerFnType,
+    treatment_learner: Callable,
     treatment_col: str,
 ) -> dict:
-    learners = {}
+    learners: Dict[str, Callable] = {}
 
     learner_fcn, _, _ = _get_model_fcn(
         df, treatment_col, control_name, control_learner
