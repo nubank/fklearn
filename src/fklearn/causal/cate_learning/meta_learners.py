@@ -1,4 +1,5 @@
 import copy
+from enum import unique
 import inspect
 from typing import Callable, List, Tuple
 
@@ -6,11 +7,15 @@ import numpy as np
 import pandas as pd
 from toolz import curry
 
-from fklearn.common_docstrings import (learner_pred_fn_docstring,
-                                       learner_return_docstring)
-from fklearn.exceptions.exceptions import (MissingControlError,
-                                           MissingTreatmentError,
-                                           MultipleTreatmentsError)
+from fklearn.common_docstrings import (
+    learner_pred_fn_docstring,
+    learner_return_docstring,
+)
+from fklearn.exceptions.exceptions import (
+    MissingControlError,
+    MissingTreatmentError,
+    MultipleTreatmentsError,
+)
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
@@ -257,19 +262,6 @@ causal_s_classification_learner.__doc__ += learner_return_docstring(
     "Causal S-Learner Classifier"
 )
 
-
-def _get_model_fcn(
-    df: pd.DataFrame,
-    treatment_col: str,
-    treatment_name: str,
-    learner: LearnerFnType,
-) -> PredictFnType:
-    df_ = df.loc[df[treatment_col] == treatment_name]
-    learner_fcn, _, _ = learner(df_)
-
-    return learner_fcn
-
-
 def _simulate_t_learner_treatment_effect(
     df: pd.DataFrame,
     learners: dict,
@@ -277,19 +269,23 @@ def _simulate_t_learner_treatment_effect(
     control_name: str,
     prediction_column: str,
 ) -> pd.DataFrame:
+    """
+    Simulate the treatment effect for the T-Leaner.
+    """
     control_fcn = learners[control_name]
     control_conversion_probability = control_fcn(df)[prediction_column].values
 
     scored_df = df.copy()
 
     uplift_cols = []
-    for treatment in treatments:
-        treatment_fcn = learners[treatment]
-
+    for treatment_name in treatments:
+        treatment_fcn = learners[treatment_name]
         treatment_conversion_probability = treatment_fcn(df)[prediction_column].values
 
-        uplift_cols.append(f"treatment_{treatment}__uplift")
-        scored_df[uplift_cols[-1]] = treatment_conversion_probability - control_conversion_probability
+        uplift_cols.append(f"treatment_{treatment_name}__uplift")
+        scored_df[uplift_cols[-1]] = (
+            treatment_conversion_probability - control_conversion_probability
+        )
 
     scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
     scored_df["suggested_treatment"] = np.where(
@@ -306,14 +302,52 @@ def _simulate_t_learner_treatment_effect(
     return scored_df
 
 
+def _get_model_fcn(
+    df: pd.DataFrame,
+    treatment_col: str,
+    treatment_name: str,
+    learner: LearnerFnType,
+) -> PredictFnType:
+    """
+    Returns a function that predicts the target column from the features.
+    """
+    df = df.loc[df[treatment_col] == treatment_name].reset_index(drop=True).copy()
+
+    return learner(df)
+
+
+def _get_learners(
+    df: pd.DataFrame,
+    unique_treatments: list,
+    control_learner: LearnerFnType,
+    control_name: str,
+    treatment_learner: LearnerFnType,
+    treatment_col: str,
+) -> dict:
+    learners = {}
+
+    learner_fcn, _, _ = _get_model_fcn(
+        df, treatment_col, control_name, control_learner
+    )
+    learners[control_name] = learner_fcn
+
+    for treatment_name in unique_treatments:
+        learner_fcn, _, _ = _get_model_fcn(
+            df, treatment_col, treatment_name, treatment_learner
+        )
+        learners[treatment_name] = learner_fcn
+
+    return learners
+
+
 @curry
 def causal_t_classification_learner(
     df: pd.DataFrame,
     treatment_col: str,
     control_name: str,
     prediction_column: str,
-    learner: LearnerMutableParametersFnType,
-    treatment_learner: LearnerMutableParametersFnType = None,
+    learner: Callable,
+    treatment_learner: Callable = None,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
@@ -384,16 +418,14 @@ def causal_t_classification_learner(
     # learners
     unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
 
-    learners = {
-        "control": _get_model_fcn(
-            df, treatment_col, control_name, control_learner_pipe
-        ),
-    }
-
-    for treatment in unique_treatments:
-        learners[treatment] = _get_model_fcn(
-            df, treatment_col, treatment, treatment_learner_pipe
-        )
+    learners = _get_learners(
+        df=df,
+        unique_treatments=unique_treatments,
+        control_learner=control_learner_pipe,
+        control_name=control_name,
+        treatment_learner=treatment_learner_pipe,
+        treatment_col=treatment_col,
+    )
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return _simulate_t_learner_treatment_effect(
