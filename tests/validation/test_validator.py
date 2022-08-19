@@ -51,10 +51,12 @@ perturb_fn_train = identity
 perturb_fn_test = perturbator(cols=["rows"], corruption_fn=nullify(perc=0.25))
 
 
-data = pd.DataFrame({"rows": ["row1", "row2", "row3", "row4"]})
+@pytest.fixture
+def data():
+    return pd.DataFrame({"rows": ["row1", "row2", "row3", "row4"]})
 
 
-def test_validator_iteration():
+def test_validator_iteration(data):
     train_index = [0, 1]
     test_indexes = [[2, 3]]
 
@@ -211,7 +213,7 @@ def test_validator_with_gap():
     assert len(validator_log[0]["eval_results"]) == 1
 
 
-def test_parallel_validator():
+def test_parallel_validator(data):
     result = parallel_validator(data, split_fn, train_fn, eval_fn, n_jobs=2)
 
     validator_log = result["validator_log"]
