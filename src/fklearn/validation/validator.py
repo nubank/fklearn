@@ -164,7 +164,7 @@ def validator(train_data: pd.DataFrame,
 
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        
+
         test_contains_null_folds = max(map(lambda x: len(x) == 0, test_indexes))
         train_fold_is_null = len(train_index) == 0
 
