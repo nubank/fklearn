@@ -347,7 +347,7 @@ def causal_t_classification_learner(
     control_name: str,
     prediction_column: str,
     learner: LearnerFnType,
-    treatment_learner: Callable = None,
+    treatment_learner: LearnerFnType = None,
     learner_transformers: List[LearnerFnType] = None,
 ) -> LearnerReturnType:
     """
