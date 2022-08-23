@@ -436,7 +436,7 @@ def causal_t_classification_learner(
             prediction_column,
         )
 
-    p.__doc__ = learner_pred_fn_docstring("causal_t_classification_learner", shap=True)
+    p.__doc__ = learner_pred_fn_docstring("causal_t_classification_learner")
     partial_log = {
         "causal_features": {
             "control": control_features,
