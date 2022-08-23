@@ -374,7 +374,7 @@ def causal_t_classification_learner(
 
     treatment_col: str
         The name of the column in `df` which contains the names of
-        the treatments or control to which each data sample was subjected.
+        the treatments and control to which each data sample was subjected.
 
     control_name: str
         The name of the control group.
