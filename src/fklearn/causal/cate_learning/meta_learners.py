@@ -388,7 +388,7 @@ def causal_t_classification_learner(
     treatment_learner: LearnerFnType
         An optional fklearn classification learner function.
 
-    learner_transformers: list
+    learner_transformers: List[LearnerFnType]
         A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
     """
