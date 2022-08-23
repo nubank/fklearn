@@ -382,7 +382,7 @@ def causal_t_classification_learner(
     prediction_column : str
         The name of the column with the predictions from the provided learner.
 
-    learner: LearnerMutableParametersFnType
+    learner: LearnerFnType
         A fklearn classification learner function.
 
     treatment_learner: LearnerFnType
