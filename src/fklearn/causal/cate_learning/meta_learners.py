@@ -323,7 +323,7 @@ def _get_learners(
     control_name: str,
     treatment_learner: Callable,
     treatment_col: str,
-) -> dict:
+) -> Dict[str, Callable]:
     learners: Dict[str, Callable] = {}
 
     learner_fcn, _, _ = _get_model_fcn(
