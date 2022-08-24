@@ -77,7 +77,8 @@ def test_feature_clustering_selection():
     assert set(result["final_features"]) == {'x', 'b', 'q'}
 
     dissimilarity_threshold = 0.0
-    result = feature_clustering_selection(train_set=train_set,
+    result = feature_clustering_selection(
+        train_set=train_set,
         features=features,
         dissimilarity_threshold=dissimilarity_threshold)
 
@@ -85,7 +86,8 @@ def test_feature_clustering_selection():
     assert set(result["final_features"]) == {'q', 'a', 'b', 'y', 'z', 'x'}
 
     dissimilarity_threshold = 1.0
-    result = feature_clustering_selection(train_set=train_set,
+    result = feature_clustering_selection(
+        train_set=train_set,
         features=features,
         dissimilarity_threshold=dissimilarity_threshold)
 

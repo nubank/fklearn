@@ -128,8 +128,10 @@ def feature_clustering_selection(train_set: pd.DataFrame,
 
     # feature clustering
     clustering = AgglomerativeClustering(
-                affinity='precomputed', linkage='average',
-                n_clusters=None, distance_threshold=dissimilarity_threshold)
+        affinity='precomputed',
+        linkage='average',
+        n_clusters=None,
+        distance_threshold=dissimilarity_threshold)
     clustering.fit(dissimilarity_matrix)
 
     # unique labels
@@ -146,7 +148,8 @@ def feature_clustering_selection(train_set: pd.DataFrame,
         tuple(
             own_cluster_other_feature for own_cluster_other_feature
             in own_cluster_features if own_cluster_feature != own_cluster_other_feature
-            )) for cluster, own_cluster_features in unique_cluster_features for own_cluster_feature in own_cluster_features]
+        )) for cluster, own_cluster_features in unique_cluster_features
+        for own_cluster_feature in own_cluster_features]
 
     # feature scores
     features_r2_scores = [(
