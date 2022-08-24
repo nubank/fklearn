@@ -128,8 +128,8 @@ def feature_clustering_selection(train_set: pd.DataFrame,
 
     # feature clustering
     clustering = AgglomerativeClustering(
-                 affinity='precomputed', linkage='average',
-                 n_clusters=None, distance_threshold=dissimilarity_threshold)
+                affinity='precomputed', linkage='average',
+                n_clusters=None, distance_threshold=dissimilarity_threshold)
     clustering.fit(dissimilarity_matrix)
 
     # unique labels
@@ -138,17 +138,15 @@ def feature_clustering_selection(train_set: pd.DataFrame,
     unique_cluster_features = [(
         cluster,
         list(
-            dissimilarity_matrix.columns[np.where(clustering.labels_ == cluster)]
-            )) for cluster in unique_labels]
+            dissimilarity_matrix.columns[np.where(clustering.labels_ == cluster)])) for cluster in unique_labels]
 
     features_cluster_regression_data = [(
         own_cluster_feature,
         cluster,
         tuple(
-            own_cluster_other_feature for own_cluster_other_feature 
+            own_cluster_other_feature for own_cluster_other_feature
             in own_cluster_features if own_cluster_feature != own_cluster_other_feature
-            )
-        ) for cluster, own_cluster_features in unique_cluster_features for own_cluster_feature in own_cluster_features]
+            )) for cluster, own_cluster_features in unique_cluster_features for own_cluster_feature in own_cluster_features]
 
     # feature scores
     features_r2_scores = [(
@@ -161,10 +159,9 @@ def feature_clustering_selection(train_set: pd.DataFrame,
                 train_set[features][f[0]])) for f in features_cluster_regression_data]
 
     df_features_ratio_scores = pd.DataFrame([(
-            f,
-            cluster,
-            own_cluster_score,
-            ) for f, cluster, own_cluster_score in features_r2_scores],
+        f,
+        cluster,
+        own_cluster_score) for f, cluster, own_cluster_score in features_r2_scores],
         columns=[
             'feature',
             'cluster',
@@ -203,29 +200,27 @@ def feature_clustering_selection(train_set: pd.DataFrame,
         own_cluster_feature,
         own_cluster,
         nearest_cluster,
-        nearest_cluster_features) for own_cluster, own_cluster_features, nearest_cluster, nearest_cluster_features 
+        nearest_cluster_features) for own_cluster, own_cluster_features, nearest_cluster, nearest_cluster_features
         in nearest_cluster_pairs_features for own_cluster_feature in own_cluster_features]
 
     # feature scores
     dict_nearest_cluster_r2_scores = {
         f[0]: {
-            'nearest_cluster':f[2],
-            'nearest_cluster_R2':LinearRegression().fit(
+            'nearest_cluster': f[2],
+            'nearest_cluster_R2': LinearRegression().fit(
                 train_set[features][list(f[3])],
                 train_set[features][f[0]]).score(
                     train_set[features][list(f[3])],
                     train_set[features][f[0]])} for f in features_nearest_cluster_regression_data}
-    
+
     # nearest cluster data
     df_features_ratio_scores['nearest_cluster'] = df_features_ratio_scores['feature'].apply(
         lambda x: None if x not in dict_nearest_cluster_r2_scores
-        else dict_nearest_cluster_r2_scores[x]['nearest_cluster']
-        )
+        else dict_nearest_cluster_r2_scores[x]['nearest_cluster'])
 
     df_features_ratio_scores['nearest_cluster_R2'] = df_features_ratio_scores['feature'].apply(
-        lambda x: None if x not in dict_nearest_cluster_r2_scores \
-        else dict_nearest_cluster_r2_scores[x]['nearest_cluster_R2']
-        )
+        lambda x: None if x not in dict_nearest_cluster_r2_scores
+        else dict_nearest_cluster_r2_scores[x]['nearest_cluster_R2'])
 
     # final scores (1-R2_ratio)
     df_features_ratio_scores['1-R2_ratio'] = (
@@ -235,19 +230,17 @@ def feature_clustering_selection(train_set: pd.DataFrame,
     df_features_ratio_scores = df_features_ratio_scores.sort_values('cluster')
     df_best_features = df_features_ratio_scores.sort_values(
         ['1-R2_ratio', 'own_cluster_R2'],
-        ascending=[True, False]
-        ).groupby('cluster').head(1)
+        ascending=[True, False]).groupby('cluster').head(1)
 
     final_features = list(df_best_features['feature'].values)
     features_to_drop = list(set(features) - set(final_features))
 
     df_features_ratio_scores['is_selected'] = df_features_ratio_scores['feature'].apply(
-        lambda x: x in final_features
-        )
+        lambda x: x in final_features)
 
     return {
         "df_feature_clustering": df_features_ratio_scores.sort_values(
-          ['cluster', '1-R2_ratio', 'own_cluster_R2'],
-          ascending=[True, True, False]).reset_index(drop=True).to_dict(),
+            ['cluster', '1-R2_ratio', 'own_cluster_R2'],
+            ascending=[True, True, False]).reset_index(drop=True).to_dict(),
         "features_to_drop": features_to_drop,
         "final_features": final_features}
