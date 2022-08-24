@@ -357,7 +357,7 @@ def causal_t_classification_learner(
     the data, according to the treatment: the CATE $\tau$ is defined as
     $\tau(x_{i}) = M_{1}(X=x_{i}, T=1) - M_{0}(X=x_{i}, T=0)$, being $M_{1}$ a model fitted 
     with treatment data and $M_{0}$ a model fitted with control data. Notice that $M_{0}$
-    and $M_{1}$ are traditional Machine Learning Model such as a LightGBM Classifier and 
+    and $M_{1}$ are traditional Machine Learning Models such as a LightGBM Classifier and 
     that $x_{i}$ is the feature set of sample $i$.
 
     References:
