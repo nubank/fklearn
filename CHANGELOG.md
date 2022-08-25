@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.0] - 2022-08-25
+- **Enhancement**
+  - Including Classification S-Learner model to the causal cate learning library.
+- **Bug Fix**
+  - Fix validator behavior when receiving data containing gaps and a time based split function that
+    could generate empty 
+    training and testing folds and then break. 
+    The argument `drop_empty_folds` can be set to `True` to drop invalid folds from validation and 
+    store them in the 
+    log.
+- **Documentation**
+  - Including Classification S-learner documentation and changing validator documentation to 
+    reflect changes.
+
 ## [2.1.0] - 2022-07-25
 - **Enhancement**
     - Add optional parameter `return_eval_logs_on_train` to the `validator` function,
