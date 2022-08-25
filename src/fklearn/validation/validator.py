@@ -1,17 +1,17 @@
 import gc
-from typing import Dict, Tuple, List
-import warnings
 import inspect
+import warnings
+from typing import Dict, Tuple, List
 
-from joblib import Parallel, delayed
 import pandas as pd
+from joblib import Parallel, delayed
 from toolz import compose
 from toolz.curried import assoc, curry, dissoc, first, map, partial, pipe
 from toolz.functoolz import identity
+from tqdm import tqdm
 
 from fklearn.types import EvalFnType, LearnerFnType, LogType
 from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
-from tqdm import tqdm
 
 
 def validator_iteration(data: pd.DataFrame,
@@ -54,6 +54,9 @@ def validator_iteration(data: pd.DataFrame,
 
     return_eval_logs_on_train : bool
         Whether to apply eval_fn to the training set and return the resulting logs in the train log
+
+    verbose : bool
+        Whether to print the starting status of the fold to be evaluated.
 
     Returns
     ----------
@@ -98,11 +101,12 @@ def validator(train_data: pd.DataFrame,
               predict_oof: bool = False,
               return_eval_logs_on_train: bool = False,
               return_all_train_logs: bool = False,
-              verbose: bool = False) -> ValidatorReturnType:
+              verbose: bool = False,
+              drop_empty_folds: bool = False) -> ValidatorReturnType:
     """
-    Splits the training data into folds given by the split function and
-    performs a train-evaluation sequence on each fold by calling
-    ``validator_iteration``.
+    Splits the training data into folds given by the split function and performs a train-evaluation sequence on each
+    fold by calling ``validator_iteration`` given the evaluation function. The output is a log containing, for each
+    fold, its logs and evaluator results.
 
     Parameters
     ----------
@@ -142,8 +146,11 @@ def validator(train_data: pd.DataFrame,
         Whether to return the train logs corresponding to all the splits or to return
         only the train log corresponding to the first split (default behavior = only first split)
 
-    verbose: bool
+    verbose : bool
         Whether to show more information about the cross validation or not
+
+    drop_empty_folds : bool
+        Whether to drop empty folds from validation and allocate them into an error log
 
     Returns
     ----------
@@ -157,13 +164,39 @@ def validator(train_data: pd.DataFrame,
 
     def fold_iter(fold: Tuple[int, Tuple[pd.Index, pd.Index]]) -> LogType:
         (fold_num, (train_index, test_indexes)) = fold
-        return validator_iteration(train_data, train_index, test_indexes, fold_num,
-                                   train_fn, eval_fn, predict_oof, return_eval_logs_on_train, verbose)
+
+        test_contains_null_folds = max(map(lambda x: len(x) == 0, test_indexes))
+        train_fold_is_null = len(train_index) == 0
+
+        if (train_fold_is_null or test_contains_null_folds) and drop_empty_folds:
+            return {"empty_fold": True}
+        else:
+            iter_results = validator_iteration(train_data, train_index, test_indexes, fold_num,
+                                               train_fn, eval_fn, predict_oof, return_eval_logs_on_train, verbose)
+
+        return assoc(iter_results, "empty_fold", False)
 
     zipped_logs = pipe(folds,
                        enumerate,
                        map(fold_iter),
                        partial(zip, logs))
+
+    def clean_logs(log_tuple: Tuple) -> Tuple:
+        split_log_error = list()
+
+        new_validator_logs = list()
+        new_split_log = list()
+        for split_log, validator_log in log_tuple:
+            if not validator_log["empty_fold"]:
+                new_validator_logs.append(dissoc(validator_log, "empty_fold"))
+                new_split_log.append(split_log)
+            else:
+                split_log_error.append(split_log)
+
+        return zip(new_split_log, new_validator_logs), split_log_error
+
+    if drop_empty_folds:
+        zipped_logs, zipped_error_logs = clean_logs(zipped_logs)
 
     def _join_split_log(log_tuple: Tuple[LogType, LogType]) -> Tuple[LogType, LogType]:
         train_log = {}
@@ -187,6 +220,9 @@ def validator(train_data: pd.DataFrame,
     if perturb_fn_test != identity:
         perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
     train_logs = assoc(train_logs, "perturbator_log", perturbator_log)
+
+    if drop_empty_folds:
+        train_logs = assoc(train_logs, "fold_error_logs", zipped_error_logs)
 
     return assoc(train_logs, "validator_log", list(validator_logs))
 
