@@ -275,6 +275,10 @@ def _simulate_t_learner_treatment_effect(
         treatment_fcn = learners[treatment_name]
         treatment_conversion_probability = treatment_fcn(df)[prediction_column].values
 
+        scored_df[
+            f"treatment_{treatment_name}__{prediction_column}_on_treatment"
+        ] = treatment_conversion_probability
+
         uplift_cols.append(f"treatment_{treatment_name}__uplift")
         scored_df[uplift_cols[-1]] = (
             treatment_conversion_probability - control_conversion_probability
