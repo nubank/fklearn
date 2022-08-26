@@ -1,6 +1,6 @@
 import copy
 import inspect
-from typing import Callable, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -191,28 +191,21 @@ def causal_s_classification_learner(
     [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
 
     [2] https://causalml.readthedocs.io/en/latest/methodology.html
-
     Parameters
     ----------
-
     df : pd.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column
         from the features.
-
     treatment_col: str
         The name of the column in `df` which contains the names of
         the treatments or control to which each data sample was subjected.
-
     control_name: str
         The name of the control group.
-
     prediction_column : str
         The name of the column with the predictions from the provided learner.
-
     learner: Callable
         A fklearn classification learner function.
-
     learner_transformers: list
         A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
@@ -265,4 +258,195 @@ def causal_s_classification_learner(
 
 causal_s_classification_learner.__doc__ += learner_return_docstring(
     "Causal S-Learner Classifier"
+)
+
+
+def _simulate_t_learner_treatment_effect(
+    df: pd.DataFrame,
+    learners: dict,
+    treatments: list,
+    control_name: str,
+    prediction_column: str,
+) -> pd.DataFrame:
+    control_fcn = learners[control_name]
+    control_conversion_probability = control_fcn(df)[prediction_column].values
+
+    scored_df = df.copy()
+
+    uplift_cols = []
+    for treatment_name in treatments:
+        treatment_fcn = learners[treatment_name]
+        treatment_conversion_probability = treatment_fcn(df)[prediction_column].values
+
+        scored_df[
+            f"treatment_{treatment_name}__{prediction_column}_on_treatment"
+        ] = treatment_conversion_probability
+
+        uplift_cols.append(f"treatment_{treatment_name}__uplift")
+        scored_df[uplift_cols[-1]] = (
+            treatment_conversion_probability - control_conversion_probability
+        )
+
+    scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
+    scored_df["suggested_treatment"] = np.where(
+        scored_df["uplift"].values <= 0,
+        control_name,
+        scored_df[uplift_cols].idxmax(axis=1).values,
+    )
+    scored_df["suggested_treatment"] = (
+        scored_df["suggested_treatment"]
+        .apply(lambda x: x.replace("__uplift", ""))
+        .values
+    )
+
+    return scored_df
+
+
+def _get_model_fcn(
+    df: pd.DataFrame,
+    treatment_col: str,
+    treatment_name: str,
+    learner: Callable,
+) -> Tuple[Callable, dict, dict]:
+    """
+    Returns a function that predicts the target column from the features.
+    """
+
+    treatment_names = df[treatment_col].unique()
+
+    if treatment_name not in treatment_names:
+        raise MissingTreatmentError()
+
+    df = df.loc[df[treatment_col] == treatment_name].reset_index(drop=True).copy()
+
+    return learner(df)
+
+
+def _get_learners(
+    df: pd.DataFrame,
+    control_learner: Callable,
+    treatment_learner: Callable,
+    unique_treatments: List[str],
+    control_name: str,
+    treatment_col: str,
+) -> Tuple[Dict[str, Callable], Dict[str, dict]]:
+    learners: Dict[str, Callable] = {}
+    logs: Dict[str, dict] = {}
+
+    learner_fcn, _, learner_logs = _get_model_fcn(
+        df, treatment_col, control_name, control_learner
+    )
+    learners[control_name] = learner_fcn
+    logs[control_name] = learner_logs
+
+    for treatment_name in unique_treatments:
+        learner_fcn, _, learner_logs = _get_model_fcn(
+            df, treatment_col, treatment_name, treatment_learner
+        )
+        learners[treatment_name] = learner_fcn
+        logs[treatment_name] = learner_logs
+
+    return learners, logs
+
+
+@curry
+def causal_t_classification_learner(
+    df: pd.DataFrame,
+    treatment_col: str,
+    control_name: str,
+    prediction_column: str,
+    learner: LearnerFnType,
+    treatment_learner: LearnerFnType = None,
+    learner_transformers: List[LearnerFnType] = None,
+) -> LearnerReturnType:
+    """
+    Fits a Causal T-Learner classifier. The T-Learner is a meta-learner which learns the
+    Conditional Average Treatment Effect (CATE) through the use of one Machine Learning
+    model for each treatment and for the control group. Each model is fitted in a subset of
+    the data, according to the treatment: the CATE $\tau$ is defined as
+    $\tau(x_{i}) = M_{1}(X=x_{i}, T=1) - M_{0}(X=x_{i}, T=0)$, being $M_{1}$ a model fitted
+    with treatment data and $M_{0}$ a model fitted with control data. Notice that $M_{0}$
+    and $M_{1}$ are traditional Machine Learning models such as a LightGBM Classifier and
+    that $x_{i}$ is the feature set of sample $i$.
+
+    References:
+    [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
+    [2] https://causalml.readthedocs.io/en/latest/methodology.html
+
+    Parameters
+    ----------
+
+    df : pd.DataFrame
+        A Pandas' DataFrame with features and target columns.
+        The model will be trained to predict the target column
+        from the features.
+
+    treatment_col: str
+        The name of the column in `df` which contains the names of
+        the treatments and control to which each data sample was subjected.
+
+    control_name: str
+        The name of the control group.
+
+    prediction_column : str
+        The name of the column with the predictions from the provided learner.
+
+    learner: LearnerFnType
+        A fklearn classification learner function.
+
+    treatment_learner: LearnerFnType
+        An optional fklearn classification learner function.
+
+    learner_transformers: List[LearnerFnType]
+        A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
+        This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
+    """
+
+    control_learner = copy.deepcopy(learner)
+
+    if treatment_learner is None:
+        treatment_learner = copy.deepcopy(learner)
+
+    # pipeline
+    if learner_transformers is not None:
+        learner_transformers = copy.deepcopy(learner_transformers)
+        control_learner_pipe = build_pipeline(*[control_learner] + learner_transformers)
+
+        treatment_learner_pipe = build_pipeline(
+            *[treatment_learner] + learner_transformers
+        )
+    else:
+        control_learner_pipe = copy.deepcopy(control_learner)
+        treatment_learner_pipe = copy.deepcopy(treatment_learner)
+
+    # learners
+    unique_treatments = _get_unique_treatments(df, treatment_col, control_name)
+
+    learners, learners_logs = _get_learners(
+        df=df,
+        control_learner=control_learner_pipe,
+        treatment_learner=treatment_learner_pipe,
+        unique_treatments=unique_treatments,
+        control_name=control_name,
+        treatment_col=treatment_col,
+    )
+
+    def p(new_df: pd.DataFrame) -> pd.DataFrame:
+        return _simulate_t_learner_treatment_effect(
+            new_df,
+            learners,
+            unique_treatments,
+            control_name,
+            prediction_column,
+        )
+
+    p.__doc__ = learner_pred_fn_docstring("causal_t_classification_learner")
+
+    log = {"causal_t_classification_learner": {**learners_logs}}
+
+    return p, p(df), log
+
+
+causal_t_classification_learner.__doc__ = learner_return_docstring(
+    "Causal T-Learner Classifier"
 )

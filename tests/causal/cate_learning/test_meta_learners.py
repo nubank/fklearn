@@ -1,20 +1,45 @@
-from unittest.mock import create_autospec, patch
+from typing import Callable
+from unittest.mock import MagicMock, call, create_autospec, patch
 
 import numpy as np
 import pandas as pd
 import pytest
+from pandas import DataFrame
+from pandas.testing import assert_frame_equal
+
 from fklearn.causal.cate_learning.meta_learners import (
     TREATMENT_FEATURE, _append_treatment_feature, _create_treatment_flag,
-    _filter_by_treatment, _fit_by_treatment, _get_unique_treatments,
-    _predict_by_treatment_flag, _simulate_treatment_effect,
-    causal_s_classification_learner)
+    _filter_by_treatment, _fit_by_treatment, _get_learners, _get_model_fcn,
+    _get_unique_treatments, _predict_by_treatment_flag,
+    _simulate_t_learner_treatment_effect, _simulate_treatment_effect,
+    causal_s_classification_learner, causal_t_classification_learner)
 from fklearn.exceptions.exceptions import (MissingControlError,
                                            MissingTreatmentError,
                                            MultipleTreatmentsError)
 from fklearn.training.classification import logistic_classification_learner
 from fklearn.types import LearnerFnType
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
+
+
+@pytest.fixture
+def base_input_df():
+    return pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1, 0.0, 1.0, 2.2, 0.4, -5.0],
+            "x2": [10, 4, 15, 6, 5, 12, 14, 5, 12],
+            "treatment": [
+                "A",
+                "B",
+                "A",
+                "A",
+                "B",
+                "control",
+                "control",
+                "B",
+                "control",
+            ],
+            "target": [1, 1, 1, 0, 0, 1, 0, 0, 1],
+        }
+    )
 
 
 def test__append_treatment_feature():
@@ -191,26 +216,7 @@ def test__create_treatment_flag():
     assert_frame_equal(results, expected)
 
 
-def test__fit_by_treatment():
-    df = pd.DataFrame(
-        {
-            "x1": [1.3, 1.0, 1.8, -0.1, 0.0, 1.0, 2.2, 0.4, -5.0],
-            "x2": [10, 4, 15, 6, 5, 12, 14, 5, 12],
-            "treatment": [
-                "A",
-                "B",
-                "A",
-                "A",
-                "B",
-                "control",
-                "control",
-                "B",
-                "control",
-            ],
-            "target": [1, 1, 1, 0, 0, 1, 0, 0, 1],
-        }
-    )
-
+def test__fit_by_treatment(base_input_df):
     learner_binary = logistic_classification_learner(
         features=["x1", "x2", TREATMENT_FEATURE],
         target="target",
@@ -220,7 +226,7 @@ def test__fit_by_treatment():
     treatments = ["A", "B"]
 
     learners, logs = _fit_by_treatment(
-        df,
+        base_input_df,
         learner=learner_binary,
         treatment_col="treatment",
         control_name="control",
@@ -352,27 +358,8 @@ def test_causal_s_classification_learner(
     mock_get_unique_treatments,
     mock_fit_by_treatment,
     mock_simulate_treatment_effect,
+    base_input_df,
 ):
-
-    df = pd.DataFrame(
-        {
-            "x1": [1.3, 1.0, 1.8, -0.1, 0.0, 1.0, 2.2, 0.4, -5.0],
-            "x2": [10, 4, 15, 6, 5, 12, 14, 5, 12],
-            "treatment": [
-                "A",
-                "B",
-                "A",
-                "A",
-                "B",
-                "control",
-                "control",
-                "B",
-                "control",
-            ],
-            "target": [1, 1, 1, 0, 0, 1, 0, 0, 1],
-        }
-    )
-
     mock_model = create_autospec(logistic_classification_learner)
     mock_fit_by_treatment.side_effect = [
         # treatment = A
@@ -382,7 +369,7 @@ def test_causal_s_classification_learner(
     ]
 
     causal_s_classification_learner(
-        df,
+        base_input_df,
         treatment_col="treatment",
         control_name="control",
         prediction_column="prediction",
@@ -394,3 +381,186 @@ def test_causal_s_classification_learner(
     mock_get_unique_treatments.assert_called()
     mock_fit_by_treatment.assert_called()
     mock_simulate_treatment_effect.assert_called()
+
+
+def test_simulate_t_learner_treatment_effect():
+    df = pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1],
+            "x2": [10, 4, 15, 6],
+            "treatment": ["A", "B", "A", "control"],
+            "target": [0, 0, 0, 1],
+        }
+    )
+
+    treatments = ["A", "B"]
+    control_name = "control"
+    prediction_column = "prediction"
+
+    control_learner = MagicMock()
+    control_learner.side_effect = lambda _: pd.DataFrame({"prediction": [1, 2, 3, 4]})
+
+    treatment_learner = MagicMock()
+    treatment_learner.side_effect = lambda _: pd.DataFrame({"prediction": [3, 2, 4, 4]})
+
+    learners = {
+        "control": control_learner,
+        "A": treatment_learner,
+        "B": treatment_learner,
+    }
+
+    result = _simulate_t_learner_treatment_effect(
+        df,
+        learners,
+        treatments,
+        control_name,
+        prediction_column,
+    )
+
+    print(result.suggested_treatment)
+
+    expected = pd.DataFrame(
+        {
+            "x1": [1.3, 1.0, 1.8, -0.1],
+            "x2": [10, 4, 15, 6],
+            "treatment": ["A", "B", "A", "control"],
+            "target": [0, 0, 0, 1],
+            "treatment_A__prediction_on_treatment": [3, 2, 4, 4],
+            "treatment_A__uplift": [2, 0, 1, 0],
+            "treatment_B__prediction_on_treatment": [3, 2, 4, 4],
+            "treatment_B__uplift": [2, 0, 1, 0],
+            "uplift": [2, 0, 1, 0],
+            "suggested_treatment": ["treatment_A", "control", "treatment_A", "control"],
+        }
+    )
+
+    assert isinstance(result, pd.DataFrame)
+    assert_frame_equal(result, expected)
+
+
+def test_get_model_fcn(base_input_df):
+    """
+    Test if the fn is filtering the data
+    Test if the learner is called with the filtered data
+    """
+
+    fake_prediction_column = [0.1, 0.2, 0.3]
+    df_expected = pd.DataFrame(
+        {
+            "x1": [1.3, 1.8, -0.1],
+            "x2": [10, 15, 6],
+            "treatment": [
+                "A",
+                "A",
+                "A",
+            ],
+            "target": [1, 1, 0],
+            "prediction": fake_prediction_column,
+        }
+    )
+
+    def mock_learner(df):
+        df["prediction"] = fake_prediction_column
+
+        return (lambda x: x, df, dict())
+
+    learner = MagicMock()
+    learner.side_effect = mock_learner
+
+    mock_fcn, mock_p_df, mock_logs = _get_model_fcn(
+        base_input_df, "treatment", "A", learner
+    )
+
+    assert isinstance(mock_fcn, Callable)
+    assert_frame_equal(mock_p_df, df_expected)
+    assert isinstance(mock_logs, dict)
+
+
+def test_get_model_fcn_exception(base_input_df):
+    """
+    Test if the fn is raising an exception when treatment name
+    is not in treatment list.
+    """
+
+    fake_prediction_column = [0.1, 0.2, 0.3]
+
+    def mock_learner(df):
+        df["prediction"] = fake_prediction_column
+
+        return (lambda x: x, df, dict())
+
+    learner = MagicMock()
+    learner.side_effect = mock_learner
+
+    with pytest.raises(Exception) as e:
+        _ = _get_model_fcn(base_input_df, "treatment", "C", learner)
+
+    assert e.type == MissingTreatmentError
+
+
+@patch("fklearn.causal.cate_learning.meta_learners._get_model_fcn")
+def test_get_learners(mock_get_model_fcn):
+    """
+    Test if it is receiving a list of treatments and is returning a dict
+    of learners.
+    """
+    unique_treatments = ["treatment_a", "treatment_b", "treatment_c"]
+
+    mock_get_model_fcn.side_effect = [
+        ("mocked_control_fcn", None, None),
+        ("mocked_treatment_fcn_filtering_treatment_a", None, None),
+        ("mocked_treatment_fcn_filtering_treatment_b", None, None),
+        ("mocked_treatment_fcn_filtering_treatment_c", None, None),
+    ]
+
+    learners, logs = _get_learners(
+        df="mocked_df",
+        unique_treatments=unique_treatments,
+        treatment_col="treatment",
+        control_name="control",
+        control_learner="mocked_control_fcn",
+        treatment_learner="mocked_treatment_fcn",
+    )
+
+    assert learners["control"] == "mocked_control_fcn"
+    assert learners["treatment_a"] == "mocked_treatment_fcn_filtering_treatment_a"
+    assert learners["treatment_b"] == "mocked_treatment_fcn_filtering_treatment_b"
+    assert learners["treatment_c"] == "mocked_treatment_fcn_filtering_treatment_c"
+    assert isinstance(learners, dict)
+    assert isinstance(logs, dict)
+
+    calls = [
+        call("mocked_df", "treatment", "control", "mocked_control_fcn"),
+        call("mocked_df", "treatment", "treatment_a", "mocked_treatment_fcn"),
+        call("mocked_df", "treatment", "treatment_b", "mocked_treatment_fcn"),
+        call("mocked_df", "treatment", "treatment_c", "mocked_treatment_fcn"),
+    ]
+
+    mock_get_model_fcn.assert_has_calls(calls)
+
+
+@patch(
+    "fklearn.causal.cate_learning.meta_learners._simulate_t_learner_treatment_effect"
+)
+@patch("fklearn.causal.cate_learning.meta_learners._get_learners")
+@patch("fklearn.causal.cate_learning.meta_learners._get_unique_treatments")
+def test_causal_t_classification_learner(
+    mock_get_unique_treatments,
+    mock_get_learners,
+    mock_simulate_t_learner_treatment_effect,
+    base_input_df,
+):
+    mock_get_learners.side_effect = [([], dict())]
+    mock_model = create_autospec(logistic_classification_learner)
+
+    causal_t_classification_learner(
+        df=base_input_df,
+        treatment_col="treatment",
+        control_name="control",
+        prediction_column="prediction",
+        learner=mock_model,
+    )
+
+    mock_get_unique_treatments.assert_called()
+    mock_get_learners.assert_called()
+    mock_simulate_t_learner_treatment_effect.assert_called()
