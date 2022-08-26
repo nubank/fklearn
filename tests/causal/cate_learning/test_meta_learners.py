@@ -417,13 +417,17 @@ def test_simulate_t_learner_treatment_effect():
         prediction_column,
     )
 
+    print(result.suggested_treatment)
+
     expected = pd.DataFrame(
         {
             "x1": [1.3, 1.0, 1.8, -0.1],
             "x2": [10, 4, 15, 6],
             "treatment": ["A", "B", "A", "control"],
             "target": [0, 0, 0, 1],
+            "treatment_A__prediction_on_treatment": [3, 2, 4, 4],
             "treatment_A__uplift": [2, 0, 1, 0],
+            "treatment_B__prediction_on_treatment": [3, 2, 4, 4],
             "treatment_B__uplift": [2, 0, 1, 0],
             "uplift": [2, 0, 1, 0],
             "suggested_treatment": ["treatment_A", "control", "treatment_A", "control"],
