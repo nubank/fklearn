@@ -2,7 +2,7 @@
 
 ## [2.2.0] - 2022-08-25
 - **Enhancement**
-  - Including Classification S-Learner model to the causal cate learning library.
+  - Including Classification S-Learner and T-Learner models to the causal cate learning library.
 - **Bug Fix**
   - Fix validator behavior when receiving data containing gaps and a time based split function that
     could generate empty 
@@ -11,7 +11,7 @@
     store them in the 
     log.
 - **Documentation**
-  - Including Classification S-learner documentation and changing validator documentation to 
+  - Including Classification S-Learner and T-Learner documentation, also changing validator documentation to 
     reflect changes.
 
 ## [2.1.0] - 2022-07-25
