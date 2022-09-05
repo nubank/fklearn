@@ -9,7 +9,7 @@ from fklearn.training.classification import \
     logistic_classification_learner, xgb_classification_learner, \
     nlp_logistic_classification_learner, lgbm_classification_learner, \
     catboost_classification_learner
-from unittest.mock import MagicMock, call, create_autospec, patch, Mock
+from unittest.mock import MagicMock, patch, Mock
 
 
 def test_logistic_classification_learner():
