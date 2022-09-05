@@ -469,7 +469,7 @@ def test_exponential_coefficient_evaluator():
 
     result = exponential_coefficient_evaluator(predictions)
 
-    assert result['exponential_coefficient_evaluator__target'] == a1
+    assert result['exponential_coefficient_evaluator__target'] == pytest.approx(a1)
 
 
 def test_logistic_coefficient_evaluator():
