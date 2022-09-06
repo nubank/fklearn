@@ -185,8 +185,11 @@ def causal_s_classification_learner(
     of a new sample for both scenarios, i.e., with T = 0 and T = 1. The CATE τ
     is defined as τ(xi) = M(X=xi, T=1) - M(X=xi, T=0), being M a Machine Learning
     Model.
-    References:
+
+    **References:**
+
     [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
+
     [2] https://causalml.readthedocs.io/en/latest/methodology.html
     Parameters
     ----------
