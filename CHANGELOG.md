@@ -3,6 +3,7 @@
 ## [2.2.1] - 2022-09-06
 - **Bug Fix**
   - Including a necessary init file to allow the import of the causal cate learners.
+  - Fix a docstring issue where the description of causal learners were not showing all parameters.
 
 ## [2.2.0] - 2022-08-25
 - **Enhancement**
