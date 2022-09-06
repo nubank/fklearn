@@ -191,6 +191,7 @@ def causal_s_classification_learner(
     [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
 
     [2] https://causalml.readthedocs.io/en/latest/methodology.html
+
     Parameters
     ----------
     df : pd.DataFrame
@@ -369,34 +370,29 @@ def causal_t_classification_learner(
     and $M_{1}$ are traditional Machine Learning models such as a LightGBM Classifier and
     that $x_{i}$ is the feature set of sample $i$.
 
-    References:
+    **References:**
+
     [1] https://matheusfacure.github.io/python-causality-handbook/21-Meta-Learners.html
+
     [2] https://causalml.readthedocs.io/en/latest/methodology.html
 
     Parameters
     ----------
-
     df : pd.DataFrame
         A Pandas' DataFrame with features and target columns.
         The model will be trained to predict the target column
         from the features.
-
     treatment_col: str
         The name of the column in `df` which contains the names of
         the treatments and control to which each data sample was subjected.
-
     control_name: str
         The name of the control group.
-
     prediction_column : str
         The name of the column with the predictions from the provided learner.
-
     learner: LearnerFnType
         A fklearn classification learner function.
-
     treatment_learner: LearnerFnType
         An optional fklearn classification learner function.
-
     learner_transformers: List[LearnerFnType]
         A list of fklearn transformer functions to be applied after the learner and before estimating the CATE.
         This parameter may be useful, for example, to estimate the CATE with calibrated classifiers.
@@ -447,6 +443,6 @@ def causal_t_classification_learner(
     return p, p(df), log
 
 
-causal_t_classification_learner.__doc__ = learner_return_docstring(
+causal_t_classification_learner.__doc__ += learner_return_docstring(
     "Causal T-Learner Classifier"
 )
