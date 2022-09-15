@@ -38,10 +38,14 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
     def p(test_data: pd.DataFrame,
           prediction_column: str = "prediction",
           target_column: str = "target",
+          weight_column: str = None,
           eval_name: str = None,
           **kwargs: Any) -> EvalReturnType:
         try:
-            score = sklearn_metric(test_data[target_column], test_data[prediction_column], **kwargs)
+            score = sklearn_metric(test_data[target_column],
+                                   test_data[prediction_column],
+                                   sample_weight=None if weight_column is None else test_data[weight_column],
+                                   **kwargs)
         except ValueError:
             # this might happen if there's only one class in the fold
             score = np.nan
@@ -58,6 +62,7 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
 def auc_evaluator(test_data: pd.DataFrame,
                   prediction_column: str = "prediction",
                   target_column: str = "target",
+                  weight_column: str = None,
                   eval_name: str = None) -> EvalReturnType:
     """
     Computes the ROC AUC score, given true label and prediction scores.
@@ -73,6 +78,9 @@ def auc_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -86,13 +94,14 @@ def auc_evaluator(test_data: pd.DataFrame,
                   " Please use `roc_auc_evaluator` instead of `auc_evaluator` for Area Under the Curve of the"
                   " Receiver Operating Characteristics curve.")
 
-    return roc_auc_evaluator(test_data, prediction_column, target_column, eval_name)
+    return roc_auc_evaluator(test_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
 def roc_auc_evaluator(test_data: pd.DataFrame,
                       prediction_column: str = "prediction",
                       target_column: str = "target",
+                      weight_column: str = None,
                       eval_name: str = None) -> EvalReturnType:
     """
     Computes the ROC AUC score, given true label and prediction scores.
@@ -108,6 +117,9 @@ def roc_auc_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -120,13 +132,14 @@ def roc_auc_evaluator(test_data: pd.DataFrame,
     eval_fn = generic_sklearn_evaluator("roc_auc_evaluator__", roc_auc_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
 def pr_auc_evaluator(test_data: pd.DataFrame,
                      prediction_column: str = "prediction",
                      target_column: str = "target",
+                     weight_column: str = None,
                      eval_name: str = None) -> EvalReturnType:
     """
     Computes the PR AUC score, given true label and prediction scores.
@@ -142,6 +155,9 @@ def pr_auc_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -153,7 +169,7 @@ def pr_auc_evaluator(test_data: pd.DataFrame,
     eval_fn = generic_sklearn_evaluator("pr_auc_evaluator__", average_precision_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
@@ -161,6 +177,7 @@ def precision_evaluator(test_data: pd.DataFrame,
                         threshold: float = 0.5,
                         prediction_column: str = "prediction",
                         target_column: str = "target",
+                        weight_column: str = None,
                         eval_name: str = None) -> EvalReturnType:
     """
     Computes the precision score, given true label and prediction scores.
@@ -180,6 +197,9 @@ def precision_evaluator(test_data: pd.DataFrame,
     target_column : str
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -191,7 +211,7 @@ def precision_evaluator(test_data: pd.DataFrame,
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
@@ -199,6 +219,7 @@ def recall_evaluator(test_data: pd.DataFrame,
                      threshold: float = 0.5,
                      prediction_column: str = "prediction",
                      target_column: str = "target",
+                     weight_column: str = None,
                      eval_name: str = None) -> EvalReturnType:
     """
     Computes the recall score, given true label and prediction scores.
@@ -219,6 +240,9 @@ def recall_evaluator(test_data: pd.DataFrame,
     target_column : str
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -231,7 +255,7 @@ def recall_evaluator(test_data: pd.DataFrame,
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
     eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
@@ -240,6 +264,7 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
                           beta: float = 1.0,
                           prediction_column: str = "prediction",
                           target_column: str = "target",
+                          weight_column: str = None,
                           eval_name: str = None) -> EvalReturnType:
     """
     Computes the F-beta score, given true label and prediction scores.
@@ -265,6 +290,9 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
     target_column : str
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -277,13 +305,14 @@ def fbeta_score_evaluator(test_data: pd.DataFrame,
     eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
     eval_fn = generic_sklearn_evaluator("fbeta_evaluator__", fbeta_score)
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name, beta=beta)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name, beta=beta)
 
 
 @curry
 def logloss_evaluator(test_data: pd.DataFrame,
                       prediction_column: str = "prediction",
                       target_column: str = "target",
+                      weight_column: str = None,
                       eval_name: str = None) -> EvalReturnType:
     """
     Computes the logloss score, given true label and prediction scores.
@@ -299,6 +328,9 @@ def logloss_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -311,13 +343,14 @@ def logloss_evaluator(test_data: pd.DataFrame,
     eval_fn = generic_sklearn_evaluator("logloss_evaluator__", log_loss)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
 def brier_score_evaluator(test_data: pd.DataFrame,
                           prediction_column: str = "prediction",
                           target_column: str = "target",
+                          weight_column: str = None,
                           eval_name: str = None) -> EvalReturnType:
     """
     Computes the Brier score, given true label and prediction scores.
@@ -333,6 +366,9 @@ def brier_score_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the binary target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         The name of the evaluator as it will appear in the logs.
 
@@ -345,7 +381,7 @@ def brier_score_evaluator(test_data: pd.DataFrame,
     eval_fn = generic_sklearn_evaluator("brier_score_evaluator__", brier_score_loss)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
-    return eval_fn(eval_data, prediction_column, target_column, eval_name)
+    return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
@@ -442,6 +478,7 @@ def expected_calibration_error_evaluator(test_data: pd.DataFrame,
 def r2_evaluator(test_data: pd.DataFrame,
                  prediction_column: str = "prediction",
                  target_column: str = "target",
+                 weight_column: str = None,
                  eval_name: str = None) -> EvalReturnType:
     """
     Computes the R2 score, given true label and predictions.
@@ -457,6 +494,9 @@ def r2_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the continuous target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -468,13 +508,14 @@ def r2_evaluator(test_data: pd.DataFrame,
 
     eval_fn = generic_sklearn_evaluator("r2_evaluator__", r2_score)
 
-    return eval_fn(test_data, prediction_column, target_column, eval_name)
+    return eval_fn(test_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
 def mse_evaluator(test_data: pd.DataFrame,
                   prediction_column: str = "prediction",
                   target_column: str = "target",
+                  weight_column: str = None,
                   eval_name: str = None) -> EvalReturnType:
     """
     Computes the Mean Squared Error, given true label and predictions.
@@ -490,6 +531,9 @@ def mse_evaluator(test_data: pd.DataFrame,
     target_column : String
         The name of the column in `test_data` with the continuous target.
 
+    weight_column : String (default=None)
+        The name of the column in `test_data` with the sample weights.
+
     eval_name : String, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
@@ -500,7 +544,7 @@ def mse_evaluator(test_data: pd.DataFrame,
     """
     eval_fn = generic_sklearn_evaluator("mse_evaluator__", mean_squared_error)
 
-    return eval_fn(test_data, prediction_column, target_column, eval_name)
+    return eval_fn(test_data, prediction_column, target_column, weight_column, eval_name)
 
 
 @curry
