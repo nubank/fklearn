@@ -205,7 +205,37 @@ def test_lgbm_regression_learner():
     assert Counter(expected_col_train) == Counter(pred_train.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
     assert (pred_test.columns == pred_train.columns).all()
+    assert all(tree['num_cat'] == 0 for tree in log['object'].dump_model()['tree_info'])
     assert "prediction" in pred_test.columns
+
+    # SHAP test
+    pred_shap = predict_fn(df_test, apply_shap=True)
+    assert "shap_values" in pred_shap.columns
+    assert "shap_expected_value" in pred_shap.columns
+    assert np.vstack(pred_shap["shap_values"]).shape == (4, 2)
+
+    learner = lgbm_regression_learner(features=features,
+                                      target="y",
+                                      learning_rate=0.1,
+                                      num_estimators=1,
+                                      categorical_features=["x2"],
+                                      extra_params={"max_depth": 2,
+                                                    "min_data_in_leaf": 1,
+                                                    "min_data_per_group": 1,
+                                                    "seed": 42},
+                                      prediction_column="prediction")
+
+    predict_fn, pred_train, log = learner(df_train)
+
+    pred_test = predict_fn(df_test)
+
+    expected_col_train = df_train.columns.tolist() + ["prediction"]
+    expected_col_test = df_test.columns.tolist() + ["prediction"]
+
+    assert Counter(expected_col_train) == Counter(pred_train.columns.tolist())
+    assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
+    assert (pred_test.columns == pred_train.columns).all()
+    assert any(tree['num_cat'] > 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test
     pred_shap = predict_fn(df_test, apply_shap=True)

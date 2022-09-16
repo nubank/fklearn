@@ -424,6 +424,20 @@ def test_lgbm_classification_learner():
         'y': [1, 2, 0, 1, 2, 0]
     })
 
+    df_train_categorical = pd.DataFrame({
+        "id": ["id1", "id2", "id3", "id4"],
+        "x1": [1, 1, 1, 1],
+        "x2": [3, 4, 4, 3],
+        "y": [0, 1, 1, 0],
+    })
+
+    df_test_categorical = pd.DataFrame({
+        "id": ["id5", "id6", "id7", "id8"],
+        "x1": [0, 0, 0, 0],
+        "x2": [3, 3, 4, 4],
+        "y": [0, 0, 1, 1],
+    })
+
     features = ["x1", "x2"]
 
     learner_binary = lgbm_classification_learner(features=features,
@@ -446,6 +460,7 @@ def test_lgbm_classification_learner():
     assert pred_test_binary.prediction.max() < 1
     assert pred_test_binary.prediction.min() > 0
     assert (pred_test_binary.columns == pred_train_binary.columns).all()
+    assert all(tree['num_cat'] == 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test
     pred_shap = predict_fn_binary(df_test_binary, apply_shap=True)
@@ -474,6 +489,7 @@ def test_lgbm_classification_learner():
     assert Counter(expected_col_train) == Counter(pred_train_multinomial.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test_multinomial.columns.tolist())
     assert (pred_test_multinomial.columns == pred_train_multinomial.columns).all()
+    assert all(tree['num_cat'] == 0 for tree in log['object'].dump_model()['tree_info'])
 
     # SHAP test multinomial
     pred_shap_multinomial = predict_fn_multinomial(df_test_multinomial, apply_shap=True)
@@ -482,3 +498,35 @@ def test_lgbm_classification_learner():
         ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
     assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
     assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
+
+    learner_binary = lgbm_classification_learner(features=features,
+                                                 target="y",
+                                                 learning_rate=0.1,
+                                                 num_estimators=1,
+                                                 categorical_features=["x2"],
+                                                 extra_params={"max_depth": 2,
+                                                               "min_data_in_leaf": 1,
+                                                               "min_data_per_group": 1,
+                                                               "seed": 42,
+                                                               "objective": "binary"},
+                                                 prediction_column="prediction")
+
+    predict_fn_categorical, pred_train_categorical, log = learner_binary(df_train_categorical)
+
+    pred_test_categorical = predict_fn_categorical(df_test_categorical)
+
+    expected_col_train = df_train_categorical.columns.tolist() + ["prediction"]
+    expected_col_test = df_test_categorical.columns.tolist() + ["prediction"]
+
+    assert Counter(expected_col_train) == Counter(pred_train_categorical.columns.tolist())
+    assert Counter(expected_col_test) == Counter(pred_test_categorical.columns.tolist())
+    assert pred_test_categorical.prediction.max() < 1
+    assert pred_test_categorical.prediction.min() > 0
+    assert (pred_test_binary.columns == pred_train_binary.columns).all()
+    assert any(tree['num_cat'] > 0 for tree in log['object'].dump_model()['tree_info'])
+
+    # SHAP test
+    pred_shap = predict_fn_categorical(df_test_categorical, apply_shap=True)
+    assert "shap_values" in pred_shap.columns
+    assert "shap_expected_value" in pred_shap.columns
+    assert np.vstack(pred_shap["shap_values"]).shape == (4, 2)
