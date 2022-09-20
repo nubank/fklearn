@@ -446,7 +446,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
     """
 
     # set default params
-    default_vect_params = {"strip_accents": "unicode", "min_df": 20}
+    default_vect_params = {"strip_accents": "unicode", "min_df": 0}
     merged_vect_params = default_vect_params if not vectorizer_params else merge(default_vect_params, vectorizer_params)
 
     default_clf_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
