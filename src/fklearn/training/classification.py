@@ -511,14 +511,16 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 valid_names: Optional[List[str]] = None,
                                 feval: Optional[Union[
                                     Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
-                                    List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]] = None,
+                                    List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
+                                ] = None,
                                 init_model: Optional[Union[str, Path, Booster]] = None,
                                 feature_name: Union[List[str], str] = 'auto',
                                 categorical_feature: Union[List[str], List[int], str] = 'auto',
                                 keep_training_booster: bool = False,
                                 callbacks: Optional[List[Callable]] = None,
                                 dataset_init_score: Optional[Union[
-                                    List, List[List], np.array, pd.Series, pd.DataFrame]] = None) -> LearnerReturnType:
+                                    List, List[List], np.array, pd.Series, pd.DataFrame]
+                                ] = None) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -572,11 +574,13 @@ def lgbm_classification_learner(df: pd.DataFrame,
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
 
-    valid_sets :
+    valid_sets : list of pandas.DataFrame, optional (default=None)
+        A list of datasets to be used for early-stopping during training.
 
-    valid_names :
+    valid_names : list of strings, optional (default=None)
+        A list of dataset names matching the list of datasets provided through the ``valid_sets`` parameter.
 
-    feval :  callable, list of callable, or None, optional (default=None)
+    feval : callable, list of callable, or None, optional (default=None)
         Customized evaluation function. Each evaluation function should accept two parameters: preds, eval_data, and
         return (eval_name, eval_result, is_higher_better) or list of such tuples.
 
