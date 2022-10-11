@@ -10,10 +10,10 @@ from fklearn.validation.splitters import out_of_time_and_space_splitter
 
 def test_random_search_tuner(tmpdir):
     train_set = pd.DataFrame({
-        'id': ["id1", "id2", "id3", "id3", "id4", "id5", "id6"],
-        'date': pd.to_datetime(["2016-01-01", "2016-02-01", "2016-03-01", "2016-05-01", "2016-06-01", "2016-07-01", "2016-08-01"]),
-        'x': [.2, .9, .3, .3, .4, .4, .5],
-        'target': [0, 1, 0, 1, 0, 1, 1]
+        'id': ["id1", "id2", "id2", "id3", "id4", "id5"],
+        'date': pd.to_datetime(["2016-02-01", "2016-03-01", "2016-05-01", "2016-06-01", "2016-07-01", "2016-08-01"]),
+        'x': [.9, .3, .3, .4, .4, .5],
+        'target': [1, 0, 1, 0, 1, 1]
     })
 
     eval_fn = roc_auc_evaluator(target_column="target")
@@ -45,10 +45,10 @@ def test_random_search_tuner(tmpdir):
 
 def test_grid_search_tuner(tmpdir):
     train_set = pd.DataFrame({
-        'id': ["id1", "id2", "id3", "id3", "id4", "id5", "id6"],
-        'date': pd.to_datetime(["2016-01-01", "2016-02-01", "2016-03-01", "2016-05-01", "2016-06-01", "2016-07-01", "2016-08-01"]),
-        'x': [.2, .9, .3, .3, .4, .4, .5],
-        'target': [0, 1, 0, 1, 0, 1, 1]
+        'id': ["id1", "id2", "id2", "id3", "id4", "id5"],
+        'date': pd.to_datetime(["2016-02-01", "2016-03-01", "2016-05-01", "2016-06-01", "2016-07-01", "2016-08-01"]),
+        'x': [.9, .3, .3, .4, .4, .5],
+        'target': [1, 0, 1, 0, 1, 1]
     })
 
     eval_fn = roc_auc_evaluator(target_column="target")
