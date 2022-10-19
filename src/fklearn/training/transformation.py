@@ -1,9 +1,9 @@
-from typing import Any, Callable, Dict, List, Union, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from numpy import nan
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from statsmodels.distributions import empirical_distribution as ed
 from toolz import curry, merge, compose, mapcat
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
@@ -884,6 +884,54 @@ def standard_scaler(df: pd.DataFrame,
 
 
 standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
+
+
+@column_duplicatable('columns_to_minmax_scale')
+@curry
+@log_learner_time(learner_name='minmax_scaler')
+def minmax_scaler(df: pd.DataFrame,
+                  columns_to_minmax_scale: List[str],
+                  feature_range: Tuple[float, float] = (0, 1)) -> LearnerReturnType:
+    """
+    Transform features by scaling each feature to a given range.
+
+    This estimator scales and translates each feature individually such
+    that it is in the given range on the training set, e.g. between zero
+    and one.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        A Pandas' DataFrame with columns to scale.
+        It must contain all columns listed in `columns_to_scale`.
+
+    columns_to_minmax_scale : list of str
+        A list of names of the columns for min-max scaling.
+
+    feature_range : tuple (min, max), default=(0, 1)
+        Desired range of transformed data.
+    """
+
+    scaler = MinMaxScaler(feature_range=feature_range)
+
+    scaler.fit(df[columns_to_minmax_scale].values)
+
+    def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
+        new_data = scaler.transform(new_data_set[columns_to_minmax_scale].values)
+        new_cols = pd.DataFrame(data=new_data, columns=columns_to_minmax_scale).to_dict('list')
+        return new_data_set.assign(**new_cols)
+
+    p.__doc__ = learner_pred_fn_docstring("minmax_scaler")
+
+    log = {'minmax_scaler': {
+        'minmax_scaler': scaler.get_params(),
+        'transformed_column': columns_to_minmax_scale}}
+
+    return p, p(df), log
+
+
+minmax_scaler.__doc__ += learner_return_docstring("MinMax Scaler")
 
 
 @column_duplicatable('columns_to_transform')
