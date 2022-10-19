@@ -893,11 +893,9 @@ def minmax_scaler(df: pd.DataFrame,
                   columns_to_minmax_scale: List[str],
                   feature_range: Tuple[float, float] = (0, 1)) -> LearnerReturnType:
     """
-    Transform features by scaling each feature to a given range.
+    Fits a minmax scaler to the dataset using a desired range.
 
-    This estimator scales and translates each feature individually such
-    that it is in the given range on the training set, e.g. between zero
-    and one.
+    The scaler will replace the original values in the dataset.
 
     Parameters
     ----------
