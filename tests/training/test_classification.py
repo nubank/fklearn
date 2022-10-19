@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
 
+import lightgbm
 import numpy as np
 import pandas as pd
 
@@ -8,6 +9,7 @@ from fklearn.training.classification import \
     logistic_classification_learner, xgb_classification_learner, \
     nlp_logistic_classification_learner, lgbm_classification_learner, \
     catboost_classification_learner
+from unittest.mock import MagicMock, patch, Mock
 
 
 def test_logistic_classification_learner():
@@ -482,3 +484,90 @@ def test_lgbm_classification_learner():
         ["shap_expected_value_0", "shap_expected_value_1", "shap_expected_value_2"]
     assert Counter(expected_col_shap) == Counter(pred_shap_multinomial.columns.tolist())
     assert np.vstack(pred_shap_multinomial["shap_values_0"]).shape == (6, 2)
+
+
+def test_lgbm_classification_learner_params():
+    # Test input parameters
+
+    df = pd.DataFrame(
+        {"feat1": [1, 2, 1, 1, 1, 0],
+         "feat2": [0.1, 0.5, 0.2, 0.5, 0.0, 0.1],
+         "target": [1, 0, 1, 1, 0, 0]
+         }
+    )
+
+    features = ["feat1", "feat2"]
+    target = "target"
+
+    df_result = pd.DataFrame(
+        {"feat1": [1, 2, 1, 1, 1, 0],
+         "feat2": [0.1, 0.5, 0.2, 0.5, 0.0, 0.1],
+         "target": [1, 0, 1, 1, 0, 0],
+         "prediction": [0.9, 0.0, 1.0, 1.0, 0.0, 0.0],
+         }
+    )
+
+    lgbm_dataset = lightgbm.Dataset(df[features].values, label=df[target], silent=True)
+
+    mock_lgbm = MagicMock()
+    mock_lgbm.predict.return_value = df_result["prediction"]
+    mock_lgbm.Dataset.return_value = lgbm_dataset
+    mock_lgbm.train.return_value = mock_lgbm
+
+    mock_lgbm.__version__ = Mock(return_value='1.0')
+
+    with patch.dict("sys.modules", lightgbm=mock_lgbm):
+        # default settings
+        lgbm_classification_learner(df=df,
+                                    features=["feat1", "feat2"],
+                                    target="target",
+                                    learning_rate=0.1,
+                                    num_estimators=100
+                                    )
+
+        mock_lgbm.train.assert_called()
+        mock_lgbm.train.assert_called_with(
+            params={'eta': 0.1, 'objective': 'binary'},
+            train_set=lgbm_dataset,
+            num_boost_round=100,
+            valid_sets=None,
+            valid_names=None,
+            feval=None,
+            init_model=None,
+            feature_name='auto',
+            categorical_feature='auto',
+            keep_training_booster=False,
+            callbacks=None
+        )
+
+        # Non default value for keep training booster
+        lgbm_classification_learner(
+            df=df,
+            features=["feat1", "feat2"],
+            target="target",
+            learning_rate=0.1,
+            num_estimators=100,
+            valid_sets=None,
+            valid_names=None,
+            feval=None,
+            init_model=None,
+            feature_name='auto',
+            categorical_feature='auto',
+            keep_training_booster=True,
+            callbacks=None,
+            dataset_init_score=None
+        )
+
+        mock_lgbm.train.assert_called_with(
+            params={'eta': 0.1, 'objective': 'binary'},
+            train_set=lgbm_dataset,
+            num_boost_round=100,
+            valid_sets=None,
+            valid_names=None,
+            feval=None,
+            init_model=None,
+            feature_name='auto',
+            categorical_feature='auto',
+            keep_training_booster=True,
+            callbacks=None
+        )
