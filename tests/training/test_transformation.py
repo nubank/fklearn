@@ -1242,7 +1242,7 @@ def test_standard_scaler():
 
 def test_minmax_scaler():
     input_df_train = pd.DataFrame({"feat1_num": [1.0, 0.5, 100.0],
-                                   "feat2_num":[-4.5, 10.2, 7.4]})
+                                   "feat2_num": [-4.5, 10.2, 7.4]})
 
     expected_output_train = pd.DataFrame(
         {"feat1_num": [0.005025, 0.0, 1.0],
