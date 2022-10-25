@@ -1,7 +1,9 @@
-from typing import List, Any
+from typing import List, Any, Optional, Callable, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from lightgbm import Booster
+from pathlib import Path
 from toolz import curry, merge, assoc
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -446,7 +448,7 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
     """
 
     # set default params
-    default_vect_params = {"strip_accents": "unicode", "min_df": 20}
+    default_vect_params = {"strip_accents": "unicode", "min_df": 1}
     merged_vect_params = default_vect_params if not vectorizer_params else merge(default_vect_params, vectorizer_params)
 
     default_clf_params = {"C": 0.1, "multi_class": "ovr", "solver": "liblinear"}
@@ -501,10 +503,24 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 target: str,
                                 learning_rate: float = 0.1,
                                 num_estimators: int = 100,
-                                extra_params: LogType = None,
+                                extra_params: Optional[LogType] = None,
                                 prediction_column: str = "prediction",
-                                weight_column: str = None,
-                                encode_extra_cols: bool = True) -> LearnerReturnType:
+                                weight_column: Optional[str] = None,
+                                encode_extra_cols: bool = True,
+                                valid_sets: Optional[List[pd.DataFrame]] = None,
+                                valid_names: Optional[List[str]] = None,
+                                feval: Optional[Union[
+                                    Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
+                                    List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
+                                ] = None,
+                                init_model: Optional[Union[str, Path, Booster]] = None,
+                                feature_name: Union[List[str], str] = 'auto',
+                                categorical_feature: Union[List[str], List[int], str] = 'auto',
+                                keep_training_booster: bool = False,
+                                callbacks: Optional[List[Callable]] = None,
+                                dataset_init_score: Optional[Union[
+                                    List, List[List], np.array, pd.Series, pd.DataFrame]
+                                ] = None) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -557,6 +573,46 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+
+    valid_sets : list of pandas.DataFrame, optional (default=None)
+        A list of datasets to be used for early-stopping during training.
+
+    valid_names : list of strings, optional (default=None)
+        A list of dataset names matching the list of datasets provided through the ``valid_sets`` parameter.
+
+    feval : callable, list of callable, or None, optional (default=None)
+        Customized evaluation function. Each evaluation function should accept two parameters: preds, eval_data, and
+        return (eval_name, eval_result, is_higher_better) or list of such tuples.
+
+    init_model : str, pathlib.Path, Booster or None, optional (default=None)
+        Filename of LightGBM model or Booster instance used for continue training.
+
+    feature_name : list of str, or 'auto', optional (default="auto")
+        Feature names. If ‘auto’ and data is pandas DataFrame, data columns names are used.
+
+    categorical_feature : list of str or int, or 'auto', optional (default="auto")
+        Categorical features. If list of int, interpreted as indices. If list of str, interpreted as feature names (need
+        to specify feature_name as well). If ‘auto’ and data is pandas DataFrame, pandas unordered categorical columns
+        are used. All values in categorical features will be cast to int32 and thus should be less than int32 max value
+        (2147483647). Large values could be memory consuming. Consider using consecutive integers starting from zero.
+        All negative values in categorical features will be treated as missing values. The output cannot be
+        monotonically constrained with respect to a categorical feature. Floating point numbers in categorical features
+        will be rounded towards 0.
+
+    keep_training_booster : bool, optional (default=False)
+        Whether the returned Booster will be used to keep training. If False, the returned value will be converted into
+        _InnerPredictor before returning. This means you won’t be able to use eval, eval_train or eval_valid methods of
+        the returned Booster. When your model is very large and cause the memory error, you can try to set this param to
+        True to avoid the model conversion performed during the internal call of model_to_string. You can still use
+        _InnerPredictor as init_model for future continue training.
+
+    callbacks : list of callable, or None, optional (default=None)
+        List of callback functions that are applied at each iteration. See Callbacks in LightGBM Python API for more
+        information.
+
+    dataset_init_score : list, list of lists (for multi-class task), numpy array, pandas Series, pandas DataFrame (for
+        multi-class task), or None, optional (default=None)
+        Init score for Dataset. It could be the prediction of the majority class or a prediction from any other model.
     """
 
     import lightgbm as lgbm
@@ -570,9 +626,12 @@ def lgbm_classification_learner(df: pd.DataFrame,
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
-                          silent=True)
+                          silent=True, init_score=dataset_init_score)
 
-    bst = lgbm.train(params, dtrain, num_estimators)
+    bst = lgbm.train(params=params, train_set=dtrain, num_boost_round=num_estimators, valid_sets=valid_sets,
+                     valid_names=valid_names, feval=feval, init_model=init_model, feature_name=feature_name,
+                     categorical_feature=categorical_feature, keep_training_booster=keep_training_booster,
+                     callbacks=callbacks)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         if params["objective"] == "multiclass":
