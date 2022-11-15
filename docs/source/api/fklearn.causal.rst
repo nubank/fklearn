@@ -27,6 +27,14 @@ fklearn.causal.effects module
     :undoc-members:
     :show-inheritance:
 
+fklearn.causal.partitioners module
+-----------------------------
+
+.. automodule:: fklearn.causal.partitioners
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
