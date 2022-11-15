@@ -53,6 +53,7 @@ def effect_by_segment(df: pd.DataFrame,
             .groupby(f"{prediction}_band")
             .apply(effect_fn_partial))
 
+
 @curry
 def cumulative_effect_curve(df: pd.DataFrame,
                             treatment: str,
