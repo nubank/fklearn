@@ -35,9 +35,9 @@ def effect_by_segment(df: pd.DataFrame,
         A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
         of the outcome column.
     partition_fn : function (series: pandas.Series, segments: int) -> Array
-        A function that returns an array of bins to be used to partition the prediction column. 
-        
-        
+        A function that returns an array of bins to be used to partition the prediction column.
+
+
     Returns
     ----------
     effect by band : Pandas' Series
@@ -45,9 +45,9 @@ def effect_by_segment(df: pd.DataFrame,
     """
 
     effect_fn_partial = partial(effect_fn, treatment_column=treatment, outcome_column=outcome)
-    
+
     bins = partition_fn(df[prediction], segments=segments)
-    
+
     return (df
             .assign(**{f"{prediction}_band": pd.cut(df[prediction], bins=bins, include_lowest=True)})
             .groupby(f"{prediction}_band")
