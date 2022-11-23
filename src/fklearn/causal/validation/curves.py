@@ -46,10 +46,10 @@ def effect_by_segment(df: pd.DataFrame,
 
     effect_fn_partial = partial(effect_fn, treatment_column=treatment, outcome_column=outcome)
 
-    bins = partition_fn(df[prediction], segments=segments)
+    bins_fn_partial = partial(partition_fn, series=df[prediction], segments=segments)
 
     return (df
-            .assign(**{f"{prediction}_band": pd.cut(df[prediction], bins=bins, include_lowest=True)})
+            .assign(**{f"{prediction}_band": pd.cut(df[prediction], bins=bins_fn_partial(), include_lowest=True)})
             .groupby(f"{prediction}_band")
             .apply(effect_fn_partial))
 
