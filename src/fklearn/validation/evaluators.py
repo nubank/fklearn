@@ -8,7 +8,7 @@ from pandas.util import hash_pandas_object
 from sklearn.metrics import (average_precision_score, brier_score_loss,
                              fbeta_score, log_loss, mean_absolute_error,
                              mean_squared_error, precision_score, r2_score,
-                             recall_score, roc_auc_score)
+                             recall_score, roc_auc_score, silhouette_score, davies_bouldin_score)
 from toolz import curry, last, first
 from scipy import optimize
 from sklearn.linear_model import LogisticRegression
@@ -52,6 +52,50 @@ def generic_sklearn_evaluator(name_prefix: str, sklearn_metric: Callable[..., fl
 
         if eval_name is None:
             eval_name = name_prefix + target_column
+
+        return {eval_name: score}
+
+    return p
+
+
+def generic_unsupervised_sklearn_evaluator(name_prefix: str,
+                                           sklearn_metric: Callable[..., float]) -> UncurriedEvalFnType:
+    """
+    Returns an evaluator build from a metric from sklearn.metrics without target column
+
+    Parameters
+    ----------
+    name_prefix: str
+        The default name of the evaluator will be name_prefix + target_column.
+
+    sklearn_metric: Callable
+        Metric function from sklearn.metrics. It should take as parameters y_score, kwargs.
+
+    Returns
+    ----------
+    eval_fn: Callable
+       An evaluator function that uses the provided metric
+    """
+
+    def p(test_data: pd.DataFrame,
+          features: List[str],
+          prediction_column: str = "prediction",
+          eval_name: str = None,
+          **kwargs: Any) -> EvalReturnType:
+        try:
+            df = test_data[features].values
+
+            labels = test_data[prediction_column].values
+
+            score = sklearn_metric(df,
+                                   labels,
+                                   **kwargs)
+        except ValueError:
+            # this might happen if there isn't any label column defined
+            score = np.nan
+
+        if eval_name is None:
+            eval_name = name_prefix + prediction_column
 
         return {eval_name: score}
 
@@ -1069,3 +1113,76 @@ def logistic_coefficient_evaluator(test_data: pd.DataFrame,
                                                                       test_data[target_column]).coef_[0][0]
 
     return {eval_name: score}
+
+
+@curry
+def silhouette_score__evaluator(test_data: pd.DataFrame,
+                                features: List[str],
+                                prediction_column: str = "prediction",
+                                eval_name: str = None) -> EvalReturnType:
+    """
+    The Silhouette Coefficient is calculated using the mean intra-cluster distance (a) and
+    the mean nearest-cluster distance (b) for each sample. The Silhouette Coefficient
+    for a sample is (b - a) / max(a, b). To clarify, b is the distance between a sample and
+    the nearest cluster that the sample is not a part of.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with prediction scores.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction scores.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the Silhouette Score
+    """
+
+    eval_fn = generic_unsupervised_sklearn_evaluator("silhouette_score__evaluator__", silhouette_score)
+
+    return eval_fn(test_data, features, prediction_column, eval_name)
+
+
+@curry
+def davies_bouldin_score__evaluator(test_data: pd.DataFrame,
+                                    features: List[str],
+                                    prediction_column: str = "prediction",
+                                    eval_name: str = None) -> EvalReturnType:
+    """
+    The Davies-Bouldin score is defined as the average similarity measure of each cluster with its most similar
+    cluster, where similarity is the ratio of within-cluster distances to between-cluster distances. Thus,
+    clusters which are farther apart and less dispersed will result in a better score.
+
+    Parameters
+    ----------
+    test_data : Pandas' DataFrame
+        A Pandas' DataFrame with prediction scores.
+
+    features : list of str
+        A list os column names that are used as features for the model. All this names
+        should be in `df`.
+
+    prediction_column : Strings
+        The name of the column in `test_data` with the prediction scores.
+
+    eval_name : String, optional (default=None)
+        the name of the evaluator as it will appear in the logs.
+
+    Returns
+    ----------
+    log: dict
+        A log-like dictionary with the Davies-Bouldin Score
+    """
+
+    eval_fn = generic_unsupervised_sklearn_evaluator("davies_bouldin_score__evaluator__", davies_bouldin_score)
+
+    return eval_fn(test_data, features, prediction_column, eval_name)
