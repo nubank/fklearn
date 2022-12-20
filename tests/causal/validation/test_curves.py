@@ -28,12 +28,16 @@ def test_cumulative_effect_curve():
         y=[1, 1, 1, 2, 3, 4, 3, 5, 7],
     ))
 
-    expected = np.array([3., 3., 2.92857143, 2.5, 2.5, 2.46153846, 2.])
+    asc_expected = np.array([1., 1., 1.07142857, 1.5, 1.5, 1.53846154, 2.])
+    desc_expected = np.array([3., 3., 2.92857143, 2.5, 2.5, 2.46153846, 2.])
 
-    result = cumulative_effect_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3, steps=df.shape[0],
-                                     effect_fn=linear_effect)
+    asc_result = cumulative_effect_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3, steps=df.shape[0],
+                                         ascending=True, effect_fn=linear_effect)
+    desc_result = cumulative_effect_curve(df, prediction="x", outcome="y", treatment="t", min_rows=3, steps=df.shape[0],
+                                          effect_fn=linear_effect)
 
-    np.testing.assert_allclose(expected, result, rtol=1e-07)
+    np.testing.assert_allclose(asc_expected, asc_result, rtol=1e-07)
+    np.testing.assert_allclose(desc_expected, desc_result, rtol=1e-07)
 
 
 def test_cumulative_gain_curve():
