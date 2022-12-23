@@ -57,7 +57,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
                                          min_rows=min_rows, steps=steps, effect_fn=effect_fn)
 
-    return abs(sum([(effect - ate) * (step_size / size) for effect, step_size in zip(cum_effect, step_sizes)]))
+    return sum([(effect - ate) * (step_size / size) for effect, step_size in zip(cum_effect, step_sizes)])
 
 
 @curry
