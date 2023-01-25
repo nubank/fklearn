@@ -189,9 +189,11 @@ def precision_evaluator(test_data: pd.DataFrame,
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    threshold : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
+    threshold : Array[float] (default=[0.5])
+        A list of thresholds for the prediction column above, the class for which interval is defined by the parametre labels.
+
+    labels: Array[int] (default=[0,1])
+        A list of labels for the classes obtained using the threshold list above.
 
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
@@ -204,6 +206,19 @@ def precision_evaluator(test_data: pd.DataFrame,
 
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
+
+    **kwargs:
+        pos_label : str or int, default=1
+            The class to report if average='binary' and the data is binary.
+
+        average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+            This parameter is required for multiclass/multilabel targets. 
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        zero_division : “warn”, 0 or 1, default=”warn”
+            Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.    
 
     Returns
     ----------
@@ -238,10 +253,12 @@ def recall_evaluator(test_data: pd.DataFrame,
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
 
-    threshold : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
+    threshold : Array[float] (default=[0.5])
+        A list of thresholds for the prediction column above, the class for which interval is defined by the parametre labels.
 
+    labels: Array[int] (default=[0,1])
+        A list of labels for the classes obtained using the threshold list above.
+    
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
 
@@ -254,6 +271,19 @@ def recall_evaluator(test_data: pd.DataFrame,
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
+    **kwargs:
+        pos_label : str or int, default=1
+            The class to report if average='binary' and the data is binary.
+
+        average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+            This parameter is required for multiclass/multilabel targets. 
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        zero_division : “warn”, 0 or 1, default=”warn”
+            Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.    
+    
     Returns
     ----------
     log: dict
