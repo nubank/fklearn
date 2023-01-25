@@ -173,12 +173,13 @@ def pr_auc_evaluator(test_data: pd.DataFrame,
 
 
 @curry
-def precision_evaluator(test_data: pd.DataFrame,
-                        threshold: float = 0.5,
+def precision_evaluator(test_data: pd.DataFrame,                        
+                        threshold: Iterable[float] = [0.5],
+                        labels: Iterable[int] = [0,1],
                         prediction_column: str = "prediction",
                         target_column: str = "target",
                         weight_column: str = None,
-                        eval_name: str = None,
+                        eval_name: str = None,                        
                         **kwargs) -> EvalReturnType:
     """
     Computes the precision score, given true label and prediction scores.
@@ -210,14 +211,19 @@ def precision_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the Precision Score
     """
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
-    eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
+    
+    bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
+    binned = pd.cut(test_data[prediction_column], bins, labels=labels)
+    
+    eval_data = test_data.assign(**{prediction_column: (binned).astype(int)})   
 
     return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name, **kwargs)
 
 
 @curry
 def recall_evaluator(test_data: pd.DataFrame,
-                     threshold: float = 0.5,
+                     threshold: Iterable[float] = [0.5],
+                     labels: Iterable[int] = [0,1],
                      prediction_column: str = "prediction",
                      target_column: str = "target",
                      weight_column: str = None,
@@ -254,8 +260,12 @@ def recall_evaluator(test_data: pd.DataFrame,
         A log-like dictionary with the Precision Score
     """
 
-    eval_data = test_data.assign(**{prediction_column: (test_data[prediction_column] > threshold).astype(int)})
     eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
+
+    bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
+    binned = pd.cut(test_data[prediction_column], bins, labels=labels)
+    
+    eval_data = test_data.assign(**{prediction_column: (binned).astype(int)})   
 
     return eval_fn(eval_data, prediction_column, target_column, weight_column, eval_name, **kwargs)
 
