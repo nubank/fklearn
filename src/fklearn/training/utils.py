@@ -16,7 +16,7 @@ def log_learner_time(learner: UncurriedLearnerFnType, learner_name: str) -> Uncu
     def timed_learner(*args: Any, **kwargs: Any) -> LearnerReturnType:
         t0 = time()
         (p, d, l) = learner(*args, **kwargs)
-        return p, d, fp.assoc_in(l, [learner_name, 'running_time'], "%2.3f s" % (time() - t0))
+        return p, d, fp.assoc_in(l, [learner_name, "running_time"], "%2.3f s" % (time() - t0))
 
     return timed_learner
 
@@ -25,14 +25,13 @@ def log_learner_time(learner: UncurriedLearnerFnType, learner_name: str) -> Uncu
 def print_learner_run(learner: UncurriedLearnerFnType, learner_name: str) -> UncurriedLearnerFnType:
     @wraps(learner)
     def printed_learner(*args: Any, **kwargs: Any) -> LearnerReturnType:
-        print('%s running' % learner_name)
+        print("%s running" % learner_name)
         return learner(*args, **kwargs)
 
     return printed_learner
 
 
-def expand_features_encoded(df: pd.DataFrame,
-                            features: List[str]) -> List[str]:
+def expand_features_encoded(df: pd.DataFrame, features: List[str]) -> List[str]:
 
     """
     Expand the list of features to include features created automatically
@@ -70,10 +69,9 @@ def expand_features_encoded(df: pd.DataFrame,
 
     def remove_original_pre_encoded_features(features: List[str], encoded_features: List[str]) -> List[str]:
         expr = r"fklearn_feat__(.*)=="
-        original_preencoded_features: List[str] = reduce(lambda x, y: x + y,
-                                                         (map(lambda x: re.findall(expr, x),
-                                                              encoded_features)),
-                                                         [])
+        original_preencoded_features: List[str] = reduce(
+            lambda x, y: x + y, (map(lambda x: re.findall(expr, x), encoded_features)), []
+        )
         return list(filter(lambda col: col not in set(original_preencoded_features), features))
 
     all_fklearn_features = fklearn_features(df)

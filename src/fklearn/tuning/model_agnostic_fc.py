@@ -8,9 +8,7 @@ from fklearn.types import LogType
 
 
 @curry
-def correlation_feature_selection(train_set: pd.DataFrame,
-                                  features: List[str],
-                                  threshold: float = 1.0) -> LogType:
+def correlation_feature_selection(train_set: pd.DataFrame, features: List[str], threshold: float = 1.0) -> LogType:
     """
     Feature selection based on correlation
 
@@ -32,20 +30,23 @@ def correlation_feature_selection(train_set: pd.DataFrame,
     """
 
     correlogram = train_set[features].corr()
-    correlogram_diag = pd.DataFrame(tril(correlogram.values),
-                                    columns=correlogram.columns,
-                                    index=correlogram.index)
+    correlogram_diag = pd.DataFrame(tril(correlogram.values), columns=correlogram.columns, index=correlogram.index)
 
-    features_to_drop = pd.melt(correlogram_diag.reset_index(), id_vars='index') \
-        .query('index!=variable') \
-        .query('abs(value)>0.0') \
-        .query('abs(value)>=%f' % threshold)["variable"].tolist()
+    features_to_drop = (
+        pd.melt(correlogram_diag.reset_index(), id_vars="index")
+        .query("index!=variable")
+        .query("abs(value)>0.0")
+        .query("abs(value)>=%f" % threshold)["variable"]
+        .tolist()
+    )
 
     final_features = list(set(features) - set(features_to_drop))
 
-    return {"feature_corr": correlogram.to_dict(),
-            "features_to_drop": features_to_drop,
-            "final_features": final_features}
+    return {
+        "feature_corr": correlogram.to_dict(),
+        "features_to_drop": features_to_drop,
+        "final_features": final_features,
+    }
 
 
 @curry
@@ -76,6 +77,8 @@ def variance_feature_selection(train_set: pd.DataFrame, features: List[str], thr
 
     final_features = list(set(features) - set(features_to_drop))
 
-    return {"feature_var": feature_var.to_dict(),
-            "features_to_drop": features_to_drop,
-            "final_features": final_features}
+    return {
+        "feature_var": feature_var.to_dict(),
+        "features_to_drop": features_to_drop,
+        "final_features": final_features,
+    }

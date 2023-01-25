@@ -99,9 +99,7 @@ def sample_columns(data: pd.DataFrame, perc: float) -> List[str]:
 
 
 @curry
-def perturbator(data: pd.DataFrame,
-                cols: List[str],
-                corruption_fn: ColumnWisePerturbFnType) -> pd.DataFrame:
+def perturbator(data: pd.DataFrame, cols: List[str], corruption_fn: ColumnWisePerturbFnType) -> pd.DataFrame:
     """
     transforms specific columns of a dataset according to an artificial
     corruption function.

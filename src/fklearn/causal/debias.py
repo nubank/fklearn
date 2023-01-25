@@ -12,12 +12,14 @@ from typing import Dict, Any
 
 
 @curry
-def debias_with_regression_formula(df: pd.DataFrame,
-                                   treatment_column: str,
-                                   outcome_column: str,
-                                   confounder_formula: str,
-                                   suffix: str = "_debiased",
-                                   denoise: bool = True) -> pd.DataFrame:
+def debias_with_regression_formula(
+    df: pd.DataFrame,
+    treatment_column: str,
+    outcome_column: str,
+    confounder_formula: str,
+    suffix: str = "_debiased",
+    denoise: bool = True,
+) -> pd.DataFrame:
     """
     Frisch-Waugh-Lovell style debiasing with linear regression. With R formula to define confounders.
     To debias, we
@@ -66,12 +68,14 @@ def debias_with_regression_formula(df: pd.DataFrame,
 
 
 @curry
-def debias_with_regression(df: pd.DataFrame,
-                           treatment_column: str,
-                           outcome_column: str,
-                           confounder_columns: List[str],
-                           suffix: str = "_debiased",
-                           denoise: bool = True) -> pd.DataFrame:
+def debias_with_regression(
+    df: pd.DataFrame,
+    treatment_column: str,
+    outcome_column: str,
+    confounder_columns: List[str],
+    suffix: str = "_debiased",
+    denoise: bool = True,
+) -> pd.DataFrame:
     """
     Frisch-Waugh-Lovell style debiasing with linear regression.
     To debias, we
@@ -115,18 +119,20 @@ def debias_with_regression(df: pd.DataFrame,
 
     model.fit(df[confounder_columns], df[cols_to_debias])
 
-    debiased = (df[cols_to_debias] - model.predict(df[confounder_columns]) + df[cols_to_debias].mean())
+    debiased = df[cols_to_debias] - model.predict(df[confounder_columns]) + df[cols_to_debias].mean()
 
     return df.assign(**{c + suffix: debiased[c] for c in cols_to_debias})
 
 
 @curry
-def debias_with_fixed_effects(df: pd.DataFrame,
-                              treatment_column: str,
-                              outcome_column: str,
-                              confounder_columns: List[str],
-                              suffix: str = "_debiased",
-                              denoise: bool = True) -> pd.DataFrame:
+def debias_with_fixed_effects(
+    df: pd.DataFrame,
+    treatment_column: str,
+    outcome_column: str,
+    confounder_columns: List[str],
+    suffix: str = "_debiased",
+    denoise: bool = True,
+) -> pd.DataFrame:
     """
     Returns a dataframe with the debiased columns with suffix appended to the name
 
@@ -172,16 +178,18 @@ def debias_with_fixed_effects(df: pd.DataFrame,
 
 
 @curry
-def debias_with_double_ml(df: pd.DataFrame,
-                          treatment_column: str,
-                          outcome_column: str,
-                          confounder_columns: List[str],
-                          ml_regressor: RegressorMixin = GradientBoostingRegressor,
-                          extra_params: Dict[str, Any] = None,
-                          cv: int = 5,
-                          suffix: str = "_debiased",
-                          denoise: bool = True,
-                          seed: int = 123) -> pd.DataFrame:
+def debias_with_double_ml(
+    df: pd.DataFrame,
+    treatment_column: str,
+    outcome_column: str,
+    confounder_columns: List[str],
+    ml_regressor: RegressorMixin = GradientBoostingRegressor,
+    extra_params: Dict[str, Any] = None,
+    cv: int = 5,
+    suffix: str = "_debiased",
+    denoise: bool = True,
+    seed: int = 123,
+) -> pd.DataFrame:
     """
     Frisch-Waugh-Lovell style debiasing with ML model.
     To debias, we

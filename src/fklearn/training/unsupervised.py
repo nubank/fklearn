@@ -11,12 +11,14 @@ from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
-@log_learner_time(learner_name='isolation_forest_learner')
-def isolation_forest_learner(df: pd.DataFrame,
-                             features: List[str],
-                             params: Dict[str, Any] = None,
-                             prediction_column: str = "prediction",
-                             encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="isolation_forest_learner")
+def isolation_forest_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an anomaly detection algorithm (Isolation Forest) to the dataset
 
@@ -52,20 +54,22 @@ def isolation_forest_learner(df: pd.DataFrame,
     model.fit(df[features].values)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        output_col = {prediction_column: model.decision_function(
-            new_df[features])}
+        output_col = {prediction_column: model.decision_function(new_df[features])}
 
         return new_df.assign(**output_col)
 
     p.__doc__ = learner_pred_fn_docstring("isolation_forest_learner")
 
-    log = {'isolation_forest_learner': {
-        'features': features,
-        'parameters': params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sklearn.__version__,
-        'training_samples': len(df)}}
+    log = {
+        "isolation_forest_learner": {
+            "features": features,
+            "parameters": params,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sklearn.__version__,
+            "training_samples": len(df),
+        }
+    }
 
     return p, p(df), log
 

@@ -9,7 +9,7 @@ def version() -> str:
     -------
     version : str
     """
-    with open(join(dirname(__file__), 'resources', 'VERSION')) as f:
+    with open(join(dirname(__file__), "resources", "VERSION")) as f:
         return f.read().strip()
 
 

@@ -13,10 +13,8 @@ from fklearn.preprocessing.schema import column_duplicatable
 
 
 @curry
-@log_learner_time(learner_name='selector')
-def selector(df: pd.DataFrame,
-             training_columns: List[str],
-             predict_columns: List[str] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="selector")
+def selector(df: pd.DataFrame, training_columns: List[str], predict_columns: List[str] = None) -> LearnerReturnType:
     """
     Filters a DataFrames by selecting only the desired columns.
 
@@ -41,10 +39,13 @@ def selector(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("selector")
 
-    log = {'selector': {
-        'training_columns': training_columns,
-        'predict_columns': predict_columns,
-        'transformed_column': list(set(training_columns).union(predict_columns))}}
+    log = {
+        "selector": {
+            "training_columns": training_columns,
+            "predict_columns": predict_columns,
+            "transformed_column": list(set(training_columns).union(predict_columns)),
+        }
+    }
 
     return p, df[training_columns], log
 
@@ -52,12 +53,10 @@ def selector(df: pd.DataFrame,
 selector.__doc__ += learner_return_docstring("Selector")
 
 
-@column_duplicatable('columns_to_cap')
+@column_duplicatable("columns_to_cap")
 @curry
-@log_learner_time(learner_name='capper')
-def capper(df: pd.DataFrame,
-           columns_to_cap: List[str],
-           precomputed_caps: Dict[str, float] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="capper")
+def capper(df: pd.DataFrame, columns_to_cap: List[str], precomputed_caps: Dict[str, float] = None) -> LearnerReturnType:
     """
     Learns the maximum value for each of the `columns_to_cap`
     and used that as the cap for those columns. If precomputed caps
@@ -88,10 +87,7 @@ def capper(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("capper")
 
-    log = {'capper': {
-        'caps': caps,
-        'transformed_column': columns_to_cap,
-        'precomputed_caps': precomputed_caps}}
+    log = {"capper": {"caps": caps, "transformed_column": columns_to_cap, "precomputed_caps": precomputed_caps}}
 
     return p, p(df), log
 
@@ -99,12 +95,12 @@ def capper(df: pd.DataFrame,
 capper.__doc__ += learner_return_docstring("Capper")
 
 
-@column_duplicatable('columns_to_floor')
+@column_duplicatable("columns_to_floor")
 @curry
-@log_learner_time(learner_name='floorer')
-def floorer(df: pd.DataFrame,
-            columns_to_floor: List[str],
-            precomputed_floors: Dict[str, float] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="floorer")
+def floorer(
+    df: pd.DataFrame, columns_to_floor: List[str], precomputed_floors: Dict[str, float] = None
+) -> LearnerReturnType:
     """
     Learns the minimum value for each of the `columns_to_floor`
     and used that as the floot for those columns. If precomputed floors
@@ -136,10 +132,9 @@ def floorer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("floorer")
 
-    log = {'floorer': {
-        'floors': floors,
-        'transformed_column': columns_to_floor,
-        'precomputed_floors': precomputed_floors}}
+    log = {
+        "floorer": {"floors": floors, "transformed_column": columns_to_floor, "precomputed_floors": precomputed_floors}
+    }
 
     return p, p(df), log
 
@@ -148,12 +143,14 @@ floorer.__doc__ += learner_return_docstring("Floorer")
 
 
 @curry
-@log_learner_time(learner_name='ecdfer')
-def ecdfer(df: pd.DataFrame,
-           ascending: bool = True,
-           prediction_column: str = "prediction",
-           ecdf_column: str = "prediction_ecdf",
-           max_range: int = 1000) -> LearnerReturnType:
+@log_learner_time(learner_name="ecdfer")
+def ecdfer(
+    df: pd.DataFrame,
+    ascending: bool = True,
+    prediction_column: str = "prediction",
+    ecdf_column: str = "prediction_ecdf",
+    max_range: int = 1000,
+) -> LearnerReturnType:
     """
     Learns an Empirical Cumulative Distribution Function from the specified column
     in the input DataFrame. It is usually used in the prediction column to convert
@@ -194,11 +191,14 @@ def ecdfer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("ecdefer")
 
-    log = {'ecdfer': {
-        'nobs': len(values),
-        'prediction_column': prediction_column,
-        'ascending': ascending,
-        'transformed_column': [ecdf_column]}}
+    log = {
+        "ecdfer": {
+            "nobs": len(values),
+            "prediction_column": prediction_column,
+            "ascending": ascending,
+            "transformed_column": [ecdf_column],
+        }
+    }
 
     return p, p(df), log
 
@@ -207,13 +207,15 @@ ecdfer.__doc__ += learner_return_docstring("ECDFer")
 
 
 @curry
-@log_learner_time(learner_name='discrete_ecdfer')
-def discrete_ecdfer(df: pd.DataFrame,
-                    ascending: bool = True,
-                    prediction_column: str = "prediction",
-                    ecdf_column: str = "prediction_ecdf",
-                    max_range: int = 1000,
-                    round_method: Callable = int) -> LearnerReturnType:
+@log_learner_time(learner_name="discrete_ecdfer")
+def discrete_ecdfer(
+    df: pd.DataFrame,
+    ascending: bool = True,
+    prediction_column: str = "prediction",
+    ecdf_column: str = "prediction_ecdf",
+    max_range: int = 1000,
+    round_method: Callable = int,
+) -> LearnerReturnType:
     """
     Learns an Empirical Cumulative Distribution Function from the specified column
     in the input DataFrame. It is usually used in the prediction column to convert
@@ -253,8 +255,8 @@ def discrete_ecdfer(df: pd.DataFrame,
     ecdf = ed.ECDF(values)
 
     df_ecdf = pd.DataFrame()
-    df_ecdf['x'] = ecdf.x
-    df_ecdf['y'] = pd.Series(base + sign * max_range * ecdf.y).apply(round_method)
+    df_ecdf["x"] = ecdf.x
+    df_ecdf["y"] = pd.Series(base + sign * max_range * ecdf.y).apply(round_method)
 
     boundaries = df_ecdf.groupby("y").agg((min, max))["x"]["min"].reset_index()
 
@@ -262,13 +264,16 @@ def discrete_ecdfer(df: pd.DataFrame,
     x = boundaries["min"]
     side = ecdf.side
 
-    log = {'discrete_ecdfer': {
-        'map': dict(zip(x, y)),
-        'round_method': round_method,
-        'nobs': len(values),
-        'prediction_column': prediction_column,
-        'ascending': ascending,
-        'transformed_column': [ecdf_column]}}
+    log = {
+        "discrete_ecdfer": {
+            "map": dict(zip(x, y)),
+            "round_method": round_method,
+            "nobs": len(values),
+            "prediction_column": prediction_column,
+            "ascending": ascending,
+            "transformed_column": [ecdf_column],
+        }
+    }
 
     del ecdf
     del values
@@ -289,10 +294,9 @@ discrete_ecdfer.__doc__ += learner_return_docstring("Discrete ECDFer")
 
 
 @curry
-def prediction_ranger(df: pd.DataFrame,
-                      prediction_min: float,
-                      prediction_max: float,
-                      prediction_column: str = "prediction") -> LearnerReturnType:
+def prediction_ranger(
+    df: pd.DataFrame, prediction_min: float, prediction_max: float, prediction_column: str = "prediction"
+) -> LearnerReturnType:
     """
     Caps and floors the specified prediction column to a set range.
 
@@ -318,10 +322,13 @@ def prediction_ranger(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("prediction_ranger")
 
-    log = {'prediction_ranger': {
-        'prediction_min': prediction_min,
-        'prediction_max': prediction_max,
-        'transformed_column': [prediction_column]}}
+    log = {
+        "prediction_ranger": {
+            "prediction_min": prediction_min,
+            "prediction_max": prediction_max,
+            "transformed_column": [prediction_column],
+        }
+    }
 
     return p, p(df), log
 
@@ -329,10 +336,7 @@ def prediction_ranger(df: pd.DataFrame,
 prediction_ranger.__doc__ += learner_return_docstring("Prediction Ranger")
 
 
-def apply_replacements(df: pd.DataFrame,
-                       columns: List[str],
-                       vec: Dict[str, Dict],
-                       replace_unseen: Any) -> pd.DataFrame:
+def apply_replacements(df: pd.DataFrame, columns: List[str], vec: Dict[str, Dict], replace_unseen: Any) -> pd.DataFrame:
     """
     Base function to apply the replacements values found on the
     "vec" vectors into the df DataFrame.
@@ -354,20 +358,19 @@ def apply_replacements(df: pd.DataFrame,
         Default value to replace when original value is not present in the `vec` dict for the feature
 
     """
-    column_categorizer = lambda col: df[col].apply(lambda x: (np.nan
-                                                              if isinstance(x, float) and np.isnan(x)
-                                                              else vec[col].get(x, replace_unseen)))
+    column_categorizer = lambda col: df[col].apply(
+        lambda x: (np.nan if isinstance(x, float) and np.isnan(x) else vec[col].get(x, replace_unseen))
+    )
     categ_columns = {col: column_categorizer(col) for col in columns}
     return df.assign(**categ_columns)
 
 
-@column_duplicatable('value_maps')
+@column_duplicatable("value_maps")
 @curry
 @log_learner_time(learner_name="value_mapper")
-def value_mapper(df: pd.DataFrame,
-                 value_maps: Dict[str, Dict],
-                 ignore_unseen: bool = True,
-                 replace_unseen_to: Any = np.nan) -> pd.DataFrame:
+def value_mapper(
+    df: pd.DataFrame, value_maps: Dict[str, Dict], ignore_unseen: bool = True, replace_unseen_to: Any = np.nan
+) -> pd.DataFrame:
     """
     Map values in selected columns in the DataFrame according to dictionaries of replacements.
     Learner wrapper for apply_replacements
@@ -390,8 +393,7 @@ def value_mapper(df: pd.DataFrame,
         Default value to replace when original value is not present in the `vec` dict for the feature.
     """
 
-    def new_col_value_map(old_col_value_map: Dict[Any, Any],
-                          new_keys: List[Any]) -> Dict[Any, Dict]:
+    def new_col_value_map(old_col_value_map: Dict[Any, Any], new_keys: List[Any]) -> Dict[Any, Dict]:
         old_keys = old_col_value_map.keys()
         return {key: old_col_value_map[key] if key in old_keys else key for key in new_keys}
 
@@ -405,15 +407,17 @@ def value_mapper(df: pd.DataFrame,
     return p, p(df), {"value_maps": value_maps}
 
 
-@column_duplicatable('columns_to_truncate')
+@column_duplicatable("columns_to_truncate")
 @curry
 @log_learner_time(learner_name="truncate_categorical")
-def truncate_categorical(df: pd.DataFrame,
-                         columns_to_truncate: List[str],
-                         percentile: float,
-                         replacement: Union[str, float] = -9999,
-                         replace_unseen: Union[str, float] = -9999,
-                         store_mapping: bool = False) -> LearnerReturnType:
+def truncate_categorical(
+    df: pd.DataFrame,
+    columns_to_truncate: List[str],
+    percentile: float,
+    replacement: Union[str, float] = -9999,
+    replace_unseen: Union[str, float] = -9999,
+    store_mapping: bool = False,
+) -> LearnerReturnType:
     """
     Truncate infrequent categories and replace them by a single one.
     You can think of it like "others" category.
@@ -456,9 +460,8 @@ def truncate_categorical(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("truncate_categorical")
 
-    log: LearnerLogType = {'truncate_categorical': {
-        'transformed_column': columns_to_truncate,
-        'replace_unseen': replace_unseen}
+    log: LearnerLogType = {
+        "truncate_categorical": {"transformed_column": columns_to_truncate, "replace_unseen": replace_unseen}
     }
 
     if store_mapping:
@@ -470,13 +473,12 @@ def truncate_categorical(df: pd.DataFrame,
 truncate_categorical.__doc__ += learner_return_docstring("Truncate Categorical")
 
 
-@column_duplicatable('columns_to_rank')
+@column_duplicatable("columns_to_rank")
 @curry
 @log_learner_time(learner_name="rank_categorical")
-def rank_categorical(df: pd.DataFrame,
-                     columns_to_rank: List[str],
-                     replace_unseen: Union[str, float] = nan,
-                     store_mapping: bool = False) -> LearnerReturnType:
+def rank_categorical(
+    df: pd.DataFrame, columns_to_rank: List[str], replace_unseen: Union[str, float] = nan, store_mapping: bool = False
+) -> LearnerReturnType:
     """
     Rank categorical features by their frequency in the train set.
 
@@ -500,12 +502,15 @@ def rank_categorical(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    col_categ_getter = lambda col: (df[col]
-                                    .value_counts()
-                                    .reset_index()
-                                    .sort_values([col, "index"], ascending=[False, True])
-                                    .set_index("index")[col]
-                                    .rank(method="first", ascending=False).to_dict())
+    col_categ_getter = lambda col: (
+        df[col]
+        .value_counts()
+        .reset_index()
+        .sort_values([col, "index"], ascending=[False, True])
+        .set_index("index")[col]
+        .rank(method="first", ascending=False)
+        .to_dict()
+    )
 
     vec = {column: col_categ_getter(column) for column in columns_to_rank}
 
@@ -514,13 +519,12 @@ def rank_categorical(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("rank_categorical")
 
-    log: LearnerLogType = {'rank_categorical': {
-        'transformed_column': columns_to_rank,
-        'replace_unseen': replace_unseen}
+    log: LearnerLogType = {
+        "rank_categorical": {"transformed_column": columns_to_rank, "replace_unseen": replace_unseen}
     }
 
     if store_mapping:
-        log['rank_categorical']['mapping'] = vec
+        log["rank_categorical"]["mapping"] = vec
 
     return p, p(df), log
 
@@ -528,13 +532,12 @@ def rank_categorical(df: pd.DataFrame,
 rank_categorical.__doc__ += learner_return_docstring("Rank Categorical")
 
 
-@column_duplicatable('columns_to_categorize')
+@column_duplicatable("columns_to_categorize")
 @curry
-@log_learner_time(learner_name='count_categorizer')
-def count_categorizer(df: pd.DataFrame,
-                      columns_to_categorize: List[str],
-                      replace_unseen: int = -1,
-                      store_mapping: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="count_categorizer")
+def count_categorizer(
+    df: pd.DataFrame, columns_to_categorize: List[str], replace_unseen: int = -1, store_mapping: bool = False
+) -> LearnerReturnType:
     """
     Replaces categorical variables by count.
 
@@ -567,13 +570,12 @@ def count_categorizer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("count_categorizer")
 
-    log: LearnerLogType = {'count_categorizer': {
-        'transformed_column': columns_to_categorize,
-        'replace_unseen': replace_unseen}
+    log: LearnerLogType = {
+        "count_categorizer": {"transformed_column": columns_to_categorize, "replace_unseen": replace_unseen}
     }
 
     if store_mapping:
-        log['count_categorizer']['mapping'] = vec
+        log["count_categorizer"]["mapping"] = vec
 
     return p, p(df), log
 
@@ -581,13 +583,15 @@ def count_categorizer(df: pd.DataFrame,
 count_categorizer.__doc__ += learner_return_docstring("Count Categorizer")
 
 
-@column_duplicatable('columns_to_categorize')
+@column_duplicatable("columns_to_categorize")
 @curry
-@log_learner_time(learner_name='label_categorizer')
-def label_categorizer(df: pd.DataFrame,
-                      columns_to_categorize: List[str],
-                      replace_unseen: Union[str, float] = nan,
-                      store_mapping: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="label_categorizer")
+def label_categorizer(
+    df: pd.DataFrame,
+    columns_to_categorize: List[str],
+    replace_unseen: Union[str, float] = nan,
+    store_mapping: bool = False,
+) -> LearnerReturnType:
     """
     Replaces categorical variables with a numeric identifier.
 
@@ -623,13 +627,12 @@ def label_categorizer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("label_categorizer")
 
-    log: LearnerLogType = {'label_categorizer': {
-        'transformed_column': columns_to_categorize,
-        'replace_unseen': replace_unseen}
+    log: LearnerLogType = {
+        "label_categorizer": {"transformed_column": columns_to_categorize, "replace_unseen": replace_unseen}
     }
 
     if store_mapping:
-        log['label_categorizer']['mapping'] = vec
+        log["label_categorizer"]["mapping"] = vec
 
     return p, p(df), log
 
@@ -637,13 +640,10 @@ def label_categorizer(df: pd.DataFrame,
 label_categorizer.__doc__ += learner_return_docstring("Label Categorizer")
 
 
-@column_duplicatable('columns_to_bin')
+@column_duplicatable("columns_to_bin")
 @curry
-@log_learner_time(learner_name='quantile_biner')
-def quantile_biner(df: pd.DataFrame,
-                   columns_to_bin: List[str],
-                   q: int = 4,
-                   right: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="quantile_biner")
+def quantile_biner(df: pd.DataFrame, columns_to_bin: List[str], q: int = 4, right: bool = False) -> LearnerReturnType:
     """
     Discretize continuous numerical columns into its quantiles. Uses pandas.qcut
     to find the bins and then numpy.digitize to fit the columns into bins.
@@ -684,9 +684,7 @@ def quantile_biner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("quantile_biner")
 
-    log = {'quantile_biner': {
-        'transformed_column': columns_to_bin,
-        'q': q}}
+    log = {"quantile_biner": {"transformed_column": columns_to_bin, "q": q}}
 
     return p, p(df), log
 
@@ -694,14 +692,16 @@ def quantile_biner(df: pd.DataFrame,
 quantile_biner.__doc__ += learner_return_docstring("Quantile Biner")
 
 
-@column_duplicatable('columns_to_categorize')
+@column_duplicatable("columns_to_categorize")
 @curry
-@log_learner_time(learner_name='onehot_categorizer')
-def onehot_categorizer(df: pd.DataFrame,
-                       columns_to_categorize: List[str],
-                       hardcode_nans: bool = False,
-                       drop_first_column: bool = False,
-                       store_mapping: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="onehot_categorizer")
+def onehot_categorizer(
+    df: pd.DataFrame,
+    columns_to_categorize: List[str],
+    hardcode_nans: bool = False,
+    drop_first_column: bool = False,
+    store_mapping: bool = False,
+) -> LearnerReturnType:
     """
     Onehot encoding on categorical columns.
     Encoded columns are removed and substituted by columns named
@@ -732,31 +732,43 @@ def onehot_categorizer(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how='any').unique()))
+    categ_getter = lambda col: list(np.sort(df[col].dropna(axis=0, how="any").unique()))
     vec = {column: categ_getter(column) for column in sorted(columns_to_categorize)}
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        make_dummies = lambda col: dict(map(lambda categ: ("fklearn_feat__" + col + "==" + str(categ),
-                                                           (new_df[col] == categ).astype(int)),
-                                            vec[col][int(drop_first_column):]))
+        make_dummies = lambda col: dict(
+            map(
+                lambda categ: ("fklearn_feat__" + col + "==" + str(categ), (new_df[col] == categ).astype(int)),
+                vec[col][int(drop_first_column) :],
+            )
+        )
 
-        oh_cols = dict(mapcat(lambda col: merge(make_dummies(col),
-                                                {"fklearn_feat__" + col + "==" + "nan":
-                                                    (~new_df[col].isin(vec[col])).astype(int)} if hardcode_nans
-                                                else {}).items(),
-                              columns_to_categorize))
+        oh_cols = dict(
+            mapcat(
+                lambda col: merge(
+                    make_dummies(col),
+                    {"fklearn_feat__" + col + "==" + "nan": (~new_df[col].isin(vec[col])).astype(int)}
+                    if hardcode_nans
+                    else {},
+                ).items(),
+                columns_to_categorize,
+            )
+        )
 
         return new_df.assign(**oh_cols).drop(columns_to_categorize, axis=1)
 
     p.__doc__ = learner_pred_fn_docstring("onehot_categorizer")
 
-    log = {'onehot_categorizer': {
-        'transformed_column': columns_to_categorize,
-        'hardcode_nans': hardcode_nans,
-        'drop_first_column': drop_first_column}}
+    log = {
+        "onehot_categorizer": {
+            "transformed_column": columns_to_categorize,
+            "hardcode_nans": hardcode_nans,
+            "drop_first_column": drop_first_column,
+        }
+    }
 
     if store_mapping:
-        log['onehot_categorizer']['mapping'] = vec
+        log["onehot_categorizer"]["mapping"] = vec
 
     return p, p(df), log
 
@@ -764,15 +776,17 @@ def onehot_categorizer(df: pd.DataFrame,
 onehot_categorizer.__doc__ += learner_return_docstring("Onehot Categorizer")
 
 
-@column_duplicatable('columns_to_categorize')
+@column_duplicatable("columns_to_categorize")
 @curry
-@log_learner_time(learner_name='target_categorizer')
-def target_categorizer(df: pd.DataFrame,
-                       columns_to_categorize: List[str],
-                       target_column: str,
-                       smoothing: float = 1.0,
-                       ignore_unseen: bool = True,
-                       store_mapping: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="target_categorizer")
+def target_categorizer(
+    df: pd.DataFrame,
+    columns_to_categorize: List[str],
+    target_column: str,
+    smoothing: float = 1.0,
+    ignore_unseen: bool = True,
+    store_mapping: bool = False,
+) -> LearnerReturnType:
     """
     Replaces categorical variables with the smoothed mean of the target variable by category.
     Uses a weighted average with the overall mean of the target variable for smoothing.
@@ -809,12 +823,13 @@ def target_categorizer(df: pd.DataFrame,
     replace_unseen = nan if ignore_unseen else target_mean
 
     def categ_target_dict(column: str) -> Dict:
-        column_agg = df.groupby(column)[target_column].agg(['count', 'mean'])
-        column_target_mean = column_agg['mean']
-        column_target_count = column_agg['count']
+        column_agg = df.groupby(column)[target_column].agg(["count", "mean"])
+        column_target_mean = column_agg["mean"]
+        column_target_count = column_agg["count"]
 
-        smoothed_target_mean = (column_target_count * column_target_mean + smoothing * target_mean) / \
-                               (column_target_count + smoothing)
+        smoothed_target_mean = (column_target_count * column_target_mean + smoothing * target_mean) / (
+            column_target_count + smoothing
+        )
 
         return smoothed_target_mean.to_dict()
 
@@ -825,15 +840,17 @@ def target_categorizer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("target_categorizer")
 
-    log = {'target_categorizer': {
-        'transformed_columns': columns_to_categorize,
-        'target_column': target_column,
-        'smoothing': smoothing,
-        'ignore_unseen': ignore_unseen}
+    log = {
+        "target_categorizer": {
+            "transformed_columns": columns_to_categorize,
+            "target_column": target_column,
+            "smoothing": smoothing,
+            "ignore_unseen": ignore_unseen,
+        }
     }
 
     if store_mapping:
-        log['target_categorizer']['mapping'] = vec
+        log["target_categorizer"]["mapping"] = vec
 
     return p, p(df), log
 
@@ -841,11 +858,10 @@ def target_categorizer(df: pd.DataFrame,
 target_categorizer.__doc__ += learner_return_docstring("Target Categorizer")
 
 
-@column_duplicatable('columns_to_scale')
+@column_duplicatable("columns_to_scale")
 @curry
-@log_learner_time(learner_name='standard_scaler')
-def standard_scaler(df: pd.DataFrame,
-                    columns_to_scale: List[str]) -> LearnerReturnType:
+@log_learner_time(learner_name="standard_scaler")
+def standard_scaler(df: pd.DataFrame, columns_to_scale: List[str]) -> LearnerReturnType:
     """
     Fits a standard scaler to the dataset.
 
@@ -871,14 +887,12 @@ def standard_scaler(df: pd.DataFrame,
 
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
         new_data = scaler.transform(new_data_set[columns_to_scale].values)
-        new_cols = pd.DataFrame(data=new_data, columns=columns_to_scale).to_dict('list')
+        new_cols = pd.DataFrame(data=new_data, columns=columns_to_scale).to_dict("list")
         return new_data_set.assign(**new_cols)
 
     p.__doc__ = learner_pred_fn_docstring("standard_scaler")
 
-    log = {'standard_scaler': {
-        'standard_scaler': scaler.get_params(),
-        'transformed_column': columns_to_scale}}
+    log = {"standard_scaler": {"standard_scaler": scaler.get_params(), "transformed_column": columns_to_scale}}
 
     return p, p(df), log
 
@@ -886,13 +900,15 @@ def standard_scaler(df: pd.DataFrame,
 standard_scaler.__doc__ += learner_return_docstring("Standard Scaler")
 
 
-@column_duplicatable('columns_to_transform')
+@column_duplicatable("columns_to_transform")
 @curry
-@log_learner_time(learner_name='custom_transformer')
-def custom_transformer(df: pd.DataFrame,
-                       columns_to_transform: List[str],
-                       transformation_function: Callable[[pd.DataFrame], pd.DataFrame],
-                       is_vectorized: bool = False) -> LearnerReturnType:
+@log_learner_time(learner_name="custom_transformer")
+def custom_transformer(
+    df: pd.DataFrame,
+    columns_to_transform: List[str],
+    transformation_function: Callable[[pd.DataFrame], pd.DataFrame],
+    is_vectorized: bool = False,
+) -> LearnerReturnType:
     """
     Applies a custom function to the desired columns.
 
@@ -924,9 +940,11 @@ def custom_transformer(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("custom_transformer")
 
-    log = {'custom_transformer': {
-        'transformed_column': columns_to_transform,
-        'transformation_function': transformation_function.__name__}
+    log = {
+        "custom_transformer": {
+            "transformed_column": columns_to_transform,
+            "transformation_function": transformation_function.__name__,
+        }
     }
 
     return p, p(df), log
@@ -936,12 +954,14 @@ custom_transformer.__doc__ += learner_return_docstring("Custom Transformer")
 
 
 @curry
-@log_learner_time(learner_name='null_injector')
-def null_injector(df: pd.DataFrame,
-                  proportion: float,
-                  columns_to_inject: Optional[List[str]] = None,
-                  groups: Optional[List[List[str]]] = None,
-                  seed: int = 1) -> LearnerReturnType:
+@log_learner_time(learner_name="null_injector")
+def null_injector(
+    df: pd.DataFrame,
+    proportion: float,
+    columns_to_inject: Optional[List[str]] = None,
+    groups: Optional[List[List[str]]] = None,
+    seed: int = 1,
+) -> LearnerReturnType:
     """
     Injects null into columns
 
@@ -963,9 +983,9 @@ def null_injector(df: pd.DataFrame,
         Random seed for consistency.
     """
     if proportion < 0 or proportion > 1:
-        raise ValueError('proportions must be between 0 and 1.')
+        raise ValueError("proportions must be between 0 and 1.")
     if not ((columns_to_inject is None) ^ (groups is None)):
-        raise ValueError('Either columns_to_inject or groups must be None.')
+        raise ValueError("Either columns_to_inject or groups must be None.")
 
     n_rows = df.shape[0]
 
@@ -984,11 +1004,7 @@ def null_injector(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("null_injector")
 
-    log = {'null_injector': {
-        "columns_to_inject": columns_to_inject,
-        "proportion": proportion,
-        "groups": groups
-    }}
+    log = {"null_injector": {"columns_to_inject": columns_to_inject, "proportion": proportion, "groups": groups}}
 
     return p, null_data, log
 
@@ -997,11 +1013,14 @@ null_injector.__doc__ += learner_return_docstring("Null Injector")
 
 
 @curry
-@log_learner_time(learner_name='missing_warner')
-def missing_warner(df: pd.DataFrame, cols_list: List[str],
-                   new_column_name: str = "has_unexpected_missing",
-                   detailed_warning: bool = False,
-                   detailed_column_name: Optional[str] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="missing_warner")
+def missing_warner(
+    df: pd.DataFrame,
+    cols_list: List[str],
+    new_column_name: str = "has_unexpected_missing",
+    detailed_warning: bool = False,
+    detailed_column_name: Optional[str] = None,
+) -> LearnerReturnType:
     """
     Creates a new column to warn about rows that columns that don't have missing in the training set
     but have missing on the scoring
@@ -1019,9 +1038,10 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
         Name of the column created to alert the existence of missing values
     """
 
-    if (detailed_warning is False and detailed_column_name is not None) or \
-            (detailed_warning is True and detailed_column_name is None):
-        raise ValueError('Either detailed_warning and detailed_column_name should be defined or both should be False.')
+    if (detailed_warning is False and detailed_column_name is not None) or (
+        detailed_warning is True and detailed_column_name is None
+    ):
+        raise ValueError("Either detailed_warning and detailed_column_name should be defined or both should be False.")
 
     df_selected = df[cols_list]
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
@@ -1044,10 +1064,7 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
 
     p.__doc__ = learner_pred_fn_docstring("missing_warner")
 
-    log = {"missing_warner": {
-        "cols_list": cols_list,
-        "cols_without_missing": cols_without_missing}
-    }
+    log = {"missing_warner": {"cols_list": cols_list, "cols_without_missing": cols_without_missing}}
 
     return p, df, log
 
