@@ -228,18 +228,18 @@ def precision_evaluator(
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
-    **kwargs:
-        pos_label : str or int, default=1
-            The class to report if average='binary' and the data is binary.
+    **kwargs 
+    pos_label : str or int, default=1
+        The class to report if average='binary' and the data is binary.
 
-        average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
-            This parameter is required for multiclass/multilabel targets.
+    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+        This parameter is required for multiclass/multilabel targets.
 
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights.
+    sample_weight : array-like of shape (n_samples,), default=None
+        Sample weights.
 
-        zero_division : “warn”, 0 or 1, default=”warn”
-            Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
+    zero_division : “warn”, 0 or 1, default=”warn”
+        Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
 
     Returns
     ----------
@@ -294,18 +294,18 @@ def recall_evaluator(
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
-    **kwargs:
-        pos_label : str or int, default=1
-            The class to report if average='binary' and the data is binary.
+    **kwargs 
+    pos_label : str or int, default=1
+        The class to report if average='binary' and the data is binary.
 
-        average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
-            This parameter is required for multiclass/multilabel targets.
+    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+        This parameter is required for multiclass/multilabel targets.
 
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights.
+    sample_weight : array-like of shape (n_samples,), default=None
+        Sample weights.
 
-        zero_division : “warn”, 0 or 1, default=”warn”
-            Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
+    zero_division : “warn”, 0 or 1, default=”warn”
+        Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
 
     Returns
     ----------
