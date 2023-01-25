@@ -228,7 +228,6 @@ def precision_evaluator(
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
-    **kwargs 
     pos_label : str or int, default=1
         The class to report if average='binary' and the data is binary.
 
@@ -294,7 +293,6 @@ def recall_evaluator(
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
 
-    **kwargs 
     pos_label : str or int, default=1
         The class to report if average='binary' and the data is binary.
 
