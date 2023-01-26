@@ -473,7 +473,6 @@ def expected_calibration_error_evaluator(
     log: dict
        A log-like dictionary with the expected calibration error.
     """
-
     if eval_name is None:
         eval_name = "expected_calibration_error_evaluator__" + target_column
 
