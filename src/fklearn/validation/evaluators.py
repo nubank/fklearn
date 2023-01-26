@@ -204,48 +204,26 @@ def precision_evaluator(
 ) -> EvalReturnType:
     """
     Computes the precision score, given true label and prediction scores.
-
     Parameters
     ----------
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
-
-    threshold : Array[float] (default=[0.5])
-        A list of thresholds for the prediction column above, the class for which interval is defined by the parametre labels.
-
-    labels: Array[int] (default=[0,1])
-        A list of labels for the classes obtained using the threshold list above.
-
+    threshold : float
+        A threshold for the prediction column above which samples
+         will be classified as 1
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
-
     target_column : str
         The name of the column in `test_data` with the binary target.
-
     weight_column : String (default=None)
         The name of the column in `test_data` with the sample weights.
-
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
-
-    pos_label : str or int, default=1
-        The class to report if average='binary' and the data is binary.
-
-    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
-        This parameter is required for multiclass/multilabel targets.
-
-    sample_weight : array-like of shape (n_samples,), default=None
-        Sample weights.
-
-    zero_division : “warn”, 0 or 1, default=”warn”
-        Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
-
     Returns
     ----------
     log: dict
         A log-like dictionary with the Precision Score
     """
-    
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
@@ -267,51 +245,28 @@ def recall_evaluator(
     eval_name: str = None,
     **kwargs,
 ) -> EvalReturnType:
-    """
-    Computes the recall score, given true label and prediction scores.
-
+   """
+    Computes the precision score, given true label and prediction scores.
     Parameters
     ----------
-
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
-
-    threshold : Array[float] (default=[0.5])
-        A list of thresholds for the prediction column above, the class for which interval is defined by the parametre labels.
-
-    labels: Array[int] (default=[0,1])
-        A list of labels for the classes obtained using the threshold list above.
-
+    threshold : float
+        A threshold for the prediction column above which samples
+         will be classified as 1
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
-
     target_column : str
         The name of the column in `test_data` with the binary target.
-
     weight_column : String (default=None)
         The name of the column in `test_data` with the sample weights.
-
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
-
-    pos_label : str or int, default=1
-        The class to report if average='binary' and the data is binary.
-
-    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
-        This parameter is required for multiclass/multilabel targets.
-
-    sample_weight : array-like of shape (n_samples,), default=None
-        Sample weights.
-
-    zero_division : “warn”, 0 or 1, default=”warn”
-        Sets the value to return when there is a zero division. If set to “warn”, this acts as 0, but warnings are also raised.
-
     Returns
     ----------
     log: dict
         A log-like dictionary with the Precision Score
     """
-
     eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
