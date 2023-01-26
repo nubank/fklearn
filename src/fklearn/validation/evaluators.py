@@ -267,7 +267,6 @@ def recall_evaluator(
         A log-like dictionary with the Precision Score
     """
     eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
-
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
     binned = pd.cut(test_data[prediction_column], bins, labels=labels)
 
