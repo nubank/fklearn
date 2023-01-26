@@ -245,6 +245,7 @@ def precision_evaluator(
     log: dict
         A log-like dictionary with the Precision Score
     """
+    
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
