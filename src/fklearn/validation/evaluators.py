@@ -184,7 +184,6 @@ def pr_auc_evaluator(
     ----------
     A log-like dictionary with the PR AUC Score
     """
-
     eval_fn = generic_sklearn_evaluator("pr_auc_evaluator__", average_precision_score)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
@@ -224,7 +223,6 @@ def precision_evaluator(
     log: dict
         A log-like dictionary with the Precision Score
     """
-    
     eval_fn = generic_sklearn_evaluator("precision_evaluator__", precision_score)
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
