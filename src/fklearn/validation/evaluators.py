@@ -199,7 +199,7 @@ def precision_evaluator(
     target_column: str = "target",
     weight_column: str = None,
     eval_name: str = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> EvalReturnType:
     """
     Computes the precision score, given true label and prediction scores.
@@ -245,7 +245,7 @@ def recall_evaluator(
     target_column: str = "target",
     weight_column: str = None,
     eval_name: str = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> EvalReturnType:
     """
     Computes the recall score, given true label and prediction scores.
