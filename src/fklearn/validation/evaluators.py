@@ -244,8 +244,8 @@ def recall_evaluator(
     eval_name: str = None,
     **kwargs,
 ) -> EvalReturnType:
-   """
-    Computes the precision score, given true label and prediction scores.
+    """
+    Computes the recall score, given true label and prediction scores.
     Parameters
     ----------
     test_data : pandas.DataFrame
@@ -266,9 +266,11 @@ def recall_evaluator(
     log: dict
         A log-like dictionary with the Precision Score
     """
-    eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
+
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
     binned = pd.cut(test_data[prediction_column], bins, labels=labels)
+
+    eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
 
     eval_data = test_data.assign(**{prediction_column: (binned).astype(int)})
 
