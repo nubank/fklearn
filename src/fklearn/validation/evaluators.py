@@ -220,7 +220,7 @@ def precision_evaluator(
     weight_column : String (default=None)
         The name of the column in `test_data` with the sample weights.
     eval_name : str, optional (default=None)
-        the name of the evaluator as it will appear in the logs.    
+        the name of the evaluator as it will appear in the logs.
     Returns
     ----------
     log: dict
