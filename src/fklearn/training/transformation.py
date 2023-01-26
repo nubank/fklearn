@@ -739,7 +739,7 @@ def onehot_categorizer(
         make_dummies = lambda col: dict(
             map(
                 lambda categ: ("fklearn_feat__" + col + "==" + str(categ), (new_df[col] == categ).astype(int)),
-                vec[col][int(drop_first_column) :],
+                vec[col][int(drop_first_column):],
             )
         )
 
