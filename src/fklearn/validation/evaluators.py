@@ -210,6 +210,9 @@ def precision_evaluator(
     threshold : float
         A threshold for the prediction column above which samples
          will be classified as 1
+    labels : float
+        A threshold for the prediction column above which samples
+         will be classified as 1
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
     target_column : str
@@ -217,7 +220,7 @@ def precision_evaluator(
     weight_column : String (default=None)
         The name of the column in `test_data` with the sample weights.
     eval_name : str, optional (default=None)
-        the name of the evaluator as it will appear in the logs.
+        the name of the evaluator as it will appear in the logs.    
     Returns
     ----------
     log: dict
@@ -251,6 +254,9 @@ def recall_evaluator(
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
     threshold : float
+        A threshold for the prediction column above which samples
+         will be classified as 1
+    labels : float
         A threshold for the prediction column above which samples
          will be classified as 1
     prediction_column : str
