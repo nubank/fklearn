@@ -266,7 +266,6 @@ def recall_evaluator(
     log: dict
         A log-like dictionary with the Precision Score
     """
-    
     eval_fn = generic_sklearn_evaluator("recall_evaluator__", recall_score)
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
@@ -402,7 +401,6 @@ def brier_score_evaluator(
     log: dict
         A log-like dictionary with the Brier score.
     """
-
     eval_fn = generic_sklearn_evaluator("brier_score_evaluator__", brier_score_loss)
     eval_data = test_data.assign(**{target_column: lambda df: df[target_column].astype(int)})
 
