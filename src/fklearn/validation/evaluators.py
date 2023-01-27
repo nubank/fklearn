@@ -207,12 +207,11 @@ def precision_evaluator(
     ----------
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
-    threshold : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
-    labels : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
+    threshold : Array[float] (default=[0.5])
+        A list of thresholds for the prediction column, to the bin is given 
+        the corresponding label in the parameter label
+    labels : Array(int) (default=[0,1])
+        A list of labels to be used by the binning
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
     target_column : str
@@ -221,6 +220,18 @@ def precision_evaluator(
         The name of the column in `test_data` with the sample weights.
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
+    pos_label : str or int, (default=1)
+        The class to report if average='binary' and the data is binary. 
+        If the data are multiclass or multilabel, this will be ignored.
+    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+        This parameter is required for multiclass/multilabel targets. 
+        If None, the scores for each class are returned as a list, 
+        but the type is not supported by sheep anymore.
+    sample_weight : array-like of shape (n_samples,), default=None
+        Sample weights.
+    zero_division : “warn”, 0 or 1, default=”warn”
+        Sets the value to return when there is a zero division. 
+        If set to “warn”, this acts as 0, but warnings are also raised.        
     Returns
     ----------
     log: dict
@@ -253,12 +264,11 @@ def recall_evaluator(
     ----------
     test_data : pandas.DataFrame
         A Pandas' DataFrame with target and prediction scores.
-    threshold : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
-    labels : float
-        A threshold for the prediction column above which samples
-         will be classified as 1
+    threshold : Array[float] (default=[0.5])
+        A list of thresholds for the prediction column, to the bin is given 
+        the corresponding label in the parameter label
+    labels : Array(int) (default=[0,1])
+        A list of labels to be used by the binning
     prediction_column : str
         The name of the column in `test_data` with the prediction scores.
     target_column : str
@@ -267,10 +277,22 @@ def recall_evaluator(
         The name of the column in `test_data` with the sample weights.
     eval_name : str, optional (default=None)
         the name of the evaluator as it will appear in the logs.
+    pos_label : str or int, (default=1)
+        The class to report if average='binary' and the data is binary. 
+        If the data are multiclass or multilabel, this will be ignored.
+    average : {‘micro’, ‘macro’, ‘samples’, ‘weighted’, ‘binary’} or None, default=’binary’
+        This parameter is required for multiclass/multilabel targets. 
+        If None, the scores for each class are returned as a list, 
+        but the type is not supported by sheep anymore.
+    sample_weight : array-like of shape (n_samples,), default=None
+        Sample weights.
+    zero_division : “warn”, 0 or 1, default=”warn”
+        Sets the value to return when there is a zero division. 
+        If set to “warn”, this acts as 0, but warnings are also raised.        
     Returns
     ----------
     log: dict
-        A log-like dictionary with the Precision Score
+        A log-like dictionary with the Recall Score
     """
 
     bins = pd.concat([pd.Series(-np.inf), pd.Series(threshold), pd.Series(np.inf)])
