@@ -14,15 +14,17 @@ from fklearn.types import EvalFnType, LearnerFnType, LogType
 from fklearn.types import SplitterFnType, ValidatorReturnType, PerturbFnType
 
 
-def validator_iteration(data: pd.DataFrame,
-                        train_index: pd.Index,
-                        test_indexes: pd.Index,
-                        fold_num: int,
-                        train_fn: LearnerFnType,
-                        eval_fn: EvalFnType,
-                        predict_oof: bool = False,
-                        return_eval_logs_on_train: bool = False,
-                        verbose: bool = False) -> LogType:
+def validator_iteration(
+    data: pd.DataFrame,
+    train_index: pd.Index,
+    test_indexes: pd.Index,
+    fold_num: int,
+    train_fn: LearnerFnType,
+    eval_fn: EvalFnType,
+    predict_oof: bool = False,
+    return_eval_logs_on_train: bool = False,
+    verbose: bool = False,
+) -> LogType:
     """
     Perform an iteration of train test split, training and evaluation.
 
@@ -65,8 +67,10 @@ def validator_iteration(data: pd.DataFrame,
 
     train_data = data.iloc[train_index]
 
-    empty_set_warn = "Splitter on validator_iteration in generating an empty training dataset. train_data.shape is %s" \
-                     % str(train_data.shape)
+    empty_set_warn = (
+        "Splitter on validator_iteration in generating an empty training dataset. train_data.shape is %s"
+        % str(train_data.shape)
+    )
     warnings.warn(empty_set_warn) if train_data.shape[0] == 0 else None  # type: ignore
 
     predict_fn, train_out, train_log = train_fn(train_data)
@@ -78,31 +82,31 @@ def validator_iteration(data: pd.DataFrame,
 
     if verbose:
         print(f"Running validation for {fold_num} fold.")
-    for test_index in (tqdm(test_indexes) if verbose else test_indexes):
+    for test_index in tqdm(test_indexes) if verbose else test_indexes:
         test_predictions = predict_fn(data.iloc[test_index])
         eval_results.append(eval_fn(test_predictions))
         if predict_oof:
             oof_predictions.append(test_predictions)
 
-    logs = {'fold_num': fold_num,
-            'train_log': train_log,
-            'eval_results': eval_results}
+    logs = {"fold_num": fold_num, "train_log": train_log, "eval_results": eval_results}
 
     return assoc(logs, "oof_predictions", oof_predictions) if predict_oof else logs
 
 
 @curry
-def validator(train_data: pd.DataFrame,
-              split_fn: SplitterFnType,
-              train_fn: LearnerFnType,
-              eval_fn: EvalFnType,
-              perturb_fn_train: PerturbFnType = identity,
-              perturb_fn_test: PerturbFnType = identity,
-              predict_oof: bool = False,
-              return_eval_logs_on_train: bool = False,
-              return_all_train_logs: bool = False,
-              verbose: bool = False,
-              drop_empty_folds: bool = False) -> ValidatorReturnType:
+def validator(
+    train_data: pd.DataFrame,
+    split_fn: SplitterFnType,
+    train_fn: LearnerFnType,
+    eval_fn: EvalFnType,
+    perturb_fn_train: PerturbFnType = identity,
+    perturb_fn_test: PerturbFnType = identity,
+    predict_oof: bool = False,
+    return_eval_logs_on_train: bool = False,
+    return_all_train_logs: bool = False,
+    verbose: bool = False,
+    drop_empty_folds: bool = False,
+) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and performs a train-evaluation sequence on each
     fold by calling ``validator_iteration`` given the evaluation function. The output is a log containing, for each
@@ -171,15 +175,21 @@ def validator(train_data: pd.DataFrame,
         if (train_fold_is_null or test_contains_null_folds) and drop_empty_folds:
             return {"empty_fold": True}
         else:
-            iter_results = validator_iteration(train_data, train_index, test_indexes, fold_num,
-                                               train_fn, eval_fn, predict_oof, return_eval_logs_on_train, verbose)
+            iter_results = validator_iteration(
+                train_data,
+                train_index,
+                test_indexes,
+                fold_num,
+                train_fn,
+                eval_fn,
+                predict_oof,
+                return_eval_logs_on_train,
+                verbose,
+            )
 
         return assoc(iter_results, "empty_fold", False)
 
-    zipped_logs = pipe(folds,
-                       enumerate,
-                       map(fold_iter),
-                       partial(zip, logs))
+    zipped_logs = pipe(folds, enumerate, map(fold_iter), partial(zip, logs))
 
     def clean_logs(log_tuple: Tuple) -> Tuple:
         split_log_error = list()
@@ -206,7 +216,7 @@ def validator(train_data: pd.DataFrame,
 
     def get_perturbed_columns(perturbator: PerturbFnType) -> List[str]:
         args = inspect.getfullargspec(perturbator).kwonlydefaults
-        return args['cols'] if args else []
+        return args["cols"] if args else []
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     if return_all_train_logs:
@@ -214,11 +224,11 @@ def validator(train_data: pd.DataFrame,
     else:
         train_logs = first(train_logs)
 
-    perturbator_log = {'perturbated_train': [], 'perturbated_test': []}  # type: LogType
+    perturbator_log = {"perturbated_train": [], "perturbated_test": []}  # type: LogType
     if perturb_fn_train != identity:
-        perturbator_log['perturbated_train'] = get_perturbed_columns(perturb_fn_train)
+        perturbator_log["perturbated_train"] = get_perturbed_columns(perturb_fn_train)
     if perturb_fn_test != identity:
-        perturbator_log['perturbated_test'] = get_perturbed_columns(perturb_fn_test)
+        perturbator_log["perturbated_test"] = get_perturbed_columns(perturb_fn_test)
     train_logs = assoc(train_logs, "perturbator_log", perturbator_log)
 
     if drop_empty_folds:
@@ -227,27 +237,40 @@ def validator(train_data: pd.DataFrame,
     return assoc(train_logs, "validator_log", list(validator_logs))
 
 
-def parallel_validator_iteration(train_data: pd.DataFrame,
-                                 fold: Tuple[int, Tuple[pd.Index, pd.Index]],
-                                 train_fn: LearnerFnType,
-                                 eval_fn: EvalFnType,
-                                 predict_oof: bool,
-                                 return_eval_logs_on_train: bool = False,
-                                 verbose: bool = False) -> LogType:
+def parallel_validator_iteration(
+    train_data: pd.DataFrame,
+    fold: Tuple[int, Tuple[pd.Index, pd.Index]],
+    train_fn: LearnerFnType,
+    eval_fn: EvalFnType,
+    predict_oof: bool,
+    return_eval_logs_on_train: bool = False,
+    verbose: bool = False,
+) -> LogType:
     (fold_num, (train_index, test_indexes)) = fold
-    return validator_iteration(train_data, train_index, test_indexes, fold_num, train_fn, eval_fn, predict_oof,
-                               return_eval_logs_on_train, verbose)
+    return validator_iteration(
+        train_data,
+        train_index,
+        test_indexes,
+        fold_num,
+        train_fn,
+        eval_fn,
+        predict_oof,
+        return_eval_logs_on_train,
+        verbose,
+    )
 
 
 @curry
-def parallel_validator(train_data: pd.DataFrame,
-                       split_fn: SplitterFnType,
-                       train_fn: LearnerFnType,
-                       eval_fn: EvalFnType,
-                       n_jobs: int = 1,
-                       predict_oof: bool = False,
-                       return_eval_logs_on_train: bool = False,
-                       verbose: bool = False) -> ValidatorReturnType:
+def parallel_validator(
+    train_data: pd.DataFrame,
+    split_fn: SplitterFnType,
+    train_fn: LearnerFnType,
+    eval_fn: EvalFnType,
+    n_jobs: int = 1,
+    predict_oof: bool = False,
+    return_eval_logs_on_train: bool = False,
+    verbose: bool = False,
+) -> ValidatorReturnType:
     """
     Splits the training data into folds given by the split function and
     performs a train-evaluation sequence on each fold. Tries to run each
@@ -292,9 +315,11 @@ def parallel_validator(train_data: pd.DataFrame,
     folds, logs = split_fn(train_data)
 
     result = Parallel(n_jobs=n_jobs, backend="threading")(
-        delayed(parallel_validator_iteration)(train_data, x, train_fn, eval_fn, predict_oof, return_eval_logs_on_train,
-                                              verbose)
-        for x in enumerate(folds))
+        delayed(parallel_validator_iteration)(
+            train_data, x, train_fn, eval_fn, predict_oof, return_eval_logs_on_train, verbose
+        )
+        for x in enumerate(folds)
+    )
     gc.collect()
 
     train_log = {"train_log": [fold_result["train_log"] for fold_result in result]}
@@ -303,10 +328,12 @@ def parallel_validator(train_data: pd.DataFrame,
     def kwdissoc(d: Dict, key: str) -> Dict:
         return dissoc(d, key)
 
-    validator_logs = pipe(result,
-                          partial(zip, logs),
-                          map(lambda log_tuple: assoc(log_tuple[1], "split_log", log_tuple[0])),
-                          map(kwdissoc(key="train_log")),
-                          list)
+    validator_logs = pipe(
+        result,
+        partial(zip, logs),
+        map(lambda log_tuple: assoc(log_tuple[1], "split_log", log_tuple[0])),
+        map(kwdissoc(key="train_log")),
+        list,
+    )
 
     return assoc(train_log, "validator_log", validator_logs)

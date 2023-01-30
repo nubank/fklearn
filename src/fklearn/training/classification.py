@@ -15,14 +15,16 @@ from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
-@log_learner_time(learner_name='logistic_classification_learner')
-def logistic_classification_learner(df: pd.DataFrame,
-                                    features: List[str],
-                                    target: str,
-                                    params: LogType = None,
-                                    prediction_column: str = "prediction",
-                                    weight_column: str = None,
-                                    encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="logistic_classification_learner")
+def logistic_classification_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    params: LogType = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an logistic regression classifier to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -80,16 +82,19 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("logistic_classification_learner")
 
-    log = {'logistic_classification_learner': {
-        'features': features,
-        'target': target,
-        'parameters': merged_params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, clf.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': clf}
+    log = {
+        "logistic_classification_learner": {
+            "features": features,
+            "target": target,
+            "parameters": merged_params,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sk_version,
+            "feature_importance": dict(zip(features, clf.coef_.flatten())),
+            "training_samples": len(df),
+        },
+        "object": clf,
+    }
 
     return p, p(df), log
 
@@ -98,16 +103,18 @@ logistic_classification_learner.__doc__ += learner_return_docstring("Logistic Re
 
 
 @curry
-@log_learner_time(learner_name='xgb_classification_learner')
-def xgb_classification_learner(df: pd.DataFrame,
-                               features: List[str],
-                               target: str,
-                               learning_rate: float = 0.1,
-                               num_estimators: int = 100,
-                               extra_params: LogType = None,
-                               prediction_column: str = "prediction",
-                               weight_column: str = None,
-                               encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="xgb_classification_learner")
+def xgb_classification_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: LogType = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
@@ -165,7 +172,7 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "objective", 'binary:logistic')
+    params = params if "objective" in params else assoc(params, "objective", "binary:logistic")
 
     weights = df[weight_column].values if weight_column else None
 
@@ -181,33 +188,36 @@ def xgb_classification_learner(df: pd.DataFrame,
 
         pred = bst.predict(dtest)
         if params["objective"] == "multi:softprob":
-            col_dict = {prediction_column + "_" + str(key): value
-                        for (key, value) in enumerate(pred.T)}
+            col_dict = {prediction_column + "_" + str(key): value for (key, value) in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
         else:
             col_dict = {prediction_column: pred}
 
         if apply_shap:
             import shap
+
             explainer = shap.TreeExplainer(bst)
             shap_values = explainer.shap_values(new_df[features])
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "multi:softprob":
-                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
-                                          for (class_index, value) in enumerate(shap_values)}
+                shap_values_multiclass = {
+                    f"shap_values_{class_index}": list(value) for (class_index, value) in enumerate(shap_values)
+                }
                 shap_expected_value_multiclass = {
-                    f"shap_expected_value_{class_index}":
-                        np.repeat(expected_value, len(class_shap_values))
-                    for (class_index, (expected_value, class_shap_values))
-                    in enumerate(zip(shap_expected_value, shap_values))
+                    f"shap_expected_value_{class_index}": np.repeat(expected_value, len(class_shap_values))
+                    for (class_index, (expected_value, class_shap_values)) in enumerate(
+                        zip(shap_expected_value, shap_values)
+                    )
                 }
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
                 shap_values = list(shap_values)
-                shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+                shap_output = {
+                    "shap_values": shap_values,
+                    "shap_expected_value": np.repeat(shap_expected_value, len(shap_values)),
+                }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -215,16 +225,19 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("xgb_classification_learner", shap=True)
 
-    log = {'xgb_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "xgboost",
-        'package_version': xgb.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': bst.get_score(),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        "xgb_classification_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "xgboost",
+            "package_version": xgb.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": bst.get_score(),
+            "training_samples": len(df),
+        },
+        "object": bst,
+    }
 
     return p, p(df), log
 
@@ -233,9 +246,9 @@ xgb_classification_learner.__doc__ += learner_return_docstring("XGboost Classifi
 
 
 @curry
-def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
-                              features: List, target: str,
-                              weights: List, cat_features: List) -> np.array:
+def _get_catboost_shap_values(
+    df: pd.DataFrame, cbr: Any, features: List, target: str, weights: List, cat_features: List
+) -> np.array:
     """
     Auxiliar method to allow us to get shap values for Catboost multiclass models
 
@@ -265,24 +278,30 @@ def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
         A list of column names that are used as categoriacal features for the model.
     """
     import catboost
-    dtrain = catboost.Pool(df[features].values, df[target].values, weight=weights,
-                           feature_names=list(map(str, features)),
-                           cat_features=cat_features)
-    return cbr.get_feature_importance(type=catboost.EFstrType.ShapValues,
-                                      data=dtrain)
+
+    dtrain = catboost.Pool(
+        df[features].values,
+        df[target].values,
+        weight=weights,
+        feature_names=list(map(str, features)),
+        cat_features=cat_features,
+    )
+    return cbr.get_feature_importance(type=catboost.EFstrType.ShapValues, data=dtrain)
 
 
 @curry
-@log_learner_time(learner_name='catboost_classification_learner')
-def catboost_classification_learner(df: pd.DataFrame,
-                                    features: List[str],
-                                    target: str,
-                                    learning_rate: float = 0.1,
-                                    num_estimators: int = 100,
-                                    extra_params: LogType = None,
-                                    prediction_column: str = "prediction",
-                                    weight_column: str = None,
-                                    encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="catboost_classification_learner")
+def catboost_classification_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: LogType = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an CatBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a CatBoost
@@ -341,14 +360,19 @@ def catboost_classification_learner(df: pd.DataFrame,
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "objective", 'Logloss')
+    params = params if "objective" in params else assoc(params, "objective", "Logloss")
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     cat_features = params["cat_features"] if "cat_features" in params else None
 
-    dtrain = Pool(df[features].values, df[target].values, weight=weights,
-                  feature_names=list(map(str, features)), cat_features=cat_features)
+    dtrain = Pool(
+        df[features].values,
+        df[target].values,
+        weight=weights,
+        feature_names=list(map(str, features)),
+        cat_features=cat_features,
+    )
 
     cat_boost_classifier = CatBoostClassifier(iterations=num_estimators, **params)
     cbr = cat_boost_classifier.fit(dtrain, verbose=0)
@@ -357,23 +381,26 @@ def catboost_classification_learner(df: pd.DataFrame,
 
         pred = cbr.predict_proba(new_df[features])
         if params["objective"] == "MultiClass":
-            col_dict = {prediction_column + "_" + str(key): value
-                        for (key, value) in enumerate(pred.T)}
+            col_dict = {prediction_column + "_" + str(key): value for (key, value) in enumerate(pred.T)}
             col_dict.update({prediction_column: pred.argmax(axis=1)})
         else:
             col_dict = {prediction_column: pred[:, 1]}
 
         if apply_shap:
             import shap
+
             if params["objective"] == "MultiClass":
                 shap_values = _get_catboost_shap_values(df, cbr, features, target, weights, cat_features)
                 # catboost shap returns a list for each row, we reformat it to return
                 # a list for each class
                 shap_values = shap_values.transpose(1, 0, 2)
-                shap_values_multiclass = {f"shap_values_{class_index}": list(value[:, :-1])
-                                          for (class_index, value) in enumerate(shap_values)}
-                shap_expected_value_multiclass = {f"shap_expected_value_{class_index}": value[:, -1]
-                                                  for (class_index, value) in enumerate(shap_values)}
+                shap_values_multiclass = {
+                    f"shap_values_{class_index}": list(value[:, :-1]) for (class_index, value) in enumerate(shap_values)
+                }
+                shap_expected_value_multiclass = {
+                    f"shap_expected_value_{class_index}": value[:, -1]
+                    for (class_index, value) in enumerate(shap_values)
+                }
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
@@ -381,8 +408,10 @@ def catboost_classification_learner(df: pd.DataFrame,
                 shap_values = explainer.shap_values(new_df[features])
                 shap_expected_value = explainer.expected_value
                 shap_values = list(shap_values)
-                shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+                shap_output = {
+                    "shap_values": shap_values,
+                    "shap_expected_value": np.repeat(shap_expected_value, len(shap_values)),
+                }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -390,16 +419,19 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("catboost_classification_learner", shap=True)
 
-    log = {'catboost_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "catboost",
-        'package_version': catboost.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)},
-        'object': cbr}
+    log = {
+        "catboost_classification_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "catboost",
+            "package_version": catboost.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": cbr.feature_importances_,
+            "training_samples": len(df),
+        },
+        "object": cbr,
+    }
 
     return p, p(df), log
 
@@ -408,13 +440,15 @@ catboost_classification_learner.__doc__ += learner_return_docstring("catboost_cl
 
 
 @curry
-@log_learner_time(learner_name='nlp_logistic_classification_learner')
-def nlp_logistic_classification_learner(df: pd.DataFrame,
-                                        text_feature_cols: List[str],
-                                        target: str,
-                                        vectorizer_params: LogType = None,
-                                        logistic_params: LogType = None,
-                                        prediction_column: str = "prediction") -> LearnerReturnType:
+@log_learner_time(learner_name="nlp_logistic_classification_learner")
+def nlp_logistic_classification_learner(
+    df: pd.DataFrame,
+    text_feature_cols: List[str],
+    target: str,
+    vectorizer_params: LogType = None,
+    logistic_params: LogType = None,
+    prediction_column: str = "prediction",
+) -> LearnerReturnType:
     """
     Fits a text vectorizer (TfidfVectorizer) followed by
     a logistic regression (LogisticRegression).
@@ -468,8 +502,10 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
         predict_sparse_vect = vect.transform(predict_text_df)
 
         if merged_logistic_params["multi_class"] == "multinomial":
-            col_dict = {prediction_column + "_" + str(key): value
-                        for (key, value) in enumerate(clf.predict_proba(predict_sparse_vect).T)}
+            col_dict = {
+                prediction_column + "_" + str(key): value
+                for (key, value) in enumerate(clf.predict_proba(predict_sparse_vect).T)
+            }
         else:
             col_dict = {prediction_column: clf.predict_proba(predict_sparse_vect)[:, 1]}
 
@@ -477,18 +513,20 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("nlp_logistic_classification_learner")
 
-    params = {"vectorizer_params": merged_vect_params,
-              "logistic_params": merged_logistic_params}
+    params = {"vectorizer_params": merged_vect_params, "logistic_params": merged_logistic_params}
 
-    log = {'nlp_logistic_classification_learner': {
-        'features': text_feature_cols,
-        'target': target,
-        'prediction_column': prediction_column,
-        'parameters': assoc(params, "vocab_size", sparse_vect.shape[1]),
-        'package': "sklearn",
-        'package_version': sk_version,
-        'training_samples': len(df)},
-        'object': clf}
+    log = {
+        "nlp_logistic_classification_learner": {
+            "features": text_feature_cols,
+            "target": target,
+            "prediction_column": prediction_column,
+            "parameters": assoc(params, "vocab_size", sparse_vect.shape[1]),
+            "package": "sklearn",
+            "package_version": sk_version,
+            "training_samples": len(df),
+        },
+        "object": clf,
+    }
 
     return p, p(df), log
 
@@ -497,30 +535,32 @@ nlp_logistic_classification_learner.__doc__ += learner_return_docstring("NLP Log
 
 
 @curry
-@log_learner_time(learner_name='lgbm_classification_learner')
-def lgbm_classification_learner(df: pd.DataFrame,
-                                features: List[str],
-                                target: str,
-                                learning_rate: float = 0.1,
-                                num_estimators: int = 100,
-                                extra_params: Optional[LogType] = None,
-                                prediction_column: str = "prediction",
-                                weight_column: Optional[str] = None,
-                                encode_extra_cols: bool = True,
-                                valid_sets: Optional[List[pd.DataFrame]] = None,
-                                valid_names: Optional[List[str]] = None,
-                                feval: Optional[Union[
-                                    Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
-                                    List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
-                                ] = None,
-                                init_model: Optional[Union[str, Path, Booster]] = None,
-                                feature_name: Union[List[str], str] = 'auto',
-                                categorical_feature: Union[List[str], List[int], str] = 'auto',
-                                keep_training_booster: bool = False,
-                                callbacks: Optional[List[Callable]] = None,
-                                dataset_init_score: Optional[Union[
-                                    List, List[List], np.array, pd.Series, pd.DataFrame]
-                                ] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="lgbm_classification_learner")
+def lgbm_classification_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: Optional[LogType] = None,
+    prediction_column: str = "prediction",
+    weight_column: Optional[str] = None,
+    encode_extra_cols: bool = True,
+    valid_sets: Optional[List[pd.DataFrame]] = None,
+    valid_names: Optional[List[str]] = None,
+    feval: Optional[
+        Union[
+            Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
+            List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]],
+        ]
+    ] = None,
+    init_model: Optional[Union[str, Path, Booster]] = None,
+    feature_name: Union[List[str], str] = "auto",
+    categorical_feature: Union[List[str], List[int], str] = "auto",
+    keep_training_booster: bool = False,
+    callbacks: Optional[List[Callable]] = None,
+    dataset_init_score: Optional[Union[List, List[List], np.array, pd.Series, pd.DataFrame]] = None,
+) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -619,48 +659,69 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "objective", 'binary')
+    params = params if "objective" in params else assoc(params, "objective", "binary")
 
     weights = df[weight_column].values if weight_column else None
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
-    dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
-                          silent=True, init_score=dataset_init_score)
+    dtrain = lgbm.Dataset(
+        df[features].values,
+        label=df[target],
+        feature_name=list(map(str, features)),
+        weight=weights,
+        silent=True,
+        init_score=dataset_init_score,
+    )
 
-    bst = lgbm.train(params=params, train_set=dtrain, num_boost_round=num_estimators, valid_sets=valid_sets,
-                     valid_names=valid_names, feval=feval, init_model=init_model, feature_name=feature_name,
-                     categorical_feature=categorical_feature, keep_training_booster=keep_training_booster,
-                     callbacks=callbacks)
+    bst = lgbm.train(
+        params=params,
+        train_set=dtrain,
+        num_boost_round=num_estimators,
+        valid_sets=valid_sets,
+        valid_names=valid_names,
+        feval=feval,
+        init_model=init_model,
+        feature_name=feature_name,
+        categorical_feature=categorical_feature,
+        keep_training_booster=keep_training_booster,
+        callbacks=callbacks,
+    )
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         if params["objective"] == "multiclass":
-            col_dict = {prediction_column + "_" + str(key): value
-                        for (key, value) in enumerate(bst.predict(new_df[features].values).T)}
+            col_dict = {
+                prediction_column + "_" + str(key): value
+                for (key, value) in enumerate(bst.predict(new_df[features].values).T)
+            }
         else:
             col_dict = {prediction_column: bst.predict(new_df[features].values)}
 
         if apply_shap:
             import shap
+
             explainer = shap.TreeExplainer(bst)
             shap_values = explainer.shap_values(new_df[features])
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "multiclass":
-                shap_values_multiclass = {f"shap_values_{class_index}": list(value)
-                                          for (class_index, value) in enumerate(shap_values)}
+                shap_values_multiclass = {
+                    f"shap_values_{class_index}": list(value) for (class_index, value) in enumerate(shap_values)
+                }
                 shap_expected_value_multiclass = {
-                    f"shap_expected_value_{class_index}":
-                        np.repeat(expected_value, len(class_shap_values))
-                    for (class_index, (expected_value, class_shap_values))
-                    in enumerate(zip(shap_expected_value, shap_values))
+                    f"shap_expected_value_{class_index}": np.repeat(expected_value, len(class_shap_values))
+                    for (class_index, (expected_value, class_shap_values)) in enumerate(
+                        zip(shap_expected_value, shap_values)
+                    )
                 }
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
                 shap_values = list(shap_values[1])
-                shap_output = {"shap_values": shap_values,
-                               "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values))}
+                shap_output = {
+                    "shap_values": shap_values,
+                    "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values)),
+                }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -668,16 +729,19 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("lgbm_classification_learner", shap=True)
 
-    log = {'lgbm_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "lightgbm",
-        'package_version': lgbm.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        "lgbm_classification_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "lightgbm",
+            "package_version": lgbm.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": dict(zip(features, bst.feature_importance().tolist())),
+            "training_samples": len(df),
+        },
+        "object": bst,
+    }
 
     return p, p(df), log
 

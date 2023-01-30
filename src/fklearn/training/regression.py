@@ -13,14 +13,16 @@ from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 @curry
-@log_learner_time(learner_name='linear_regression_learner')
-def linear_regression_learner(df: pd.DataFrame,
-                              features: List[str],
-                              target: str,
-                              params: Dict[str, Any] = None,
-                              prediction_column: str = "prediction",
-                              weight_column: str = None,
-                              encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="linear_regression_learner")
+def linear_regression_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an linear regressor to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -70,16 +72,19 @@ def linear_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("linear_regression_learner")
 
-    log = {'linear_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': regr}
+    log = {
+        "linear_regression_learner": {
+            "features": features,
+            "target": target,
+            "parameters": params,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sk_version,
+            "feature_importance": dict(zip(features, regr.coef_.flatten())),
+            "training_samples": len(df),
+        },
+        "object": regr,
+    }
 
     return p, p(df), log
 
@@ -88,16 +93,18 @@ linear_regression_learner.__doc__ += learner_return_docstring("Linear Regression
 
 
 @curry
-@log_learner_time(learner_name='xgb_regression_learner')
-def xgb_regression_learner(df: pd.DataFrame,
-                           features: List[str],
-                           target: str,
-                           learning_rate: float = 0.1,
-                           num_estimators: int = 100,
-                           extra_params: Dict[str, Any] = None,
-                           prediction_column: str = "prediction",
-                           weight_column: str = None,
-                           encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="xgb_regression_learner")
+def xgb_regression_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an XGBoost regressor to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then it fits a XGBoost
@@ -155,7 +162,7 @@ def xgb_regression_learner(df: pd.DataFrame,
     weights = df[weight_column].values if weight_column else None
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "objective", 'reg:linear')
+    params = params if "objective" in params else assoc(params, "objective", "reg:linear")
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
@@ -169,12 +176,15 @@ def xgb_regression_learner(df: pd.DataFrame,
 
         if apply_shap:
             import shap
+
             explainer = shap.TreeExplainer(bst)
             shap_values = list(explainer.shap_values(new_df[features]))
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+            shap_output = {
+                "shap_values": shap_values,
+                "shap_expected_value": np.repeat(shap_expected_value, len(shap_values)),
+            }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -182,16 +192,19 @@ def xgb_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("xgb_regression_learner", shap=True)
 
-    log = {'xgb_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "xgboost",
-        'package_version': xgb.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': bst.get_score(),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        "xgb_regression_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "xgboost",
+            "package_version": xgb.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": bst.get_score(),
+            "training_samples": len(df),
+        },
+        "object": bst,
+    }
 
     return p, p(df), log
 
@@ -200,15 +213,17 @@ xgb_regression_learner.__doc__ += learner_return_docstring("XGboost Regressor")
 
 
 @curry
-@log_learner_time(learner_name='catboost_regressor_learner')
-def catboost_regressor_learner(df: pd.DataFrame,
-                               features: List[str],
-                               target: str,
-                               learning_rate: float = 0.1,
-                               num_estimators: int = 100,
-                               extra_params: Dict[str, Any] = None,
-                               prediction_column: str = "prediction",
-                               weight_column: str = None) -> LearnerReturnType:
+@log_learner_time(learner_name="catboost_regressor_learner")
+def catboost_regressor_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+) -> LearnerReturnType:
     """
     Fits an CatBoost regressor to the dataset. It first generates a Pool
     with the specified features and labels from `df`. Then it fits a CatBoost
@@ -274,12 +289,15 @@ def catboost_regressor_learner(df: pd.DataFrame,
 
         if apply_shap:
             import shap
+
             explainer = shap.TreeExplainer(cbr)
             shap_values = list(explainer.shap_values(new_df[features]))
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+            shap_output = {
+                "shap_values": shap_values,
+                "shap_expected_value": np.repeat(shap_expected_value, len(shap_values)),
+            }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -287,16 +305,19 @@ def catboost_regressor_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("CatBoostRegressor", shap=False)
 
-    log = {'catboost_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "catboost",
-        'package_version': catboost.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)},
-        'object': cbr}
+    log = {
+        "catboost_regression_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "catboost",
+            "package_version": catboost.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": cbr.feature_importances_,
+            "training_samples": len(df),
+        },
+        "object": cbr,
+    }
 
     return p, p(df), log
 
@@ -305,17 +326,19 @@ catboost_regressor_learner.__doc__ += learner_return_docstring("CatBoostRegresso
 
 
 @curry
-@log_learner_time(learner_name='gp_regression_learner')
-def gp_regression_learner(df: pd.DataFrame,
-                          features: List[str],
-                          target: str,
-                          kernel: kernels.Kernel = None,
-                          alpha: float = 0.1,
-                          extra_variance: Union[str, float] = "fit",
-                          return_std: bool = False,
-                          extra_params: Dict[str, Any] = None,
-                          prediction_column: str = "prediction",
-                          encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="gp_regression_learner")
+def gp_regression_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    kernel: kernels.Kernel = None,
+    alpha: float = 0.1,
+    extra_variance: Union[str, float] = "fit",
+    return_std: bool = False,
+    extra_params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an gaussian process regressor to the dataset.
 
@@ -367,8 +390,8 @@ def gp_regression_learner(df: pd.DataFrame,
 
     params = extra_params if extra_params else {}
 
-    params['alpha'] = alpha
-    params['kernel'] = kernel
+    params["alpha"] = alpha
+    params["kernel"] = kernel
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
@@ -387,16 +410,18 @@ def gp_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("gp_regression_learner")
 
-    log = {'gp_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': merge(params, {'extra_variance': extra_variance,
-                                     'return_std': return_std}),
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'training_samples': len(df)},
-        'object': gp}
+    log = {
+        "gp_regression_learner": {
+            "features": features,
+            "target": target,
+            "parameters": merge(params, {"extra_variance": extra_variance, "return_std": return_std}),
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sk_version,
+            "training_samples": len(df),
+        },
+        "object": gp,
+    }
 
     return p, p(df), log
 
@@ -405,16 +430,18 @@ gp_regression_learner.__doc__ += learner_return_docstring("Gaussian Process Regr
 
 
 @curry
-@log_learner_time(learner_name='lgbm_regression_learner')
-def lgbm_regression_learner(df: pd.DataFrame,
-                            features: List[str],
-                            target: str,
-                            learning_rate: float = 0.1,
-                            num_estimators: int = 100,
-                            extra_params: Dict[str, Any] = None,
-                            prediction_column: str = "prediction",
-                            weight_column: str = None,
-                            encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="lgbm_regression_learner")
+def lgbm_regression_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    learning_rate: float = 0.1,
+    num_estimators: int = 100,
+    extra_params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
 
@@ -472,14 +499,15 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     params = extra_params if extra_params else {}
     params = assoc(params, "eta", learning_rate)
-    params = params if "objective" in params else assoc(params, "objective", 'regression')
+    params = params if "objective" in params else assoc(params, "objective", "regression")
 
     weights = df[weight_column].values if weight_column else None
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
-    dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
-                          silent=True)
+    dtrain = lgbm.Dataset(
+        df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights, silent=True
+    )
 
     bst = lgbm.train(params, dtrain, num_estimators)
 
@@ -488,12 +516,15 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
         if apply_shap:
             import shap
+
             explainer = shap.TreeExplainer(bst)
             shap_values = list(explainer.shap_values(new_df[features]))
             shap_expected_value = explainer.expected_value
 
-            shap_output = {"shap_values": shap_values,
-                           "shap_expected_value": np.repeat(shap_expected_value, len(shap_values))}
+            shap_output = {
+                "shap_values": shap_values,
+                "shap_expected_value": np.repeat(shap_expected_value, len(shap_values)),
+            }
 
             col_dict = merge(col_dict, shap_output)
 
@@ -501,16 +532,19 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("lgbm_regression_learner", shap=True)
 
-    log = {'lgbm_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "lightgbm",
-        'package_version': lgbm.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        "lgbm_regression_learner": {
+            "features": features,
+            "target": target,
+            "prediction_column": prediction_column,
+            "package": "lightgbm",
+            "package_version": lgbm.__version__,
+            "parameters": assoc(params, "num_estimators", num_estimators),
+            "feature_importance": dict(zip(features, bst.feature_importance().tolist())),
+            "training_samples": len(df),
+        },
+        "object": bst,
+    }
 
     return p, p(df), log
 
@@ -519,14 +553,16 @@ lgbm_regression_learner.__doc__ += learner_return_docstring("LGBM Regressor")
 
 
 @curry
-@log_learner_time(learner_name='custom_supervised_model_learner')
-def custom_supervised_model_learner(df: pd.DataFrame,
-                                    features: List[str],
-                                    target: str,
-                                    model: Any,
-                                    supervised_type: str,
-                                    log: Dict[str, Dict],
-                                    prediction_column: str = "prediction") -> LearnerReturnType:
+@log_learner_time(learner_name="custom_supervised_model_learner")
+def custom_supervised_model_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    model: Any,
+    supervised_type: str,
+    log: Dict[str, Dict],
+    prediction_column: str = "prediction",
+) -> LearnerReturnType:
     """
     Fits a custom model to the dataset.
     Return the predict function, the predictions for the input dataset and a log describing the model.
@@ -567,25 +603,25 @@ def custom_supervised_model_learner(df: pd.DataFrame,
     """
 
     if len(log) != 1:
-        raise ValueError("\'log\' dictionary must start with model name")
-    if supervised_type not in ('classification', 'regression'):
-        raise TypeError("supervised_type options are: \'classification\' or \'regression\'")
-    if not hasattr(model, 'fit'):
-        raise AttributeError("\'model\' object must have \'fit\' attribute")
-    if supervised_type == 'classification' and not hasattr(model, 'predict_proba'):
-        raise AttributeError("\'model\' object for classification must have \'predict_proba\' attribute")
-    if supervised_type == 'regression' and not hasattr(model, 'predict'):
-        raise AttributeError("\'model\' object for regression must have \'predict\' attribute")
+        raise ValueError("'log' dictionary must start with model name")
+    if supervised_type not in ("classification", "regression"):
+        raise TypeError("supervised_type options are: 'classification' or 'regression'")
+    if not hasattr(model, "fit"):
+        raise AttributeError("'model' object must have 'fit' attribute")
+    if supervised_type == "classification" and not hasattr(model, "predict_proba"):
+        raise AttributeError("'model' object for classification must have 'predict_proba' attribute")
+    if supervised_type == "regression" and not hasattr(model, "predict"):
+        raise AttributeError("'model' object for regression must have 'predict' attribute")
 
     model.fit(df[features].values, df[target].values)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
-        if supervised_type == 'classification':
+        if supervised_type == "classification":
             pred = model.predict_proba(new_df[features].values)
             col_dict = {}
             for (key, value) in enumerate(pred.T):
                 col_dict.update({prediction_column + "_" + str(key): value})
-        elif supervised_type == 'regression':
+        elif supervised_type == "regression":
             col_dict = {prediction_column: model.predict(new_df[features].values)}
 
         return new_df.assign(**col_dict)
@@ -601,14 +637,16 @@ custom_supervised_model_learner.__doc__ += learner_return_docstring("Custom Supe
 
 
 @curry
-@log_learner_time(learner_name='elasticnet_regression_learner')
-def elasticnet_regression_learner(df: pd.DataFrame,
-                                  features: List[str],
-                                  target: str,
-                                  params: Dict[str, Any] = None,
-                                  prediction_column: str = "prediction",
-                                  weight_column: str = None,
-                                  encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="elasticnet_regression_learner")
+def elasticnet_regression_learner(
+    df: pd.DataFrame,
+    features: List[str],
+    target: str,
+    params: Dict[str, Any] = None,
+    prediction_column: str = "prediction",
+    weight_column: str = None,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an elastic net regressor to the dataset. Return the predict function
     for the model and the predictions for the input dataset.
@@ -658,16 +696,19 @@ def elasticnet_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("elasticnet_regression_learner")
 
-    log = {'elasticnet_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': regr}
+    log = {
+        "elasticnet_regression_learner": {
+            "features": features,
+            "target": target,
+            "parameters": params,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sk_version,
+            "feature_importance": dict(zip(features, regr.coef_.flatten())),
+            "training_samples": len(df),
+        },
+        "object": regr,
+    }
 
     return p, p(df), log
 

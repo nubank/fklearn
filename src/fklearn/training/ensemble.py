@@ -8,21 +8,23 @@ from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_
 from fklearn.types import LearnerReturnType
 from fklearn.training.utils import log_learner_time
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 @curry
-@log_learner_time(learner_name='xgb_octopus_classification_learner')
-def xgb_octopus_classification_learner(train_set: pd.DataFrame,
-                                       learning_rate_by_bin: Dict[T, float],
-                                       num_estimators_by_bin: Dict[T, int],
-                                       extra_params_by_bin: Dict[T, Dict[str, Any]],
-                                       features_by_bin: Dict[T, List[str]],
-                                       train_split_col: str,
-                                       train_split_bins: List,
-                                       nthread: int,
-                                       target_column: str,
-                                       prediction_column: str = "prediction") -> LearnerReturnType:
+@log_learner_time(learner_name="xgb_octopus_classification_learner")
+def xgb_octopus_classification_learner(
+    train_set: pd.DataFrame,
+    learning_rate_by_bin: Dict[T, float],
+    num_estimators_by_bin: Dict[T, int],
+    extra_params_by_bin: Dict[T, Dict[str, Any]],
+    features_by_bin: Dict[T, List[str]],
+    train_split_col: str,
+    train_split_bins: List,
+    nthread: int,
+    target_column: str,
+    prediction_column: str = "prediction",
+) -> LearnerReturnType:
 
     """
     Octopus ensemble allows you to inject domain specific knowledge to force a split in an initial feature, instead of
@@ -115,19 +117,21 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
         The name of the column with the predictions from the model.
     """
 
-    train_fns = {b: xgb_classification_learner(features=features_by_bin[b],
-                                               learning_rate=learning_rate_by_bin[b],
-                                               num_estimators=num_estimators_by_bin[b],
-                                               target=target_column,
-                                               extra_params=assoc(extra_params_by_bin[b], 'nthread', nthread),
-                                               prediction_column=prediction_column + "_bin_" + str(b))
-                 for b in train_split_bins}
+    train_fns = {
+        b: xgb_classification_learner(
+            features=features_by_bin[b],
+            learning_rate=learning_rate_by_bin[b],
+            num_estimators=num_estimators_by_bin[b],
+            target=target_column,
+            extra_params=assoc(extra_params_by_bin[b], "nthread", nthread),
+            prediction_column=prediction_column + "_bin_" + str(b),
+        )
+        for b in train_split_bins
+    }
 
-    train_sets = {b: train_set[train_set[train_split_col] == b]
-                  for b in train_split_bins}
+    train_sets = {b: train_set[train_set[train_split_col] == b] for b in train_split_bins}
 
-    train_results = {b: train_fns[b](train_sets[b])
-                     for b in train_split_bins}
+    train_results = {b: train_fns[b](train_sets[b]) for b in train_split_bins}
 
     # train_results is a 3-tuple (prediction functions, predicted train dataset, train logs)
     pred_fns = {b: train_results[b][0] for b in train_split_bins}
@@ -136,24 +140,25 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
     def p(df: pd.DataFrame) -> pd.DataFrame:
         pred_fn = compose(*pred_fns.values())
 
-        return (pred_fn(df)
-                .assign(pred_bin=prediction_column + "_bin_" + df[train_split_col].astype(str))
-                .assign(prediction=lambda d: d.lookup(d.index.values,
-                                                      d.pred_bin.values.squeeze()))
-                .rename(index=str, columns={"prediction": prediction_column})
-                .drop("pred_bin", axis=1))
+        return (
+            pred_fn(df)
+            .assign(pred_bin=prediction_column + "_bin_" + df[train_split_col].astype(str))
+            .assign(prediction=lambda d: d.lookup(d.index.values, d.pred_bin.values.squeeze()))
+            .rename(index=str, columns={"prediction": prediction_column})
+            .drop("pred_bin", axis=1)
+        )
 
     p.__doc__ = learner_pred_fn_docstring("xgb_octopus_classification_learner")
 
     log = {
-        'xgb_octopus_classification_learner': {
-            'features': features_by_bin,
-            'target': target_column,
-            'prediction_column': prediction_column,
-            'package': "xgboost",
-            'train_logs': train_logs,
-            'parameters': extra_params_by_bin,
-            'training_samples': len(train_set)
+        "xgb_octopus_classification_learner": {
+            "features": features_by_bin,
+            "target": target_column,
+            "prediction_column": prediction_column,
+            "package": "xgboost",
+            "train_logs": train_logs,
+            "parameters": extra_params_by_bin,
+            "training_samples": len(train_set),
         }
     }
 
