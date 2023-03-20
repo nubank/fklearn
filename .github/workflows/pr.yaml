@@ -1,0 +1,44 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up venv
+        run: |
+          python3 -m venv env
+          source env/bin/activate
+          python3 -m pip install --upgrade pip setuptools
+          echo "Python path: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          echo "pip version: $(python3 -m pip --version)"
+          echo "pip version: $(python3 -m setuptools --version)"
+      - name: Install dependencies
+        run: |
+          source env/bin/activate
+          echo "Python path: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          echo "pip version: $(python3 -m pip --version)"
+          echo "pip version: $(python3 -m setuptools --version)"
+          python3 -m pip install .[devel]
+      - name: Test with pytest
+        run: |
+          source env/bin/activate
+          echo "Python path: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          echo "pip version: $(python3 -m pip --version)"
+          echo "pip version: $(python3 -m setuptools --version)"
+          python3 -m pytest --cov=fklearn tests/
+          codecov
