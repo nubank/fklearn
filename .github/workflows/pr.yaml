@@ -30,7 +30,7 @@ jobs:
           echo "Python path: $(which python3)"
           echo "Python version: $(python3 --version)"
           echo "pip version: $(python3 -m pip --version)"
-          python3 -m pip install .[devel]
+          python3 -m pip install -e .[devel]
       - name: Test with pytest
         run: |
           source env/bin/activate
