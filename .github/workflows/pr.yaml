@@ -37,5 +37,5 @@ jobs:
           echo "Python path: $(which python3)"
           echo "Python version: $(python3 --version)"
           echo "pip version: $(python3 -m pip --version)"
-          python3 -m pytest tests --cov=src/
+          python3 -m pytest --cov-config=.coveragerc --cov=src/ tests
           codecov
