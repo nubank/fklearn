@@ -1,8 +1,3 @@
-[run]
-parallel = True
-concurrency = multiprocessing
-branch = True
-
 [report]
 exclude_lines =
     raise *
