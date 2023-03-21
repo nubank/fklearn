@@ -23,7 +23,7 @@ If you would like to chat with other contributors to fklearn, consider joining t
 Working with the code
 =====================
 
-Now that that you already understand how the project works, maybe it's time to fix something, add and enhancement, or write new documentation.
+Now that you already understand how the project works, maybe it's time to fix something, add and enhancement, or write new documentation.
 It's time to understand how we send contributions.
 
 Version control
