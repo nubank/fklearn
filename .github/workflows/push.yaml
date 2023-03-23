@@ -114,4 +114,5 @@ jobs:
           set -euxo pipefail
           source env/bin/activate
 
+          sudo apt-get install pandoc
           cd docs/ && make html
