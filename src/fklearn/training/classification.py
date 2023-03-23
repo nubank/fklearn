@@ -235,7 +235,7 @@ xgb_classification_learner.__doc__ += learner_return_docstring("XGboost Classifi
 @curry
 def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
                               features: List, target: str,
-                              weights: List, cat_features: List) -> np.array:
+                              weights: List, cat_features: List) -> np.ndarray:
     """
     Auxiliar method to allow us to get shap values for Catboost multiclass models
 
@@ -519,7 +519,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                 keep_training_booster: bool = False,
                                 callbacks: Optional[List[Callable]] = None,
                                 dataset_init_score: Optional[Union[
-                                    List, List[List], np.array, pd.Series, pd.DataFrame]
+                                    List, List[List], np.ndarray, pd.Series, pd.DataFrame]
                                 ] = None) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
