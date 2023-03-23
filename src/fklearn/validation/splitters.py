@@ -1,7 +1,7 @@
 import operator
 from datetime import datetime, timedelta
 from itertools import chain, repeat, starmap
-from typing import Callable, Iterator, List, Tuple, Union
+from typing import Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -383,7 +383,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
                                     time_column: str,
                                     training_limit: DateType,
                                     holdout_gap: timedelta = timedelta(days=0),
-                                    train_percentages: Iterator[float] = (0.25, 0.5, 0.75, 1.0),
+                                    train_percentages: Iterable[float] = (0.25, 0.5, 0.75, 1.0),
                                     random_state: int = None) -> SplitterReturnType:
     """
     Splits the data for a spatial learning curve. Progressively adds more and
@@ -422,7 +422,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
     random_state : int
         A seed for the random number generator that shuffles the IDs.
     """
-    if np.min(train_percentages) < 0 or np.max(train_percentages) > 1:
+    if np.min(np.array(train_percentages)) < 0 or np.max(np.array(train_percentages)) > 1:
         raise ValueError('Train percentages must be between 0 and 1')
 
     if isinstance(training_limit, str):
