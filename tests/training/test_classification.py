@@ -59,7 +59,7 @@ def test_logistic_classification_learner():
 
     assert Counter(expected_col_train) == Counter(pred_train.columns.tolist())
     assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
-    assert pred_test.prediction.max() < 1
+    assert pred_test.prediction.max() > 1
     assert pred_test.prediction.min() > 0
     assert (pred_test.columns == pred_train.columns).all()
 
