@@ -1,7 +1,7 @@
 import operator
 from datetime import datetime, timedelta
 from itertools import chain, repeat, starmap
-from typing import Callable, Iterable, List, Tuple, Union
+from typing import Callable, Iterator, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -383,7 +383,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
                                     time_column: str,
                                     training_limit: DateType,
                                     holdout_gap: timedelta = timedelta(days=0),
-                                    train_percentages: Iterable[float] = (0.25, 0.5, 0.75, 1.0),
+                                    train_percentages: Iterator[float] = (0.25, 0.5, 0.75, 1.0),
                                     random_state: int = None) -> SplitterReturnType:
     """
     Splits the data for a spatial learning curve. Progressively adds more and
