@@ -44,7 +44,7 @@ def isolation_forest_learner(df: pd.DataFrame,
 
     model = IsolationForest()
 
-    default_params = {"n_jobs": -1, "random_state": 1729, "contamination": 0.1}
+    default_params: Dict[str, Any] = {"n_jobs": -1, "random_state": 1729, "contamination": 0.1}
     # Remove this when we stop supporting scikit-learn<0.24 as this param is deprecated
     if "behaviour" in model.get_params():
         default_params["behaviour"] = "new"
