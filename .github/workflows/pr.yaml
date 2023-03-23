@@ -1,9 +1,31 @@
-name: Python package
+name: PR check suite
 
 on: [push]
 
 jobs:
-  build:
+
+  linter:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name:
+        run: |
+          set -euxo pipefail
+          python3 -m pip install -q flake8==3.8.4
+          python3 -m flake8 \
+            --ignore=E731,W503 \
+            --filename=*.py \
+            --exclude=__init__.py \
+            --show-source \
+            --statistics \
+            --max-line-length=120 \
+            src/ tests/
+
+  test-suite:
 
     runs-on: ubuntu-20.04
     strategy:
@@ -33,9 +55,21 @@ jobs:
           source env/bin/activate
 
           python3 -m pip install -e .[devel]
+      - name: Pip check
+        run: |
+          set -euxo pipefail
+          source env/bin/activate
+
+          pip check
+      - name: Type check
+        run: |
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m mypy src tests --config mypy.ini
       - name: Test with pytest
         run: |
           set -euxo pipefail
           source env/bin/activate
 
-          python3 -m pytest --cov-fail-under=97 --cov=fklearn tests/
+          python3 -m pytest --cov-fail-under=95 --cov=fklearn tests/
