@@ -80,7 +80,7 @@ jobs:
           python3 -m pytest --cov-fail-under=95 --cov=fklearn tests/
 
   build-docs:
-    requires: [linter, test-suite]
+    needs: [linter, test-suite]
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
