@@ -3,7 +3,7 @@ name: Test Suite
 on:
   push:
     branches:    
-      - '*'
+      - '**'
 
 jobs:
   linter:
