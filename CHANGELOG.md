@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.2] - 2023-03-27
+- **Enhacement**
+  - Bump maximum allowed `scikit-learn`
+  - Move from CircleCI to Github Actions
+
 ## [2.2.1] - 2022-09-06
 - **Bug Fix**
   - Including a necessary init file to allow the import of the causal cate learners.
