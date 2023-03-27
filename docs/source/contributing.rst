@@ -55,7 +55,7 @@ Creating the virtual environment
 .. code-block:: bash
 
   # Use an ENV_DIR of you choice. We are using ~/venvs
-  python3.6 -m venv ~/venvs/fklearn-dev
+  python3 -m venv ~/venvs/fklearn-dev
   source ~/venvs/fklearn-dev/activate
 
 Install the requirements
@@ -65,7 +65,7 @@ This command will install all the test dependencies. To install the package you 
 
 .. code-block:: bash
 
-  pip install -qe .[test_deps]
+  python3 -m pip install -qe .[devel]
 
 First testing
 ~~~~~~~~~~~~~
@@ -74,7 +74,7 @@ The following command should run all tests, if every test pass, you should be re
 
 .. code-block:: bash
 
-  python -m pytest tests/
+  python3 -m pytest tests/
 
 Creating a development branch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -106,15 +106,15 @@ In this session we'll guide you on how to contribute with the code. This is a gu
 Code standards
 --------------
 
-This project is compatible only with python3.6 and follows the `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_
+This project is compatible only with python 3.6 to 3.9 and follows the `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_
 And we use this `import formatting <https://google.github.io/styleguide/pyguide.html?showone=Imports_formatting#313-imports-formatting>`_
 
 In order to check if your code is following our codestyle, you can run from the root directory of the repo the next commands:
 
 .. code-block:: bash
 
-  python -m pip install -q flake8
-  python -m flake8 \
+  python3 -m pip install -q flake8
+  python3 -m flake8 \
     --ignore=E731,W503 \
     --filename=\*.py \
     --exclude=__init__.py \
@@ -122,6 +122,12 @@ In order to check if your code is following our codestyle, you can run from the 
     --statistics \
     --max-line-length=120 \
     src/ tests/
+
+We also use mypy for type checking, which you can run with:
+
+.. code-block:: bash
+
+  python3 -m mypy src tests --config mypy.ini
 
 Run tests
 ---------
@@ -131,13 +137,13 @@ After you finish your feature development or bug fix, you should run your tests,
 
 .. code-block:: bash
 
-  python -m pytest tests/
+  python3 -m pytest tests/
 
 Or if you want to run only one test:
 
 .. code-block:: bash
 
-  python -m pytest tests/test-file-name.py::test_method_name
+  python3 -m pytest tests/test-file-name.py::test_method_name
 
 
 You must write tests for every feature **always**, you can look at the other tests to have a better idea how we implement them.

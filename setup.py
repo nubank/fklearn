@@ -29,7 +29,7 @@ devel_deps = test_deps + all_deps
 setup(name=MODULE_NAME,
       description="Functional machine learning",
       url='https://github.com/nubank/{:s}'.format(REPO_NAME),
-      python_requires='>=3.6.2',
+      python_requires='>=3.6.2,<3.10',
       author="Nubank",
       package_dir={'': 'src'},
       packages=find_packages('src'),

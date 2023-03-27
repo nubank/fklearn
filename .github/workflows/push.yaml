@@ -18,7 +18,7 @@ jobs:
         run: |
           #!/bin/bash
           set -euxo pipefail
-          python3 -m pip install -q flake8==3.8.4
+          python3 -m pip install -q flake8
           python3 -m flake8 \
             --ignore=E731,W503 \
             --filename=*.py \
@@ -42,7 +42,7 @@ jobs:
         set -euxo pipefail
 
         python3 -m pip install --upgrade pip
-        pip install build
+        python3 -m pip install build
         python3 -m build
 
   test-suite:
@@ -81,7 +81,7 @@ jobs:
           set -euxo pipefail
           source env/bin/activate
 
-          pip check
+          python3 -m pip check
       - name: Type check
         run: |
           #!/bin/bash
