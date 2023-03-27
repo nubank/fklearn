@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.3.0] - 2023-03-27
+## [2.3.0rc0] - 2023-03-27
 - **Enhacement**
   - Bump maximum allowed `scikit-learn`
   - Move from CircleCI to Github Actions
