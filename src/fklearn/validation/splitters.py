@@ -422,7 +422,7 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
     random_state : int
         A seed for the random number generator that shuffles the IDs.
     """
-    if np.min(train_percentages) < 0 or np.max(train_percentages) > 1:
+    if np.min(np.array(train_percentages)) < 0 or np.max(np.array(train_percentages)) > 1:
         raise ValueError('Train percentages must be between 0 and 1')
 
     if isinstance(training_limit, str):
@@ -444,8 +444,8 @@ def spatial_learning_curve_splitter(train_data: pd.DataFrame,
         spatial_ids,
         lambda ids: (np.array(train_percentages) * len(ids)).astype(int),  # Get the corresponding indices for each %
         lambda idx: np.split(spatial_ids, idx)[:-1],  # Split spatial ids by the indices
-        lambda l: map(lambda x: x.tolist(), l),  # Transform sub-arrays into sub-lists
-        lambda l: filter(None, l),  # Drop empty sub-lists
+        lambda to_list: map(lambda x: x.tolist(), to_list),  # Transform sub-arrays into sub-lists
+        lambda drop_empty: filter(None, drop_empty),  # Drop empty sub-lists
         accumulate(operator.add)  # Cumulative sum of lists
     )
 

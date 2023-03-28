@@ -301,12 +301,12 @@ def test_custom_supervised_model_learner():
 
     expected_col_train = df_train_classification.columns.tolist() + ["prediction_0", "prediction_1"]
     expected_col_test = df_test_classification.columns.tolist() + ["prediction_0", "prediction_1"]
-    assert(Counter(expected_col_train) == Counter(pred_train_classification.columns.tolist()))
-    assert(Counter(expected_col_test) == Counter(pred_test_classification.columns.tolist()))
-    assert(pred_test_classification.prediction_0.max() <= 1)
-    assert(pred_test_classification.prediction_0.min() >= 0)
-    assert(pred_test_classification.prediction_1.max() <= 1)
-    assert(pred_test_classification.prediction_1.min() >= 0)
+    assert (Counter(expected_col_train) == Counter(pred_train_classification.columns.tolist()))
+    assert (Counter(expected_col_test) == Counter(pred_test_classification.columns.tolist()))
+    assert (pred_test_classification.prediction_0.max() <= 1)
+    assert (pred_test_classification.prediction_0.min() >= 0)
+    assert (pred_test_classification.prediction_1.max() <= 1)
+    assert (pred_test_classification.prediction_1.min() >= 0)
 
     custom_regression_learner = custom_supervised_model_learner(
         features=features,
@@ -319,7 +319,7 @@ def test_custom_supervised_model_learner():
 
     expected_col_train = df_train_regression.columns.tolist() + ["prediction"]
     expected_col_test = df_test_regression.columns.tolist() + ["prediction"]
-    assert(Counter(expected_col_train) == Counter(pred_train.columns.tolist()))
-    assert(Counter(expected_col_test) == Counter(pred_test.columns.tolist()))
-    assert((pred_test.columns == pred_train.columns).all())
-    assert("prediction" in pred_test.columns)
+    assert (Counter(expected_col_train) == Counter(pred_train.columns.tolist()))
+    assert (Counter(expected_col_test) == Counter(pred_test.columns.tolist()))
+    assert ((pred_test.columns == pred_train.columns).all())
+    assert ("prediction" in pred_test.columns)

@@ -26,10 +26,15 @@ all_models_deps = lgbm_deps + xgboost_deps + catboost_deps
 all_deps = all_models_deps + tools_deps
 devel_deps = test_deps + all_deps
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(name=MODULE_NAME,
       description="Functional machine learning",
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       url='https://github.com/nubank/{:s}'.format(REPO_NAME),
-      python_requires='>=3.6.2',
+      python_requires='>=3.6.2,<3.10',
       author="Nubank",
       package_dir={'': 'src'},
       packages=find_packages('src'),
@@ -46,5 +51,9 @@ setup(name=MODULE_NAME,
                       "all": all_deps},
       include_package_data=True,
       zip_safe=False,
-      classifiers=['Programming Language :: Python :: 3.6'])
-
+      classifiers=[
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9'
+          ])

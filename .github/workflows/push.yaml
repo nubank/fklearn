@@ -1,0 +1,137 @@
+name: Test Suite
+
+on:
+  push:
+    branches:    
+      - '**'
+
+jobs:
+  linter:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name:
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          python3 -m pip install -q flake8
+          python3 -m flake8 \
+            --ignore=E731,W503 \
+            --filename=*.py \
+            --exclude=__init__.py \
+            --show-source \
+            --statistics \
+            --max-line-length=120 \
+            src/ tests/
+
+  test-packaging:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Build package
+      run: |
+        #!/bin/bash
+        set -euxo pipefail
+
+        python3 -m pip install --upgrade pip
+        python3 -m pip install build twine
+        python3 -m build
+        python3 -m twine check dist/*
+
+  test-suite:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up venv
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+
+          python3 -m venv env
+          source env/bin/activate
+          python3 -m pip install --upgrade pip setuptools
+          
+          echo "Python path: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          echo "pip version: $(python3 -m pip --version)"
+      - name: Install dependencies
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m pip install -e .[devel]
+      - name: Pip check
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m pip check
+      - name: Type check
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m mypy src tests --config mypy.ini
+      - name: Test with pytest
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m pytest --cov-fail-under=94 --cov=fklearn tests/
+
+  build-docs:
+    needs: [linter, test-suite]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Set up venv
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+
+          python3 -m venv env
+          source env/bin/activate
+          python3 -m pip install --upgrade pip setuptools
+          
+          echo "Python path: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          echo "pip version: $(python3 -m pip --version)"
+      - name: Install dependencies
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          python3 -m pip install -e .[devel]
+          python3 -m pip install -r docs/requirements.txt
+      - name: Generate docs
+        run: |
+          #!/bin/bash
+          set -euxo pipefail
+          source env/bin/activate
+
+          sudo apt-get install pandoc
+          cd docs/ && make html

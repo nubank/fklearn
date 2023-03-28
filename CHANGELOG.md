@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0] - 2023-03-28
+- **Enhacement**
+  - Bump maximum allowed `scikit-learn`
+  - Move from CircleCI to Github Actions
+  - Add optional `weight_column` argument for evaluators
+  - Change default of `min_df` from 20 to 1 on `TfidfVectorizer`
+  - Include new optional LGBM parameters to `lgbm_classification_learner`
+
 ## [2.2.1] - 2022-09-06
 - **Bug Fix**
   - Including a necessary init file to allow the import of the causal cate learners.
