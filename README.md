@@ -20,7 +20,7 @@ The name is a reference to the widely known [scikit-learn](https://scikit-learn.
 
 [Documentation](https://fklearn.readthedocs.io/en/latest/) |
 [Getting Started](https://fklearn.readthedocs.io/en/latest/getting_started.html) |
-[API Docs](https://fklearn.readthedocs.io/en/latest/api.html) |
+[API Docs](https://fklearn.readthedocs.io/en/latest/api/modules.html) |
 [Contributing](https://fklearn.readthedocs.io/en/latest/contributing.html) |
 
 
