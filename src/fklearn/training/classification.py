@@ -511,7 +511,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                     Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
                                     List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
                                 ] = None,
-                                init_model = None,
+                                init_model=None,
                                 feature_name: Union[List[str], str] = 'auto',
                                 categorical_feature: Union[List[str], List[int], str] = 'auto',
                                 keep_training_booster: bool = False,
