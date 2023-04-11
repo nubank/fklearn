@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from toolz import curry, partial
 
-from fklearn.types import EffectFnType
+from fklearn.types import EffectErrorFnType, EffectFnType
 from fklearn.causal.effects import linear_effect
 
 
@@ -215,6 +215,7 @@ def effect_curves(
     min_rows: int = 30,
     steps: int = 100,
     effect_fn: EffectFnType = linear_effect,
+    error_fn: EffectErrorFnType = None,
 ) -> pd.DataFrame:
     """
      Creates a dataset summarizing the effect curves: cumulative effect, cumulative gain and
@@ -247,6 +248,11 @@ def effect_curves(
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
 
+    error_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> float or Array of float
+         A function that computes the standard error given a dataframe, the name of the treatment column and the name
+         of the outcome column. Standard error must be multiplied by a quantile to get the upper and lower bounds of
+         a confidence interval.
+
 
      Returns
      ----------
@@ -268,7 +274,7 @@ def effect_curves(
     )
     ate: float = cum_effect[-1]
 
-    return pd.DataFrame({"samples_count": n_rows, "cumulative_effect_curve": cum_effect}).assign(
+    effect_curves_df = pd.DataFrame({"samples_count": n_rows, "cumulative_effect_curve": cum_effect}).assign(
         samples_fraction=lambda x: x["samples_count"] / size,
         cumulative_gain_curve=lambda x: x["samples_fraction"] * x["cumulative_effect_curve"],
         random_model_cumulative_gain_curve=lambda x: x["samples_fraction"] * ate,
@@ -276,3 +282,23 @@ def effect_curves(
             x["samples_fraction"] * x["cumulative_effect_curve"] - x["random_model_cumulative_gain_curve"]
         ),
     )
+
+    if error_fn is not None:
+
+        effect_errors: np.ndarray = confidence_interval_curve(
+            df=df,
+            treatment=treatment,
+            outcome=outcome,
+            prediction=prediction,
+            min_rows=min_rows,
+            steps=steps,
+            error_fn=error_fn,
+            **kwargs,
+        )
+
+        effect_curves_df = effect_curves_df.assign(
+            cumulative_effect_curve_error=effect_errors,
+            cumulative_gain_curve_error=lambda x: x["samples_fraction"] * x["cumulative_effect_curve_error"],
+        )
+
+    return effect_curves_df
