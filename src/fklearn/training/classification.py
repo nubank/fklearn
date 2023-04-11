@@ -1,8 +1,7 @@
-from typing import List, Any, Optional, Callable, Tuple, Union
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
-from lightgbm import Booster
 from pathlib import Path
 from toolz import curry, merge, assoc
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -12,6 +11,10 @@ from sklearn import __version__ as sk_version
 from fklearn.types import LearnerReturnType, LogType
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time, expand_features_encoded
+
+
+if TYPE_CHECKING:
+    from lightgbm import Booster
 
 
 @curry
@@ -513,7 +516,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                     Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
                                     List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
                                 ] = None,
-                                init_model: Optional[Union[str, Path, Booster]] = None,
+                                init_model: Optional[Union[str, Path, 'Booster']] = None,
                                 feature_name: Union[List[str], str] = 'auto',
                                 categorical_feature: Union[List[str], List[int], str] = 'auto',
                                 keep_training_booster: bool = False,

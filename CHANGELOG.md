@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.1] - 2023-04-11
+- **Bugfix**
+  - Remove incorrect `lightgbm` import from common paths
+
 ## [2.3.0] - 2023-03-28
 - **Enhacement**
   - Bump maximum allowed `scikit-learn`
