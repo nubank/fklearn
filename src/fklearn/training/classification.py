@@ -495,7 +495,7 @@ nlp_logistic_classification_learner.__doc__ += learner_return_docstring("NLP Log
 
 
 @curry
-@log_learner_time(learner_name='lgbm_classification_learner')
+@log_learner_time(learner_name='lgbm_classification_learner')  # type: ignore
 def lgbm_classification_learner(df: pd.DataFrame,
                                 features: List[str],
                                 target: str,
