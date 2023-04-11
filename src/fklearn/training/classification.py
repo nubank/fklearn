@@ -1,7 +1,8 @@
-from typing import List, Any, Optional, Callable, Tuple, Union
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from toolz import curry, merge, assoc
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -10,6 +11,10 @@ from sklearn import __version__ as sk_version
 from fklearn.types import LearnerReturnType, LogType
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time, expand_features_encoded
+
+
+if TYPE_CHECKING:
+    from lightgbm import Booster
 
 
 @curry
@@ -495,7 +500,7 @@ nlp_logistic_classification_learner.__doc__ += learner_return_docstring("NLP Log
 
 
 @curry
-@log_learner_time(learner_name='lgbm_classification_learner')  # type: ignore
+@log_learner_time(learner_name='lgbm_classification_learner')
 def lgbm_classification_learner(df: pd.DataFrame,
                                 features: List[str],
                                 target: str,
@@ -511,7 +516,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                     Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
                                     List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
                                 ] = None,
-                                init_model=None,
+                                init_model: Optional[Union[str, Path, 'Booster']] = None,
                                 feature_name: Union[List[str], str] = 'auto',
                                 categorical_feature: Union[List[str], List[int], str] = 'auto',
                                 keep_training_booster: bool = False,
