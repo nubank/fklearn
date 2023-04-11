@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
 
-import lightgbm
 import numpy as np
 import pandas as pd
 
@@ -487,6 +486,7 @@ def test_lgbm_classification_learner():
 
 
 def test_lgbm_classification_learner_params():
+    import lightgbm
     # Test input parameters
 
     df = pd.DataFrame(

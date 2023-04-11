@@ -2,8 +2,6 @@ from typing import List, Any, Optional, Callable, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from lightgbm import Booster
-from pathlib import Path
 from toolz import curry, merge, assoc
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -513,7 +511,7 @@ def lgbm_classification_learner(df: pd.DataFrame,
                                     Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
                                     List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
                                 ] = None,
-                                init_model: Optional[Union[str, Path, Booster]] = None,
+                                init_model = None,
                                 feature_name: Union[List[str], str] = 'auto',
                                 categorical_feature: Union[List[str], List[int], str] = 'auto',
                                 keep_training_booster: bool = False,
