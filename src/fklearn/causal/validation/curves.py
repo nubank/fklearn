@@ -6,6 +6,7 @@ from toolz import curry, partial
 
 from fklearn.types import EffectErrorFnType, EffectFnType
 from fklearn.causal.effects import linear_effect
+from fklearn.causal.statistical_errors import linear_standard_error
 
 
 @curry
@@ -206,6 +207,58 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
 
 
+
+def cumulative_statistical_error_curve(
+    df: pd.DataFrame,
+    treatment: str,
+    outcome: str,
+    prediction: str,
+    min_rows: int = 30,
+    steps: int = 100,
+    error_fn: EffectFnType = linear_standard_error) -> np.ndarray:
+
+    """
+    Orders the dataset by prediction and computes the cumulative error curve according 
+    to that ordering. The function to compute the error is given by error_fn.
+
+    Parameters
+    ----------
+    df : Pandas' DataFrame
+        A Pandas' DataFrame with target and prediction scores.
+
+    treatment : Strings
+        The name of the treatment column in `df`.
+
+    outcome : Strings
+        The name of the outcome column in `df`.
+
+    prediction : Strings
+        The name of the prediction column in `df`.
+
+    min_rows : Integer
+        Minimum number of observations needed to have a valid result.
+
+    steps : Integer
+        The number of cumulative steps to iterate when accumulating the effect
+
+    error_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> float
+        A function that computes the statistical error of the regression of the treatment effect
+        over the outcome given a dataframe, the name of the treatment column and the name
+        of the outcome column.
+
+
+    Returns
+    ----------
+    cumulative statistical error curve: Numpy's Array
+        The cumulative error according to the predictions ordering.
+    """
+
+    size = df.shape[0]
+    ordered_df = df.sort_values(prediction, ascending=False).reset_index(drop=True)
+    n_rows = list(range(min_rows, size, size // steps)) + [size]
+    
+    return np.array([error_fn(ordered_df.head(rows), treatment, outcome) for rows in n_rows])
+
 @curry
 def effect_curves(
     df: pd.DataFrame,
@@ -223,6 +276,11 @@ def effect_curves(
      used to compute the curves at each step: number of samples and fraction of samples used.
      Moreover one column indicating the cumulative gain for a corresponding random model is
      also included as a benchmark.
+
+     It is also possible to include a cumulative error function by passing an error_fn, this
+     column is useful to include a confidence interval, which can be achieved by multiplying the
+     error column by a desired quantile.
+
 
      Parameters
      ----------
@@ -248,9 +306,9 @@ def effect_curves(
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
 
-    error_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> float or Array of float
-         A function that computes the standard error given a dataframe, the name of the treatment column and the name
-         of the outcome column. Standard error must be multiplied by a quantile to get the upper and lower bounds of
+    error_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> float
+         A function that computes the statistical error given a dataframe, the name of the treatment column and the
+         name of the outcome column. The error must be multiplied by a quantile to get the upper and lower bounds of
          a confidence interval.
 
 
@@ -285,15 +343,14 @@ def effect_curves(
 
     if error_fn is not None:
 
-        effect_errors: np.ndarray = confidence_interval_curve(
+        effect_errors: np.ndarray = cumulative_statistical_error_curve(
             df=df,
             treatment=treatment,
             outcome=outcome,
             prediction=prediction,
             min_rows=min_rows,
             steps=steps,
-            error_fn=error_fn,
-            **kwargs,
+            error_fn=error_fn
         )
 
         effect_curves_df = effect_curves_df.assign(
