@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from fklearn.causal.validation.statistical_errors import linear_standard_error
+from fklearn.causal.statistical_errors import linear_standard_error
 
 
 def test_linear_standard_error():

@@ -4,7 +4,7 @@ import pandas as pd
 from fklearn.causal.effects import linear_effect
 from fklearn.causal.validation.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
                                               relative_cumulative_gain_curve, effect_curves)
-from fklearn.causal.validation.statistical_errors import linear_standard_error
+from fklearn.causal.statistical_errors import linear_standard_error
 
 
 def test_effect_by_segment():

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from fklearn.causal.effects import linear_effect
 
-def linear_standard_error(df: pd.DatFrame, treatment: str, outcome: str):
+def linear_standard_error(df: pd.DataFrame, treatment: str, outcome: str):
     """
     Linear Standard Error
 
