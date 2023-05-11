@@ -207,17 +207,17 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
 
 
-def cumulative_statistical_error_curve(
-    df: pd.DataFrame,
-    treatment: str,
-    outcome: str,
-    prediction: str,
-    min_rows: int = 30,
-    steps: int = 100,
-    error_fn: EffectFnType = linear_standard_error) -> np.ndarray:
+def cumulative_statistical_error_curve(df: pd.DataFrame,
+                                       treatment: str,
+                                       outcome: str,
+                                       prediction: str,
+                                       min_rows: int = 30,
+                                       steps: int = 100,
+                                       error_fn: EffectFnType = linear_standard_error,
+                                       ) -> np.ndarray:
 
     """
-    Orders the dataset by prediction and computes the cumulative error curve according 
+    Orders the dataset by prediction and computes the cumulative error curve according
     to that ordering. The function to compute the error is given by error_fn.
 
     Parameters
@@ -260,16 +260,14 @@ def cumulative_statistical_error_curve(
 
 
 @curry
-def effect_curves(
-    df: pd.DataFrame,
-    treatment: str,
-    outcome: str,
-    prediction: str,
-    min_rows: int = 30,
-    steps: int = 100,
-    effect_fn: EffectFnType = linear_effect,
-    error_fn: EffectErrorFnType = None,
-    ) -> pd.DataFrame:
+def effect_curves(df: pd.DataFrame,
+                  treatment: str,
+                  outcome: str,
+                  prediction: str,
+                  min_rows: int = 30,
+                  steps: int = 100,
+                  effect_fn: EffectFnType = linear_effect,
+                  error_fn: EffectErrorFnType = None) -> pd.DataFrame:
     """
      Creates a dataset summarizing the effect curves: cumulative effect, cumulative gain and
      relative cumulative gain. The dataset also contains two columns referencing the data
