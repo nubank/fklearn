@@ -4,6 +4,7 @@ import pandas as pd
 from fklearn.causal.effects import linear_effect
 from fklearn.causal.validation.curves import (effect_by_segment, cumulative_effect_curve, cumulative_gain_curve,
                                               relative_cumulative_gain_curve, effect_curves)
+from fklearn.causal.validation.statistical_errors import linear_standard_error
 
 
 def test_effect_by_segment():
@@ -83,9 +84,11 @@ def test_effect_curves():
         "cumulative_gain_curve": [1., 1.33333333, 1.62698413, 1.66666667, 1.94444444, 2.18803419, 2.],
         "random_model_cumulative_gain_curve": [0.6666666, 0.8888888, 1.1111111, 1.3333333, 1.5555555, 1.7777777, 2.],
         "relative_cumulative_gain_curve": [0.33333333, 0.44444444, 0.51587302, 0.33333333, 0.38888889, 0.41025641, 0.],
+        "cumulative_effect_curve_error": [0.0 , 0.0 , 0.30583887, 0.39528471, 0.32084447, 0.39055247, 0.48795004],
+        "cumulative_gain_curve_error": [0.0, 0.0, 0.16991048, 0.26352313, 0.24954570, 0.34715774, 0.48795003],
     })
 
     result = effect_curves(df, prediction="x", outcome="y", treatment="t", min_rows=3, steps=df.shape[0],
-                           effect_fn=linear_effect)
+                           effect_fn=linear_effect, error_fn=linear_standard_error)
 
     pd.testing.assert_frame_equal(result, expected, atol=1e-07)
