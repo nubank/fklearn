@@ -27,6 +27,14 @@ fklearn.causal.effects module
     :undoc-members:
     :show-inheritance:
 
+fklearn.causal.statistical_errors module
+-----------------------------
+
+.. automodule:: fklearn.causal.statistical_errors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

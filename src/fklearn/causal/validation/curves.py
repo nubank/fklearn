@@ -207,7 +207,6 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
 
 
-
 def cumulative_statistical_error_curve(
     df: pd.DataFrame,
     treatment: str,
@@ -256,8 +255,9 @@ def cumulative_statistical_error_curve(
     size = df.shape[0]
     ordered_df = df.sort_values(prediction, ascending=False).reset_index(drop=True)
     n_rows = list(range(min_rows, size, size // steps)) + [size]
-    
+
     return np.array([error_fn(ordered_df.head(rows), treatment, outcome) for rows in n_rows])
+
 
 @curry
 def effect_curves(
@@ -269,7 +269,7 @@ def effect_curves(
     steps: int = 100,
     effect_fn: EffectFnType = linear_effect,
     error_fn: EffectErrorFnType = None,
-) -> pd.DataFrame:
+    ) -> pd.DataFrame:
     """
      Creates a dataset summarizing the effect curves: cumulative effect, cumulative gain and
      relative cumulative gain. The dataset also contains two columns referencing the data
