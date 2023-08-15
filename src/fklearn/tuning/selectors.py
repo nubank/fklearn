@@ -13,7 +13,7 @@ from fklearn.tuning.stoppers import (
     stop_by_num_features_parallel,
     stop_by_iter_num,
     stop_by_no_improvement,
-    stop_by_no_improvement_parallel, 
+    stop_by_no_improvement_parallel,
     aggregate_stop_funcs
 )
 from fklearn.validation.validator import parallel_validator
