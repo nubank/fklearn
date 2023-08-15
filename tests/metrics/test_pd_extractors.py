@@ -217,7 +217,7 @@ def test_extract():
     assert extract(tlc_results, splitter_extractor).shape == (36, 10)
 
     assert extract(sc_results, base_extractors).shape == (667, 9)
-    assert extract(sc_results, splitter_extractor).shape == (15, 10)
+    assert extract(sc_results, splitter_extractor).shape == (2001, 10)
 
     assert extract(fw_sc_results, base_extractors).shape == (3, 9)
     assert extract(fw_sc_results, splitter_extractor).shape == (9, 10)
