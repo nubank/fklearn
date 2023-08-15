@@ -158,7 +158,7 @@ def test_extract():
         spearman_evaluator(target_column='target', prediction_column='prediction')
     ])
 
-    splitter = split_evaluator(eval_fn=base_evaluator, split_col='RAD', split_values=[4.0, 5.0, 24.0])
+    splitter = split_evaluator(eval_fn=base_evaluator, split_col='median_income', split_values=[0.5, 10.0, 20.0])
     temporal_week_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y-%W')
     temporal_year_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y')
 
