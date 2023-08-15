@@ -3,7 +3,7 @@ from datetime import timedelta
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_california_housing
 
 from fklearn.data.datasets import make_tutorial_data
 from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
@@ -142,15 +142,15 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
 
 
 def test_extract():
-    boston = load_boston()
-    df = pd.DataFrame(boston['data'], columns=boston['feature_names'])
-    df['target'] = boston['target']
+    california = fetch_california_housing()
+    df = pd.DataFrame(california['data'], columns=california['feature_names'])
+    df['target'] = california['target']
     df['time'] = pd.date_range(start='2015-01-01', periods=len(df))
     np.random.seed(42)
     df['space'] = np.random.randint(0, 100, size=len(df))
 
     # Define train function
-    train_fn = linear_regression_learner(features=boston['feature_names'].tolist(), target="target")
+    train_fn = linear_regression_learner(features=california['feature_names'].tolist(), target="target")
 
     # Define evaluator function
     base_evaluator = combined_evaluators(evaluators=[
