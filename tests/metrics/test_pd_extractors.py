@@ -150,7 +150,7 @@ def test_extract():
     df['space'] = np.random.randint(0, 100, size=len(df))
 
     # Define train function
-    train_fn = linear_regression_learner(features=california['feature_names'].tolist(), target="target")
+    train_fn = linear_regression_learner(features=california['feature_names'], target="target")
 
     # Define evaluator function
     base_evaluator = combined_evaluators(evaluators=[
