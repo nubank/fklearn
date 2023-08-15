@@ -235,8 +235,8 @@ def test__fit_by_treatment(base_input_df):
 
     assert len(learners) == len(treatments)
     assert len(logs) == len(treatments)
-    assert isinstance(logs, dict)
-    assert [isinstance(learner, LearnerFnType) for learner in learners]
+    assert type(logs) == dict
+    assert [type(learner) == LearnerFnType for learner in learners]
 
 
 def ones_or_zeros_model(df):
