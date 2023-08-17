@@ -1,2 +1,2 @@
-shap>=0.42
-swifter>=0.284,<2
+shap>=0.42,<1
+swifter>=0.24,<2
