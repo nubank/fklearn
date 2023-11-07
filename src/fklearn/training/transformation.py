@@ -500,12 +500,14 @@ def rank_categorical(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    col_categ_getter = lambda col: (df[col]
-                                    .value_counts()
-                                    .reset_index()
-                                    .sort_values([col, "index"], ascending=[False, True])
-                                    .set_index("index")[col]
-                                    .rank(method="first", ascending=False).to_dict())
+    def col_categ_getter(col):
+        return (df[col]
+                .value_counts()
+                .reset_index()
+                .sort_values([col, "count"], ascending=[True, False])
+                .set_index(col)["count"]
+                .rank(method="first", ascending=False)
+                .to_dict())
 
     vec = {column: col_categ_getter(column) for column in columns_to_rank}
 
