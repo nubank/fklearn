@@ -538,7 +538,7 @@ def lgbm_classification_learner(
         keep_training_booster: bool = False,
         callbacks: Optional[List[Callable]] = None,
         #dataset_init_score: Optional[Union[List, List[List], np.ndarray, pd.Series, pd.DataFrame]] = None
-        dataset_init_score: Optional[Union[List, List[List]]] = None
+        dataset_init_score: Optional[Union[List, np.ndarray, pd.Series, pd.DataFrame]] = None
 ) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
