@@ -49,7 +49,7 @@ def test_build_pipeline(has_repeated_learners):
     pred_test_without_shap = predict_fn(df_test)
     assert set(pred_test_without_shap.columns) == set(pred_train.columns)
 
-    pd.util.testing.assert_frame_equal(pred_test_with_shap[pred_test_without_shap.columns], pred_test_without_shap)
+    pd.testing.assert_frame_equal(pred_test_with_shap[pred_test_without_shap.columns], pred_test_without_shap)
 
 
 @pytest.mark.parametrize("has_repeated_learners", [False, True])
@@ -73,7 +73,7 @@ def test_build_pipeline_no_side_effects(has_repeated_learners):
         side_effect_learner, kwargs_learner, has_repeated_learners=has_repeated_learners)
     side_effect_pipeline(test_df)
 
-    pd.util.testing.assert_frame_equal(test_df, orig_df)
+    pd.testing.assert_frame_equal(test_df, orig_df)
 
 
 @pytest.mark.parametrize("has_repeated_learners", [False, True])
@@ -97,9 +97,9 @@ def test_build_pipeline_idempotency(has_repeated_learners):
         side_effect_pipeline = build_pipeline(*variation, has_repeated_learners=has_repeated_learners)
         predict_fn, result_df, log = side_effect_pipeline(test_df)
 
-        pd.util.testing.assert_frame_equal(test_df, orig_df)
-        pd.util.testing.assert_frame_equal(result_df, expected_df)
-        pd.util.testing.assert_frame_equal(predict_fn(test_df, mult=mult_constant), expected_df)
+        pd.testing.assert_frame_equal(test_df, orig_df)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+        pd.testing.assert_frame_equal(predict_fn(test_df, mult=mult_constant), expected_df)
 
 
 @pytest.mark.parametrize("has_repeated_learners", [False, True])

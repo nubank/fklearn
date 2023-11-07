@@ -56,4 +56,4 @@ def test_find_thresholds_with_same_risk():
     df_with_ecdf["fair"] = pred_df
 
     assert fair_thresholds == log["find_thresholds_with_same_risk"]["fair_thresholds"]
-    pd.util.testing.assert_frame_equal(df_expected, df_with_ecdf)
+    pd.testing.assert_frame_equal(df_expected, df_with_ecdf)
