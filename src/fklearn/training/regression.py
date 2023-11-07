@@ -8,7 +8,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 from sklearn import __version__ as sk_version
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
-from fklearn.types import LearnerReturnType
+from fklearn.types import LearnerReturnType, LearnerLogType
 from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
@@ -70,16 +70,19 @@ def linear_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("linear_regression_learner")
 
-    log = {'linear_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': regr}
+    log = {
+        'linear_regression_learner': {
+            'features': features,
+            'target': target,
+            'parameters': params,
+            'prediction_column': prediction_column,
+            'package': "sklearn",
+            'package_version': sk_version,
+            'feature_importance': dict(zip(features, regr.coef_.flatten())),
+            'training_samples': len(df)
+        },
+        'object': regr
+    }
 
     return p, p(df), log
 
@@ -182,16 +185,19 @@ def xgb_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("xgb_regression_learner", shap=True)
 
-    log = {'xgb_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "xgboost",
-        'package_version': xgb.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': bst.get_score(),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        'xgb_regression_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "xgboost",
+            'package_version': xgb.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': bst.get_score(),
+            'training_samples': len(df)
+        },
+        'object': bst
+    }
 
     return p, p(df), log
 
@@ -287,16 +293,19 @@ def catboost_regressor_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("CatBoostRegressor", shap=False)
 
-    log = {'catboost_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "catboost",
-        'package_version': catboost.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)},
-        'object': cbr}
+    log = {
+        'catboost_regression_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "catboost",
+            'package_version': catboost.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': cbr.feature_importances_,
+            'training_samples': len(df)
+        },
+        'object': cbr
+    }
 
     return p, p(df), log
 
@@ -387,16 +396,18 @@ def gp_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("gp_regression_learner")
 
-    log = {'gp_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': merge(params, {'extra_variance': extra_variance,
-                                     'return_std': return_std}),
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'training_samples': len(df)},
-        'object': gp}
+    log = {
+        'gp_regression_learner': {
+            'features': features,
+            'target': target,
+            'parameters': merge(params, {'extra_variance': extra_variance,
+                                         'return_std': return_std}),
+            'prediction_column': prediction_column,
+            'package': "sklearn",
+            'package_version': sk_version,
+            'training_samples': len(df)},
+        'object': gp
+    }
 
     return p, p(df), log
 
@@ -406,15 +417,17 @@ gp_regression_learner.__doc__ += learner_return_docstring("Gaussian Process Regr
 
 @curry
 @log_learner_time(learner_name='lgbm_regression_learner')
-def lgbm_regression_learner(df: pd.DataFrame,
-                            features: List[str],
-                            target: str,
-                            learning_rate: float = 0.1,
-                            num_estimators: int = 100,
-                            extra_params: Dict[str, Any] = None,
-                            prediction_column: str = "prediction",
-                            weight_column: str = None,
-                            encode_extra_cols: bool = True) -> LearnerReturnType:
+def lgbm_regression_learner(
+        df: pd.DataFrame,
+        features: List[str],
+        target: str,
+        learning_rate: float = 0.1,
+        num_estimators: int = 100,
+        extra_params: Dict[str, Any] = None,
+        prediction_column: str = "prediction",
+        weight_column: str = None,
+        encode_extra_cols: bool = True
+) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
 
@@ -500,16 +513,18 @@ def lgbm_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("lgbm_regression_learner", shap=True)
 
-    log = {'lgbm_regression_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "lightgbm",
-        'package_version': lgbm.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        'lgbm_regression_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "lightgbm",
+            'package_version': lgbm.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
+            'training_samples': len(df)},
+        'object': bst
+    }
 
     return p, p(df), log
 
@@ -519,13 +534,15 @@ lgbm_regression_learner.__doc__ += learner_return_docstring("LGBM Regressor")
 
 @curry
 @log_learner_time(learner_name='custom_supervised_model_learner')
-def custom_supervised_model_learner(df: pd.DataFrame,
-                                    features: List[str],
-                                    target: str,
-                                    model: Any,
-                                    supervised_type: str,
-                                    log: Dict[str, Dict],
-                                    prediction_column: str = "prediction") -> LearnerReturnType:
+def custom_supervised_model_learner(
+        df: pd.DataFrame,
+        features: List[str],
+        target: str,
+        model: Any,
+        supervised_type: str,
+        log: Dict[str, Dict],
+        prediction_column: str = "prediction"
+) -> LearnerReturnType:
     """
     Fits a custom model to the dataset.
     Return the predict function, the predictions for the input dataset and a log describing the model.
@@ -657,16 +674,19 @@ def elasticnet_regression_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("elasticnet_regression_learner")
 
-    log = {'elasticnet_regression_learner': {
-        'features': features,
-        'target': target,
-        'parameters': params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, regr.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': regr}
+    log = {
+        'elasticnet_regression_learner': {
+            'features': features,
+            'target': target,
+            'parameters': params,
+            'prediction_column': prediction_column,
+            'package': "sklearn",
+            'package_version': sk_version,
+            'feature_importance': dict(zip(features, regr.coef_.flatten())),
+            'training_samples': len(df)
+        },
+        'object': regr
+    }
 
     return p, p(df), log
 

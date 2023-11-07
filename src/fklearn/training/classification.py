@@ -1,4 +1,4 @@
-from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING, Literal
 
 import numpy as np
 import pandas as pd
@@ -8,14 +8,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn import __version__ as sk_version
 
-from fklearn.types import LearnerReturnType, LogType
+from fklearn.types import LearnerReturnType, LearnerLogType, LogType
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
 if TYPE_CHECKING:
     from lightgbm import Booster
-
 
 @curry
 @log_learner_time(learner_name='logistic_classification_learner')
@@ -83,16 +82,19 @@ def logistic_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("logistic_classification_learner")
 
-    log = {'logistic_classification_learner': {
-        'features': features,
-        'target': target,
-        'parameters': merged_params,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': dict(zip(features, clf.coef_.flatten())),
-        'training_samples': len(df)},
-        'object': clf}
+    log = {
+        'logistic_classification_learner': {
+            'features': features,
+            'target': target,
+            'parameters': merged_params,
+            'prediction_column': prediction_column,
+            'package': "sklearn",
+            'package_version': sk_version,
+            'feature_importance': dict(zip(features, clf.coef_.flatten())),
+            'training_samples': len(df)
+        },
+        'object': clf
+    }
 
     return p, p(df), log
 
@@ -218,16 +220,19 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("xgb_classification_learner", shap=True)
 
-    log = {'xgb_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "xgboost",
-        'package_version': xgb.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': bst.get_score(),
-        'training_samples': len(df)},
-        'object': bst}
+    log = {
+        'xgb_classification_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "xgboost",
+            'package_version': xgb.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': bst.get_score(),
+            'training_samples': len(df)
+        },
+        'object': bst
+    }
 
     return p, p(df), log
 
@@ -393,16 +398,19 @@ def catboost_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("catboost_classification_learner", shap=True)
 
-    log = {'catboost_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "catboost",
-        'package_version': catboost.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': cbr.feature_importances_,
-        'training_samples': len(df)},
-        'object': cbr}
+    log = {
+        'catboost_classification_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "catboost",
+            'package_version': catboost.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': cbr.feature_importances_,
+            'training_samples': len(df)
+        },
+        'object': cbr
+    }
 
     return p, p(df), log
 
@@ -501,29 +509,36 @@ nlp_logistic_classification_learner.__doc__ += learner_return_docstring("NLP Log
 
 @curry
 @log_learner_time(learner_name='lgbm_classification_learner')
-def lgbm_classification_learner(df: pd.DataFrame,
-                                features: List[str],
-                                target: str,
-                                learning_rate: float = 0.1,
-                                num_estimators: int = 100,
-                                extra_params: Optional[LogType] = None,
-                                prediction_column: str = "prediction",
-                                weight_column: Optional[str] = None,
-                                encode_extra_cols: bool = True,
-                                valid_sets: Optional[List[pd.DataFrame]] = None,
-                                valid_names: Optional[List[str]] = None,
-                                feval: Optional[Union[
-                                    Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]],
-                                    List[Callable[[np.ndarray, pd.DataFrame], Tuple[str, float, bool]]]]
-                                ] = None,
-                                init_model: Optional[Union[str, Path, 'Booster']] = None,
-                                feature_name: Union[List[str], str] = 'auto',
-                                categorical_feature: Union[List[str], List[int], str] = 'auto',
-                                keep_training_booster: bool = False,
-                                callbacks: Optional[List[Callable]] = None,
-                                dataset_init_score: Optional[Union[
-                                    List, List[List], np.ndarray, pd.Series, pd.DataFrame]
-                                ] = None) -> LearnerReturnType:
+def lgbm_classification_learner(
+        df: pd.DataFrame,
+        features: List[str],
+        target: str,
+        learning_rate: float = 0.1,
+        num_estimators: int = 100,
+        extra_params: Optional[LogType] = None,
+        prediction_column: str = "prediction",
+        weight_column: Optional[str] = None,
+        encode_extra_cols: bool = True,
+        valid_sets: Optional[List[pd.DataFrame]] = None,
+        valid_names: Optional[List[str]] = None,
+        feval: Optional[Union[
+            Union[Callable[[np.ndarray[Any, Any], Any], Tuple[str, float, bool]],
+                  Callable[[np.ndarray[Any, Any], Any], List[Tuple[str, float, bool]]]],
+            List[Union[Callable[[np.ndarray[Any, Any], Any],
+            Tuple[str, float, bool]],
+            Callable[[np.ndarray[Any, Any], Any],
+            List[Tuple[str, float, bool]]]]],
+            None
+        ]] = None,
+        init_model: Optional[Union[str, Path, 'Booster']] = None,
+        feature_name: Union[List[str], Literal['auto']] = 'auto',
+        categorical_feature: Union[List[str], List[int], Literal['auto']] = 'auto',
+        keep_training_booster: bool = False,
+        callbacks: Optional[List[Callable]] = None,
+        dataset_init_score: Optional[Union[
+            List, List[List], np.ndarray, pd.Series, pd.DataFrame]
+        ] = None
+) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
 
@@ -685,16 +700,18 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("lgbm_classification_learner", shap=True)
 
-    log = {'lgbm_classification_learner': {
-        'features': features,
-        'target': target,
-        'prediction_column': prediction_column,
-        'package': "lightgbm",
-        'package_version': lgbm.__version__,
-        'parameters': assoc(params, "num_estimators", num_estimators),
-        'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
-        'training_samples': len(df)},
-        'object': bst}
+    log: LearnerLogType = {
+        'lgbm_classification_learner': {
+            'features': features,
+            'target': target,
+            'prediction_column': prediction_column,
+            'package': "lightgbm",
+            'package_version': lgbm.__version__,
+            'parameters': assoc(params, "num_estimators", num_estimators),
+            'feature_importance': dict(zip(features, bst.feature_importance().tolist())),
+            'training_samples': len(df)},
+        'object': bst
+    }
 
     return p, p(df), log
 

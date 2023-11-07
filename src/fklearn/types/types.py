@@ -12,8 +12,8 @@ LogListType = List[LogType]
 ListLogListType = List[LogListType]
 
 # Learner types
-PredictFnType = Callable[[pd.DataFrame], pd.DataFrame]
-LearnerLogType = Dict[str, LogType]
+PredictFnType = Callable[..., pd.DataFrame]
+LearnerLogType = Dict[str, Any]
 LearnerReturnType = Tuple[PredictFnType, pd.DataFrame, LearnerLogType]
 
 UncurriedLearnerFnType = Callable[..., LearnerReturnType]
