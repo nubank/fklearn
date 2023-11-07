@@ -179,13 +179,21 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
-    dtrain = xgb.DMatrix(df[features].values, label=df[target].values, feature_names=map(str, features), weight=weights)
+    dtrain = xgb.DMatrix(
+        df[features].values,
+        label=df[target].values,
+        feature_names=list(map(str, features)),
+        weight=weights
+    )
 
     bst = xgb.train(params, dtrain, num_estimators)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
 
-        dtest = xgb.DMatrix(new_df[features].values, feature_names=map(str, features))
+        dtest = xgb.DMatrix(
+            new_df[features].values,
+            feature_names=list(map(str, features))
+        )
 
         pred = bst.predict(dtest)
         if params["objective"] == "multi:softprob":
