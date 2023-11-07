@@ -2,6 +2,7 @@ from typing_extensions import Literal
 from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from pathlib import Path
 from toolz import curry, merge, assoc
@@ -524,11 +525,11 @@ def lgbm_classification_learner(
         valid_sets: Optional[List[pd.DataFrame]] = None,
         valid_names: Optional[List[str]] = None,
         feval: Optional[Union[
-            Union[Callable[[np.ndarray[Any, Any], Any], Tuple[str, float, bool]],
-                  Callable[[np.ndarray[Any, Any], Any], List[Tuple[str, float, bool]]]],
-            List[Union[Callable[[np.ndarray[Any, Any], Any],
+            Union[Callable[[npt.NDArray, Any], Tuple[str, float, bool]],
+                  Callable[[npt.NDArray, Any], List[Tuple[str, float, bool]]]],
+            List[Union[Callable[[npt.NDArray, Any],
                        Tuple[str, float, bool]],
-                       Callable[[np.ndarray[Any, Any], Any],
+                       Callable[[npt.NDArray, Any],
                        List[Tuple[str, float, bool]]]]],
             None
         ]] = None,
