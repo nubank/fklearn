@@ -469,8 +469,8 @@ def test_hash_evaluator():
     # if we consider all the features in the dataframe, it should return different hashes for different dataframes
     assert eval_fn_all(df1)["eval_name"] != eval_fn_all(df2)["eval_name"]
     # Assert that the hashes stay the same everytime this is run
-    assert eval_fn_all(df1)["eval_name"] == -6356943988420224450
-    assert eval_fn_all(df2)["eval_name"] == -4865376220991082723
+    assert eval_fn_all(df1)["eval_name"] == 12089800085289327166
+    assert eval_fn_all(df2)["eval_name"] == 13581367852718468893
     assert eval_fn_all(df3)["eval_name"] == 141388279445698461
 
 
