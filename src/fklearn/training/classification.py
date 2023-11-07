@@ -669,8 +669,12 @@ def lgbm_classification_learner(
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         if params["objective"] == "multiclass":
-            col_dict = {prediction_column + "_" + str(key): value
-                        for (key, value) in enumerate(bst.predict(new_df[features].values).T)}
+            predictions = bst.predict(new_df[features].values)
+            if not isinstance(predictions, List):
+                predictions_transposed = predictions.T
+            else:
+                predictions_transposed = predictions
+            col_dict = {prediction_column + "_" + str(key): value for (key, value) in enumerate(predictions_transposed)}
         else:
             col_dict = {prediction_column: bst.predict(new_df[features].values)}
 
