@@ -1,4 +1,5 @@
-from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING, Literal
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
+from typing_extensions import Literal
 
 import numpy as np
 import pandas as pd
