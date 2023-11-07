@@ -1,1 +1,1 @@
-xgboost>=0.81,<2
+xgboost>=2,<3
