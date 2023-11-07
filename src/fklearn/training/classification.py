@@ -628,13 +628,27 @@ def lgbm_classification_learner(df: pd.DataFrame,
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
-    dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights,
-                          silent=True, init_score=dataset_init_score)
+    dtrain = lgbm.Dataset(
+        df[features].values,
+        label=df[target],
+        feature_name=list(map(str, features)),
+        weight=weights,
+        init_score=dataset_init_score
+    )
 
-    bst = lgbm.train(params=params, train_set=dtrain, num_boost_round=num_estimators, valid_sets=valid_sets,
-                     valid_names=valid_names, feval=feval, init_model=init_model, feature_name=feature_name,
-                     categorical_feature=categorical_feature, keep_training_booster=keep_training_booster,
-                     callbacks=callbacks)
+    bst = lgbm.train(
+        params=params,
+        train_set=dtrain,
+        num_boost_round=num_estimators,
+        valid_sets=valid_sets,
+        valid_names=valid_names,
+        feval=feval,
+        init_model=init_model,
+        feature_name=feature_name,
+        categorical_feature=categorical_feature,
+        keep_training_booster=keep_training_booster,
+        callbacks=callbacks
+    )
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         if params["objective"] == "multiclass":
