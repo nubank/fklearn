@@ -16,6 +16,7 @@ from fklearn.training.utils import log_learner_time, expand_features_encoded
 if TYPE_CHECKING:
     from lightgbm import Booster
 
+
 @curry
 @log_learner_time(learner_name='logistic_classification_learner')
 def logistic_classification_learner(df: pd.DataFrame,
@@ -525,9 +526,9 @@ def lgbm_classification_learner(
             Union[Callable[[np.ndarray[Any, Any], Any], Tuple[str, float, bool]],
                   Callable[[np.ndarray[Any, Any], Any], List[Tuple[str, float, bool]]]],
             List[Union[Callable[[np.ndarray[Any, Any], Any],
-            Tuple[str, float, bool]],
-            Callable[[np.ndarray[Any, Any], Any],
-            List[Tuple[str, float, bool]]]]],
+                       Tuple[str, float, bool]],
+                       Callable[[np.ndarray[Any, Any], Any],
+                       List[Tuple[str, float, bool]]]]],
             None
         ]] = None,
         init_model: Optional[Union[str, Path, 'Booster']] = None,

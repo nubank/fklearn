@@ -8,7 +8,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor, kernels
 from sklearn import __version__ as sk_version
 
 from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
-from fklearn.types import LearnerReturnType, LearnerLogType
+from fklearn.types import LearnerReturnType
 from fklearn.training.utils import log_learner_time, expand_features_encoded
 
 
