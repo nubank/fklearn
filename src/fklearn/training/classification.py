@@ -1,8 +1,7 @@
-from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
 from typing_extensions import Literal
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 from pathlib import Path
 from toolz import curry, merge, assoc
@@ -246,7 +245,7 @@ xgb_classification_learner.__doc__ += learner_return_docstring("XGboost Classifi
 @curry
 def _get_catboost_shap_values(df: pd.DataFrame, cbr: Any,
                               features: List, target: str,
-                              weights: List, cat_features: List) -> npt.NDArray:
+                              weights: List, cat_features: List) -> np.ndarray:
     """
     Auxiliar method to allow us to get shap values for Catboost multiclass models
 
@@ -525,11 +524,11 @@ def lgbm_classification_learner(
         valid_sets: Optional[List[pd.DataFrame]] = None,
         valid_names: Optional[List[str]] = None,
         feval: Optional[Union[
-            Union[Callable[[npt.NDArray[Any, Any], Any], Tuple[str, float, bool]],
-                  Callable[[npt.NDArray[Any, Any], Any], List[Tuple[str, float, bool]]]],
-            List[Union[Callable[[npt.NDArray[Any, Any], Any],
+            Union[Callable[[np.ndarray[Any, Any], Any], Tuple[str, float, bool]],
+                  Callable[[np.ndarray[Any, Any], Any], List[Tuple[str, float, bool]]]],
+            List[Union[Callable[[np.ndarray[Any, Any], Any],
                        Tuple[str, float, bool]],
-                       Callable[[npt.NDArray[Any, Any], Any],
+                       Callable[[np.ndarray[Any, Any], Any],
                        List[Tuple[str, float, bool]]]]],
             None
         ]] = None,
@@ -538,7 +537,7 @@ def lgbm_classification_learner(
         categorical_feature: Union[List[str], List[int], Literal['auto']] = 'auto',
         keep_training_booster: bool = False,
         callbacks: Optional[List[Callable]] = None,
-        dataset_init_score: Optional[Union[List, List[List], npt.NDArray, pd.Series, pd.DataFrame]] = None
+        dataset_init_score: Optional[Union[List, List[List], np.ndarray, pd.Series, pd.DataFrame]] = None
 ) -> LearnerReturnType:
     """
     Fits an LGBM classifier to the dataset.
