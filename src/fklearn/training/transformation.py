@@ -500,7 +500,7 @@ def rank_categorical(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    def col_categ_getter(col):
+    def col_categ_getter(col: str) -> Dict:
         return (df[col]
                 .value_counts()
                 .reset_index()
