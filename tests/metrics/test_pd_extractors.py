@@ -119,7 +119,7 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
 
     results = feature3_date_evaluator(data)
 
-    date_values = [
+    date_values = pd.to_datetime([
         np.datetime64("2015-01-06T00:00:00.000000000"),
         np.datetime64("2015-01-14T00:00:00.000000000"),
         np.datetime64("2015-01-22T00:00:00.000000000"),
@@ -127,7 +127,7 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
         np.datetime64("2015-03-08T00:00:00.000000000"),
         np.datetime64("2015-03-09T00:00:00.000000000"),
         np.datetime64("2015-04-04T00:00:00.000000000"),
-    ]
+    ])
 
     base_evaluator = evaluator_extractor(evaluator_name="mse_evaluator__target")
     feature3_extractor = split_evaluator_extractor(
