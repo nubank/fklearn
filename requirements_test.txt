@@ -4,4 +4,4 @@ pytest-xdist>=3.3.1,<4
 mypy>=1.6.1,<2
 coverage>=7.3.2,<8
 codecov>=2.0,<3
-hypothesis>=5.5.4,<7
+hypothesis>=6.88.3,<7
