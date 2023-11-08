@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, TypeVar
 
+import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from toolz import curry, assoc, compose
 
@@ -136,10 +138,14 @@ def xgb_octopus_classification_learner(train_set: pd.DataFrame,
     def p(df: pd.DataFrame) -> pd.DataFrame:
         pred_fn = compose(*pred_fns.values())
 
+        def lookup(df: pd.DataFrame) -> npt.NDArray:
+            idx, cols = pd.factorize(df.pred_bin.values.squeeze())
+            output = df.reindex(cols, axis=1).to_numpy()[np.arange(len(df)), idx]
+            return output
+
         return (pred_fn(df)
                 .assign(pred_bin=prediction_column + "_bin_" + df[train_split_col].astype(str))
-                .assign(prediction=lambda d: d.lookup(d.index.values,
-                                                      d.pred_bin.values.squeeze()))
+                .assign(prediction=lookup)
                 .rename(index=str, columns={"prediction": prediction_column})
                 .drop("pred_bin", axis=1))
 

@@ -500,12 +500,14 @@ def rank_categorical(df: pd.DataFrame,
         Whether to store the feature value -> integer dictionary in the log
     """
 
-    col_categ_getter = lambda col: (df[col]
-                                    .value_counts()
-                                    .reset_index()
-                                    .sort_values([col, "index"], ascending=[False, True])
-                                    .set_index("index")[col]
-                                    .rank(method="first", ascending=False).to_dict())
+    def col_categ_getter(col: str) -> Dict:
+        return (df[col]
+                .value_counts()
+                .reset_index()
+                .sort_values([col, "count"], ascending=[True, False])
+                .set_index(col)["count"]
+                .rank(method="first", ascending=False)
+                .to_dict())
 
     vec = {column: col_categ_getter(column) for column in columns_to_rank}
 
@@ -1027,11 +1029,12 @@ def missing_warner(df: pd.DataFrame, cols_list: List[str],
     cols_without_missing = df_selected.loc[:, df_selected.isna().sum(axis=0) == 0].columns.tolist()
 
     def p(dataset: pd.DataFrame) -> pd.DataFrame:
-        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> np.ndarray:
+        def detailed_assignment(df: pd.DataFrame, cols_to_check: List[str]) -> list:
+            print(df.loc[:, cols_to_check])
             cols_with_missing = np.array([np.where(df[col].isna(), col, "") for col in cols_to_check]).T
-            missing_by_row_list = np.array([list(filter(None, x)) for x in cols_with_missing]).reshape(-1, 1)
-            if missing_by_row_list.size == 0:
-                return np.empty((df.shape[0], 0)).tolist()
+            missing_by_row_list: list = [list(filter(None, x)) for x in cols_with_missing]
+            if len(missing_by_row_list) == 0:
+                return np.empty((0, 0)).tolist()
             else:
                 return missing_by_row_list
 

@@ -1,3 +1,4 @@
+import sys
 import string
 
 import numpy as np
@@ -468,10 +469,18 @@ def test_hash_evaluator():
     assert eval_fn(df1)["eval_name"] != eval_fn(df3)["eval_name"]
     # if we consider all the features in the dataframe, it should return different hashes for different dataframes
     assert eval_fn_all(df1)["eval_name"] != eval_fn_all(df2)["eval_name"]
-    # Assert that the hashes stay the same everytime this is run
-    assert eval_fn_all(df1)["eval_name"] == -6356943988420224450
-    assert eval_fn_all(df2)["eval_name"] == -4865376220991082723
-    assert eval_fn_all(df3)["eval_name"] == 141388279445698461
+
+    # Assert that the hashes stay the same everytime this is run.
+    # The hash function is update in python 3.9 requiring different checks for each version.
+    python_version = sys.version_info
+    if python_version.minor == 8:
+        assert eval_fn_all(df1)["eval_name"] == -6356943988420224450
+        assert eval_fn_all(df2)["eval_name"] == -4865376220991082723
+        assert eval_fn_all(df3)["eval_name"] == 141388279445698461
+    else:
+        assert eval_fn_all(df1)["eval_name"] == 12089800085289327166
+        assert eval_fn_all(df2)["eval_name"] == 13581367852718468893
+        assert eval_fn_all(df3)["eval_name"] == 141388279445698461
 
 
 def test_exponential_coefficient_evaluator():

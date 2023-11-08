@@ -3,7 +3,7 @@ from datetime import timedelta
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_california_housing
 
 from fklearn.data.datasets import make_tutorial_data
 from fklearn.metrics.pd_extractors import (combined_evaluator_extractor,
@@ -119,7 +119,7 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
 
     results = feature3_date_evaluator(data)
 
-    date_values = [
+    date_values = pd.to_datetime([
         np.datetime64("2015-01-06T00:00:00.000000000"),
         np.datetime64("2015-01-14T00:00:00.000000000"),
         np.datetime64("2015-01-22T00:00:00.000000000"),
@@ -127,7 +127,7 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
         np.datetime64("2015-03-08T00:00:00.000000000"),
         np.datetime64("2015-03-09T00:00:00.000000000"),
         np.datetime64("2015-04-04T00:00:00.000000000"),
-    ]
+    ])
 
     base_evaluator = evaluator_extractor(evaluator_name="mse_evaluator__target")
     feature3_extractor = split_evaluator_extractor(
@@ -142,15 +142,15 @@ def test__split_evaluator_extractor__when_split_value_is_missing():
 
 
 def test_extract():
-    boston = load_boston()
-    df = pd.DataFrame(boston['data'], columns=boston['feature_names'])
-    df['target'] = boston['target']
+    california = fetch_california_housing()
+    df = pd.DataFrame(california['data'], columns=california['feature_names'])
+    df['target'] = california['target']
     df['time'] = pd.date_range(start='2015-01-01', periods=len(df))
     np.random.seed(42)
     df['space'] = np.random.randint(0, 100, size=len(df))
 
     # Define train function
-    train_fn = linear_regression_learner(features=boston['feature_names'].tolist(), target="target")
+    train_fn = linear_regression_learner(features=california['feature_names'], target="target")
 
     # Define evaluator function
     base_evaluator = combined_evaluators(evaluators=[
@@ -158,7 +158,7 @@ def test_extract():
         spearman_evaluator(target_column='target', prediction_column='prediction')
     ])
 
-    splitter = split_evaluator(eval_fn=base_evaluator, split_col='RAD', split_values=[4.0, 5.0, 24.0])
+    splitter = split_evaluator(eval_fn=base_evaluator, split_col='MedInc', split_values=[0.5, 10.0, 20.0])
     temporal_week_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y-%W')
     temporal_year_splitter = temporal_split_evaluator(eval_fn=base_evaluator, time_col='time', time_format='%Y')
 
@@ -216,11 +216,11 @@ def test_extract():
     assert extract(tlc_results, base_extractors).shape == (12, 9)
     assert extract(tlc_results, splitter_extractor).shape == (36, 10)
 
-    assert extract(sc_results, base_extractors).shape == (5, 9)
-    assert extract(sc_results, splitter_extractor).shape == (15, 10)
+    assert extract(sc_results, base_extractors).shape == (667, 9)
+    assert extract(sc_results, splitter_extractor).shape == (2001, 10)
 
-    assert extract(fw_sc_results, base_extractors).shape == (3, 9)
-    assert extract(fw_sc_results, splitter_extractor).shape == (9, 10)
+    assert extract(fw_sc_results, base_extractors).shape == (674, 9)
+    assert extract(fw_sc_results, splitter_extractor).shape == (2022, 10)
 
     n_time_week_folds = len(df['time'].dt.strftime('%Y-%W').unique())
     n_time_year_folds = len(df['time'].dt.strftime('%Y').unique())

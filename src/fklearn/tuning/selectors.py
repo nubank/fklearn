@@ -3,12 +3,30 @@ from typing import Callable, Dict, List
 from toolz.curried import pipe, first, mapcat
 import pandas as pd
 
-from fklearn.tuning.samplers import remove_features_subsets, remove_by_feature_importance, remove_by_feature_shuffling
-from fklearn.tuning.stoppers import stop_by_num_features, stop_by_num_features_parallel, stop_by_iter_num, \
-    stop_by_no_improvement, stop_by_no_improvement_parallel, aggregate_stop_funcs
+from fklearn.tuning.samplers import (
+    remove_features_subsets,
+    remove_by_feature_importance,
+    remove_by_feature_shuffling
+)
+from fklearn.tuning.stoppers import (
+    stop_by_num_features,
+    stop_by_num_features_parallel,
+    stop_by_iter_num,
+    stop_by_no_improvement,
+    stop_by_no_improvement_parallel,
+    aggregate_stop_funcs
+)
 from fklearn.validation.validator import parallel_validator
-from fklearn.types import EvalFnType, ExtractorFnType, LearnerReturnType, ListLogListType, LogListType, SplitterFnType,\
-    ValidatorReturnType, LogType
+from fklearn.types import (
+    EvalFnType,
+    ExtractorFnType,
+    LearnerReturnType,
+    ListLogListType,
+    LogListType,
+    SplitterFnType,
+    ValidatorReturnType,
+    LogType
+)
 
 SaveIntermediaryFnType = Callable[[List[ValidatorReturnType]], None]
 TuningLearnerFnType = Callable[[pd.DataFrame, List[str]], LearnerReturnType]

@@ -1,1 +1,1 @@
-lightgbm>=2.2.2,<4
+lightgbm>=4,<5

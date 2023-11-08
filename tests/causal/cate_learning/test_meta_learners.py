@@ -8,14 +8,25 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
 from fklearn.causal.cate_learning.meta_learners import (
-    TREATMENT_FEATURE, _append_treatment_feature, _create_treatment_flag,
-    _filter_by_treatment, _fit_by_treatment, _get_learners, _get_model_fcn,
-    _get_unique_treatments, _predict_by_treatment_flag,
-    _simulate_t_learner_treatment_effect, _simulate_treatment_effect,
-    causal_s_classification_learner, causal_t_classification_learner)
-from fklearn.exceptions.exceptions import (MissingControlError,
-                                           MissingTreatmentError,
-                                           MultipleTreatmentsError)
+    TREATMENT_FEATURE,
+    _append_treatment_feature,
+    _create_treatment_flag,
+    _filter_by_treatment,
+    _fit_by_treatment,
+    _get_learners,
+    _get_model_fcn,
+    _get_unique_treatments,
+    _predict_by_treatment_flag,
+    _simulate_t_learner_treatment_effect,
+    _simulate_treatment_effect,
+    causal_s_classification_learner,
+    causal_t_classification_learner
+)
+from fklearn.exceptions.exceptions import (
+    MissingControlError,
+    MissingTreatmentError,
+    MultipleTreatmentsError
+)
 from fklearn.training.classification import logistic_classification_learner
 from fklearn.types import LearnerFnType
 
@@ -235,8 +246,8 @@ def test__fit_by_treatment(base_input_df):
 
     assert len(learners) == len(treatments)
     assert len(logs) == len(treatments)
-    assert type(logs) == dict
-    assert [type(learner) == LearnerFnType for learner in learners]
+    assert type(logs) is dict
+    assert [type(learner) is LearnerFnType for learner in learners]
 
 
 def ones_or_zeros_model(df):
