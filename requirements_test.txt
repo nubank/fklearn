@@ -5,4 +5,3 @@ mypy>=0.670,<1
 coverage<5
 codecov>=2.0,<3
 hypothesis>=5.5.4,<7
-typing-extensions

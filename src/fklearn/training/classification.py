@@ -1,5 +1,4 @@
-from typing_extensions import Literal
-from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING
+from typing import List, Any, Optional, Callable, Tuple, Union, TYPE_CHECKING, Literal
 
 import numpy as np
 import numpy.typing as npt
