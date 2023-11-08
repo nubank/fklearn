@@ -2,9 +2,9 @@
 
 ## [2.4.0] - 2023-08-16
 - **Enhancement**
-  - Remove support for python 3.6.
-  - Remove the scikit-learn constraint on version 0.24. Scikit-learn can jump to 1.0.0.
-  - Remove the shap constraint on version 0.40. Shap must start from 0.42
+  - Remove support for python 3.6 and 3.7.
+  - Bumps in joblib, numpy, pandas, scikit-learn, statsmodels, toolz, catboost, lightgbm, shap, xgboost 
+    and test auxiliary packages.
 
 ## [2.3.1] - 2023-04-11
 - **Bugfix**
