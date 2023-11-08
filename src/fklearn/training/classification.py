@@ -679,6 +679,8 @@ def lgbm_classification_learner(
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         predictions = bst.predict(new_df[features].values)
+        if isinstance(predictions, List):
+            predictions = np.ndarray(predictions)
         if is_multiclass_classification:
             col_dict = {prediction_column + "_" + str(key): value
                         for (key, value) in enumerate(predictions.T)}
