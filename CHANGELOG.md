@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.4.0] - 2023-08-16
+## [3.0.0] - 2023-11-08
 - **Enhancement**
   - Remove support for python 3.6 and 3.7.
   - Bumps in joblib, numpy, pandas, scikit-learn, statsmodels, toolz, catboost, lightgbm, shap, xgboost 
