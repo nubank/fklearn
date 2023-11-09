@@ -12,7 +12,8 @@ from fklearn.validation.evaluators import (
     mean_prediction_evaluator, mse_evaluator, permutation_evaluator,
     pr_auc_evaluator, precision_evaluator, r2_evaluator, recall_evaluator,
     roc_auc_evaluator, spearman_evaluator, linear_coefficient_evaluator, ndcg_evaluator, split_evaluator,
-    temporal_split_evaluator, exponential_coefficient_evaluator, logistic_coefficient_evaluator)
+    temporal_split_evaluator, exponential_coefficient_evaluator, logistic_coefficient_evaluator,
+    silhouette_score__evaluator, davies_bouldin_score__evaluator)
 
 
 def test_combined_evaluators():
@@ -484,7 +485,6 @@ def test_hash_evaluator():
 
 
 def test_exponential_coefficient_evaluator():
-
     a1 = -10
     a0 = -2
 
@@ -501,7 +501,6 @@ def test_exponential_coefficient_evaluator():
 
 
 def test_logistic_coefficient_evaluator():
-
     predictions = pd.DataFrame(dict(
         prediction=[1, 1, 1, 2, 2, 2, 3, 3, 3],
         target=[0, 0, 0, 0, 0, 0, 1, 1, 1]
@@ -510,3 +509,29 @@ def test_logistic_coefficient_evaluator():
     result = logistic_coefficient_evaluator(predictions)
 
     assert round(result['logistic_coefficient_evaluator__target'], 3) == 20.645
+
+
+def test_silhouette_score__evaluator():
+    predictions = pd.DataFrame({
+        'id': ["id1", "id2", "id3", "id4"],
+        'x1': [10.0, 13.0, 100.0, 13.0],
+        'x2': [0, 1, 100, 0],
+        'prediction': [1, 1, 0, 1]
+    })
+
+    result = silhouette_score__evaluator(predictions, features=["x1", "x2"])
+
+    assert round(result['silhouette_score__evaluator__prediction'], 3) == 0.737
+
+
+def test_davies_bouldin_score__evaluator():
+    predictions = pd.DataFrame({
+        'id': ["id1", "id2", "id3", "id4"],
+        'x1': [10.0, 13.0, 100.0, 13.0],
+        'x2': [0, 1, 100, 0],
+        'prediction': [1, 1, 0, 1]
+    })
+
+    result = davies_bouldin_score__evaluator(predictions, features=["x1", "x2"])
+
+    assert round(result['davies_bouldin_score__evaluator__prediction'], 3) == 0.011
