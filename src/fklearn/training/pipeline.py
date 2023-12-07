@@ -82,8 +82,8 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
             current_data = new_data
 
             model_objects = {}
-            if learner_log.get("obj"):
-                model_objects["obj"] = learner_log.pop("obj")
+            if learner_log.get("object"):
+                model_objects["object"] = learner_log.pop("object")
 
             serialisation[learner_name].append({"fn": learner_fn, "log": learner_log, **model_objects})
             logs.append(learner_log)

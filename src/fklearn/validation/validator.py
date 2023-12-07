@@ -210,7 +210,7 @@ def validator(train_data: pd.DataFrame,
 
     train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
     if return_all_train_logs:
-        train_logs = {"train_log": [log["train_log"] for log in train_logs]}
+        train_logs = {"train_log": [log["train_log"] for log in train_logs]}  # type: ignore
     else:
         train_logs = first(train_logs)
 

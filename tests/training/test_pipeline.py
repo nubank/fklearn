@@ -152,7 +152,7 @@ def test_build_pipeline_serialisation():
 
     @fp.curry
     def dummy_learner_3(df, fn, call):
-        return fn, df, {f"dummy_learner_{call}": {}, "obj": "a"}
+        return fn, df, {f"dummy_learner_{call}": {}, "object": "a"}
 
     train_fn = build_pipeline(
         dummy_learner(fn=fn, call=1),
@@ -166,10 +166,10 @@ def test_build_pipeline_serialisation():
             "features": ['id', 'x1', 'y'],
             "learners": {"dummy_learner": {"fn": fn, "log": {"dummy_learner_1": {}}},
                          "dummy_learner_2": {"fn": fn, "log": {"dummy_learner_2": {}}},
-                         "dummy_learner_3": {"fn": fn, "log": {"dummy_learner_3": {}}, "obj": "a"}}}
+                         "dummy_learner_3": {"fn": fn, "log": {"dummy_learner_3": {}}, "object": "a"}}}
 
     assert log["__fkml__"] == fkml
-    assert "obj" not in log.keys()
+    assert "object" not in log.keys()
 
 
 @pytest.mark.parametrize("has_repeated_learners", [False, True])
@@ -247,4 +247,4 @@ def test_build_pipeline_repeated_learners_serialisation():
                 "dummy_learner_2": [{"fn": fn, "log": {"dummy_learner_2": {}}}]}}
 
     assert log["__fkml__"] == fkml
-    assert "obj" not in log.keys()
+    assert "object" not in log.keys()
