@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.1] - 2023-12-07
+- **Bugfix**
+  - Fix pipeline logs to actually return learners objects in \_\_fkml__.learners dicts.
+
 ## [3.0.0] - 2023-11-08
 - **Enhancement**
   - Remove support for python 3.6 and 3.7.
