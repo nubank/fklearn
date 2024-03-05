@@ -393,11 +393,11 @@ def test_nlp_logistic_classification_learner():
 
     # test keep_tfidf_object case
     learner_keep_tfidf = nlp_logistic_classification_learner(text_feature_cols=["text1", "text2"],
-                                                         target="y",
-                                                         vectorizer_params={"min_df": 1},
-                                                         logistic_params=None,
-                                                         prediction_column="prediction",
-                                                         keep_tfidf_object=True)
+                                                             target="y",
+                                                             vectorizer_params={"min_df": 1},
+                                                             logistic_params=None,
+                                                             prediction_column="prediction",
+                                                             keep_tfidf_object=True)
 
     predict_fn, pred_train, log = learner_keep_tfidf(df_train_binary)
 
