@@ -391,6 +391,28 @@ def test_nlp_logistic_classification_learner():
     assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
     assert (pred_test.columns == pred_train.columns).all()
 
+    # test keep_tfidf_object case
+    learner_keep_tfidf = nlp_logistic_classification_learner(text_feature_cols=["text1", "text2"],
+                                                         target="y",
+                                                         vectorizer_params={"min_df": 1},
+                                                         logistic_params=None,
+                                                         prediction_column="prediction",
+                                                         keep_tfidf_object=True)
+
+    predict_fn, pred_train, log = learner_keep_tfidf(df_train_binary)
+
+    pred_test = predict_fn(df_test_binary)
+
+    expected_col_train = df_train_binary.columns.tolist() + ["prediction"]
+    expected_col_test = df_test_binary.columns.tolist() + ["prediction"]
+
+    assert Counter(expected_col_train) == Counter(pred_train.columns.tolist())
+    assert Counter(expected_col_test) == Counter(pred_test.columns.tolist())
+    assert pred_test.prediction.max() < 1
+    assert pred_test.prediction.min() > 0
+    assert (pred_test.columns == pred_train.columns).all()
+    assert "tf_idf_object" in log
+
 
 def test_lgbm_classification_learner():
     df_train_binary = pd.DataFrame({
