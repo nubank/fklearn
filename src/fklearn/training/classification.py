@@ -114,7 +114,8 @@ def xgb_classification_learner(df: pd.DataFrame,
                                extra_params: LogType = None,
                                prediction_column: str = "prediction",
                                weight_column: str = None,
-                               encode_extra_cols: bool = True) -> LearnerReturnType:
+                               encode_extra_cols: bool = True,
+                               categorical_feature: List[str] = None) -> LearnerReturnType:
     """
     Fits an XGBoost classifier to the dataset. It first generates a DMatrix
     with the specified features and labels from `df`. Then, it fits a XGBoost
@@ -166,7 +167,11 @@ def xgb_classification_learner(df: pd.DataFrame,
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
-    """
+
+    categorical_feature : list of str, optional (default: None)
+        List of categorical feature names. Starting from version 1.5, the XGBoost Python package has experimental support
+        for categorical data available for public testing.
+        More here: https://xgboost.readthedocs.io/en/stable/tutorials/categorical.html"""
 
     import xgboost as xgb
 
@@ -177,21 +182,29 @@ def xgb_classification_learner(df: pd.DataFrame,
     weights = df[weight_column].values if weight_column else None
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
+    enable_categorical = categorical_feature is not None
+
+    # Usually, passing numpy array (from df.values()) into xgb.DMatrix is faster.
+    # However, if there are categorical features, we can't use it
+    feature_values = df[features] if enable_categorical else df[features].values()
 
     dtrain = xgb.DMatrix(
-        df[features].values,
+        feature_values,
         label=df[target].values,
         feature_names=list(map(str, features)),
-        weight=weights
+        weight=weights,
+        enable_categorical=enable_categorical
     )
 
     bst = xgb.train(params, dtrain, num_estimators)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
+        new_feature_values = new_df[features] if enable_categorical else new_df[features].values()
 
         dtest = xgb.DMatrix(
-            new_df[features].values,
-            feature_names=list(map(str, features))
+            new_feature_values,
+            feature_names=list(map(str, features)),
+            enable_categorical=enable_categorical
         )
 
         pred = bst.predict(dtest)
@@ -655,8 +668,12 @@ def lgbm_classification_learner(
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
+    # Usually, passing numpy array (from df.values()) into xgb.DMatrix is faster.
+    # However, if there are categorical features, we can't use it
+    feature_values = df[features] if categorical_feature is not None else df[features].values()
+
     dtrain = lgbm.Dataset(
-        df[features].values,
+        feature_values,
         label=df[target],
         feature_name=list(map(str, features)),
         weight=weights,
@@ -678,7 +695,9 @@ def lgbm_classification_learner(
     )
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
-        predictions = bst.predict(new_df[features].values)
+        new_feature_values = new_df[features] if categorical_feature is not None else new_df[features].values()
+
+        predictions = bst.predict(new_feature_values)
         if isinstance(predictions, List):
             predictions = np.ndarray(predictions)
         if is_multiclass_classification:
