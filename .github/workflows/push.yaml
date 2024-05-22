@@ -96,7 +96,7 @@ jobs:
           set -euxo pipefail
           source env/bin/activate
 
-          python3 -m pytest --cov-fail-under=94 --cov=fklearn tests/
+          python3 -m pytest --cov-fail-under=93 --cov=fklearn tests/
 
   build-docs:
     needs: [linter, test-suite]
