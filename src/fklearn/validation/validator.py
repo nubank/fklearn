@@ -208,11 +208,11 @@ def validator(train_data: pd.DataFrame,
         args = inspect.getfullargspec(perturbator).kwonlydefaults
         return args['cols'] if args else []
 
-    train_logs, validator_logs = zip(*map(_join_split_log, zipped_logs))
+    train_logs_, validator_logs = zip(*map(_join_split_log, zipped_logs))
     if return_all_train_logs:
-        train_logs = {"train_log": [log["train_log"] for log in train_logs]}
+        train_logs = {"train_log": [log["train_log"] for log in train_logs_]}
     else:
-        train_logs = first(train_logs)
+        train_logs = first(train_logs_)
 
     perturbator_log = {'perturbated_train': [], 'perturbated_test': []}  # type: LogType
     if perturb_fn_train != identity:
