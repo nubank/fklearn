@@ -34,7 +34,7 @@ setup(name=MODULE_NAME,
       long_description=long_description,
       long_description_content_type="text/markdown",
       url='https://github.com/nubank/{:s}'.format(REPO_NAME),
-      python_requires='>=3.8,<3.10',
+      python_requires='>=3.9,<3.12,!=3.10.*',
       author="Nubank",
       package_dir={'': 'src'},
       packages=find_packages('src'),
@@ -53,5 +53,6 @@ setup(name=MODULE_NAME,
       zip_safe=False,
       classifiers=[
           'Programming Language :: Python :: 3.8',
-          'Programming Language :: Python :: 3.9'
+          'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.11',
           ])
