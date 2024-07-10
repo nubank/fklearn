@@ -509,4 +509,8 @@ def test_logistic_coefficient_evaluator():
 
     result = logistic_coefficient_evaluator(predictions)
 
-    assert round(result['logistic_coefficient_evaluator__target'], 3) == 20.645
+    SKLEARN_GTE_1_4_RESULT = 17.922
+    SKLEARN_LT_1_4_RESULT = 20.645
+    expected_result_range = {SKLEARN_GTE_1_4_RESULT, SKLEARN_LT_1_4_RESULT}
+
+    assert round(result['logistic_coefficient_evaluator__target'], 3) in expected_result_range

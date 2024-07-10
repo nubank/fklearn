@@ -62,4 +62,9 @@ def test_logistic_coefficient_effect():
     ))
 
     result = logistic_coefficient_effect(df, treatment_column="t", outcome_column="y")
-    assert round(result, 3) == 20.645
+
+    SKLEARN_GTE_1_4_RESULT = 17.922
+    SKLEARN_LT_1_4_RESULT = 20.645
+    expected_result_range = {SKLEARN_GTE_1_4_RESULT, SKLEARN_LT_1_4_RESULT}
+
+    assert round(result, 3) in expected_result_range
