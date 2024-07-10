@@ -1,8 +1,8 @@
 # Changelog
 
-## [4.0.0rc0] - 2024-05-22
+## [4.0.0rc1] - 2024-05-22
 - **Enhancement**
-  - Add support for python 3.11
+  - Add support for python 3.11 and 3.10
   - Decrease maxmimum allowed `scikit-learn`
 
 ## [3.0.0] - 2023-11-08
