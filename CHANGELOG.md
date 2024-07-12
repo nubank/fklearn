@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.0.0rc1] - 2024-05-22
+## [4.0.0rc1] - 2024-07-12
 - **Enhancement**
   - Add support for python 3.11 and 3.10
 
