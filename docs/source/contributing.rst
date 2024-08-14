@@ -106,7 +106,7 @@ In this session we'll guide you on how to contribute with the code. This is a gu
 Code standards
 --------------
 
-This project is compatible only with python 3.6 to 3.9 and follows the `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_
+This project is compatible only with python 3.8 to 3.11 and follows the `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_
 And we use this `import formatting <https://google.github.io/styleguide/pyguide.html?showone=Imports_formatting#313-imports-formatting>`_
 
 In order to check if your code is following our codestyle, you can run from the root directory of the repo the next commands:
@@ -153,7 +153,7 @@ Document your code
 ------------------
 
 All methods should have type annotations, this allow us to know what that method expect as parameters, and what is the expected output.
-You can learn more about it in `typing docs <https://docs.python.org/3.6/library/typing.html>`_
+You can learn more about it in `typing docs <https://docs.python.org/3.8/library/typing.html>`_
 
 To document your code you should add docstrings, all methods with docstring will appear in this documentation's api file.
 If you created a new file, you may need to add it to the ``api.rst`` following the structure
