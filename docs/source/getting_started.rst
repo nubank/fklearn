@@ -5,7 +5,7 @@ Getting started
 Installation
 ------------
 
-The fklearn library is compatible only with Python 3.6.2+.
+The fklearn library is compatible only with Python 3.8+.
 In order to install it using pip, run:
 
 .. code-block:: bash
