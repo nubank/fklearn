@@ -1065,7 +1065,9 @@ def logistic_coefficient_evaluator(test_data: pd.DataFrame,
     if eval_name is None:
         eval_name = "logistic_coefficient_evaluator__" + target_column
 
-    score = LogisticRegression(penalty="none", multi_class="ovr").fit(test_data[[prediction_column]],
-                                                                      test_data[target_column]).coef_[0][0]
+    score = LogisticRegression(penalty=None, multi_class="ovr").fit(
+        test_data[[prediction_column]],
+        test_data[target_column]
+    ).coef_[0][0]
 
     return {eval_name: score}

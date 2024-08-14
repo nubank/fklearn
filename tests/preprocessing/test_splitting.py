@@ -2,7 +2,7 @@ from collections import Counter
 
 import hypothesis.strategies as st
 import pandas as pd
-from hypothesis import given
+from hypothesis import given, settings, HealthCheck
 from hypothesis.extra.pandas import columns, data_frames, range_indexes
 from pandas.testing import assert_frame_equal
 
@@ -256,6 +256,7 @@ def assert_sample_size_per_class(data, target_column_name, expected_samples_per_
 @given(sample=gen_stratified_test_data(),
        random_state=st.integers(min_value=0, max_value=100),
        test_size=st.floats(min_value=0.2, max_value=0.8))
+@settings(suppress_health_check={HealthCheck.too_slow})
 def test_stratified_split_dataset(sample, random_state, test_size):
     expected_data, target_column_name, num_classes = sample
 

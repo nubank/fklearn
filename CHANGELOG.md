@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.0.0] - 2024-08-12
+- **Enhancement**
+  - Add support for python 3.11 and 3.10
+
 ## [3.0.0] - 2023-11-08
 - **Enhancement**
   - Remove support for python 3.6 and 3.7.
