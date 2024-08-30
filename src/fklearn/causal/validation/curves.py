@@ -4,8 +4,9 @@ import numpy as np
 import pandas as pd
 from toolz import curry, partial
 
-from fklearn.types import EffectFnType
+from fklearn.types import EffectFnType, PartitionFnType
 from fklearn.causal.effects import linear_effect
+from fklearn.causal.partitioners import quantile_partitioner
 
 
 @curry
@@ -14,30 +15,28 @@ def effect_by_segment(df: pd.DataFrame,
                       outcome: str,
                       prediction: str,
                       segments: int = 10,
-                      effect_fn: EffectFnType = linear_effect) -> pd.Series:
+                      effect_fn: EffectFnType = linear_effect,
+                      partition_fn: PartitionFnType = quantile_partitioner) -> pd.Series:
     """
-    Segments the dataset by a prediction's quantile and estimates the treatment effect by segment.
-
+    Segments the dataset using a partition function and estimates the treatment effect by segment.
     Parameters
     ----------
     df : Pandas' DataFrame
         A Pandas' DataFrame with target and prediction scores.
-
     treatment : Strings
         The name of the treatment column in `df`.
-
     outcome : Strings
         The name of the outcome column in `df`.
-
     prediction : Strings
         The name of the prediction column in `df`.
-
     segments : Integer
         The number of the segments to create. Uses Pandas' qcut under the hood.
-
     effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
         A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
         of the outcome column.
+    partition_fn : function (series: pandas.Series, segments: int) -> Array
+        A function that returns an array of bins to be used to partition the prediction column.
+
 
     Returns
     ----------
@@ -46,8 +45,11 @@ def effect_by_segment(df: pd.DataFrame,
     """
 
     effect_fn_partial = partial(effect_fn, treatment_column=treatment, outcome_column=outcome)
+
+    bins_fn_partial = partial(partition_fn, series=df[prediction], segments=segments)
+
     return (df
-            .assign(**{f"{prediction}_band": pd.qcut(df[prediction], q=segments)})
+            .assign(**{f"{prediction}_band": pd.cut(df[prediction], bins=bins_fn_partial(), include_lowest=True)})
             .groupby(f"{prediction}_band")
             .apply(effect_fn_partial))
 

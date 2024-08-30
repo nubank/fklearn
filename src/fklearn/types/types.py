@@ -41,3 +41,6 @@ ExtractorFnType = Callable[[str], float]
 
 # Effect Functions
 EffectFnType = Callable[[pd.DataFrame, str, str], float]
+
+# Partition Functions
+PartitionFnType = Callable[[pd.Series, int], List[float]]
