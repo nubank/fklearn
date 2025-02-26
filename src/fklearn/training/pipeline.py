@@ -45,7 +45,7 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
 
     def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
         no_default_list = [
-            p for p, a in signature(learner).parameters.items() 
+            p for p, a in signature(learner).parameters.items()
             if isinstance(a.default, str) and a.default == '__no__default__'
         ]
         if len(no_default_list) > 1:
