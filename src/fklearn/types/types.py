@@ -41,3 +41,6 @@ ExtractorFnType = Callable[[str], float]
 
 # Effect Functions
 EffectFnType = Callable[[pd.DataFrame, str, str], float]
+
+# Effect Error Functions
+EffectErrorFnType = Callable[[pd.DataFrame, str, str], float]
