@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.0.1] - 2025-02-26
+- **Bug Fix**
+  - Fix fn _has_one_unfilled_arg in build_pipeline to correctly check the default value of the parameters
+  - Restricts the maximum version of lightgbm to 4.5
+
 ## [4.0.0] - 2024-08-12
 - **Enhancement**
   - Add support for python 3.11 and 3.10

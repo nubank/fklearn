@@ -44,7 +44,10 @@ def build_pipeline(*learners: LearnerFnType, has_repeated_learners: bool = False
     """
 
     def _has_one_unfilled_arg(learner: LearnerFnType) -> None:
-        no_default_list = [p for p, a in signature(learner).parameters.items() if a.default == '__no__default__']
+        no_default_list = [
+            p for p, a in signature(learner).parameters.items()
+            if isinstance(a.default, str) and a.default == '__no__default__'
+        ]
         if len(no_default_list) > 1:
             raise ValueError("Learner {0} has more than one unfilled argument: {1}\n"
                              "Make sure all learners are curried properly and only require one argument,"
