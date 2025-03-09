@@ -59,6 +59,7 @@ def cumulative_effect_curve(df: pd.DataFrame,
                             prediction: str,
                             min_rows: int = 30,
                             steps: int = 100,
+                            ascending: bool = False,
                             effect_fn: EffectFnType = linear_effect) -> np.ndarray:
     """
     Orders the dataset by prediction and computes the cumulative effect curve according to that ordering
@@ -83,6 +84,9 @@ def cumulative_effect_curve(df: pd.DataFrame,
     steps : Integer
         The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
     effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
         A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
         of the outcome column.
@@ -95,7 +99,7 @@ def cumulative_effect_curve(df: pd.DataFrame,
     """
 
     size = df.shape[0]
-    ordered_df = df.sort_values(prediction, ascending=False).reset_index(drop=True)
+    ordered_df = df.sort_values(prediction, ascending=ascending).reset_index(drop=True)
     n_rows = list(range(min_rows, size, size // steps)) + [size]
     return np.array([effect_fn(ordered_df.head(rows), treatment, outcome) for rows in n_rows])
 
@@ -107,6 +111,7 @@ def cumulative_gain_curve(df: pd.DataFrame,
                           prediction: str,
                           min_rows: int = 30,
                           steps: int = 100,
+                          ascending: bool = False,
                           effect_fn: EffectFnType = linear_effect) -> np.ndarray:
     """
     Orders the dataset by prediction and computes the cumulative gain (effect * proportional sample size) curve
@@ -132,6 +137,9 @@ def cumulative_gain_curve(df: pd.DataFrame,
     steps : Integer
         The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
     effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
         A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
         of the outcome column.
@@ -147,7 +155,7 @@ def cumulative_gain_curve(df: pd.DataFrame,
     n_rows = list(range(min_rows, size, size // steps)) + [size]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
-                                         min_rows=min_rows, steps=steps, effect_fn=effect_fn)
+                                         min_rows=min_rows, steps=steps, ascending=ascending, effect_fn=effect_fn)
 
     return np.array([effect * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
 
@@ -159,6 +167,7 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
                                    prediction: str,
                                    min_rows: int = 30,
                                    steps: int = 100,
+                                   ascending: bool = False,
                                    effect_fn: EffectFnType = linear_effect) -> np.ndarray:
     """
      Orders the dataset by prediction and computes the relative cumulative gain curve curve according to that ordering.
@@ -185,6 +194,9 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
      steps : Integer
          The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
      effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
@@ -201,7 +213,7 @@ def relative_cumulative_gain_curve(df: pd.DataFrame,
     n_rows = list(range(min_rows, size, size // steps)) + [size]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
-                                         min_rows=min_rows, steps=steps, effect_fn=effect_fn)
+                                         min_rows=min_rows, steps=steps, ascending=ascending, effect_fn=effect_fn)
 
     return np.array([(effect - ate) * (rows / size) for rows, effect in zip(n_rows, cum_effect)])
 
@@ -214,6 +226,7 @@ def effect_curves(
     prediction: str,
     min_rows: int = 30,
     steps: int = 100,
+    ascending: bool = False,
     effect_fn: EffectFnType = linear_effect,
 ) -> pd.DataFrame:
     """
@@ -243,6 +256,9 @@ def effect_curves(
      steps : Integer
          The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
      effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
@@ -264,6 +280,7 @@ def effect_curves(
         prediction=prediction,
         min_rows=min_rows,
         steps=steps,
+        ascending=ascending,
         effect_fn=effect_fn,
     )
     ate: float = cum_effect[-1]

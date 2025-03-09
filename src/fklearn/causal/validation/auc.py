@@ -13,6 +13,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
                                            prediction: str,
                                            min_rows: int = 30,
                                            steps: int = 100,
+                                           ascending: bool = False,
                                            effect_fn: EffectFnType = linear_effect) -> float:
     """
      Orders the dataset by prediction and computes the area under the cumulative effect curve, according to that
@@ -38,6 +39,9 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
      steps : Integer
          The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
      effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
@@ -55,7 +59,7 @@ def area_under_the_cumulative_effect_curve(df: pd.DataFrame,
     step_sizes = [min_rows] + [t - s for s, t in zip(n_rows, n_rows[1:])]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
-                                         min_rows=min_rows, steps=steps, effect_fn=effect_fn)
+                                         min_rows=min_rows, steps=steps, ascending=ascending, effect_fn=effect_fn)
 
     return abs(sum([(effect - ate) * (step_size / size) for effect, step_size in zip(cum_effect, step_sizes)]))
 
@@ -67,6 +71,7 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
                                          prediction: str,
                                          min_rows: int = 30,
                                          steps: int = 100,
+                                         ascending: bool = False,
                                          effect_fn: EffectFnType = linear_effect) -> float:
     """
      Orders the dataset by prediction and computes the area under the cumulative gain curve, according to that ordering.
@@ -91,6 +96,9 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
      steps : Integer
          The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
      effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
@@ -107,7 +115,7 @@ def area_under_the_cumulative_gain_curve(df: pd.DataFrame,
     step_sizes = [min_rows] + [t - s for s, t in zip(n_rows, n_rows[1:])]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
-                                         min_rows=min_rows, steps=steps, effect_fn=effect_fn)
+                                         min_rows=min_rows, steps=steps, ascending=ascending, effect_fn=effect_fn)
 
     return abs(sum([effect * (rows / size) * (step_size / size)
                     for rows, effect, step_size in zip(n_rows, cum_effect, step_sizes)]))
@@ -120,6 +128,7 @@ def area_under_the_relative_cumulative_gain_curve(df: pd.DataFrame,
                                                   prediction: str,
                                                   min_rows: int = 30,
                                                   steps: int = 100,
+                                                  ascending: bool = False,
                                                   effect_fn: EffectFnType = linear_effect) -> float:
     """
      Orders the dataset by prediction and computes the area under the relative cumulative gain curve, according to that
@@ -145,6 +154,9 @@ def area_under_the_relative_cumulative_gain_curve(df: pd.DataFrame,
      steps : Integer
          The number of cumulative steps to iterate when accumulating the effect
 
+    ascending : Boolean
+        Indicates if the dataset should be ordered ascending with respect to the prediction column
+
      effect_fn : function (df: pandas.DataFrame, treatment: str, outcome: str) -> int or Array of int
          A function that computes the treatment effect given a dataframe, the name of the treatment column and the name
          of the outcome column.
@@ -162,7 +174,7 @@ def area_under_the_relative_cumulative_gain_curve(df: pd.DataFrame,
     step_sizes = [min_rows] + [t - s for s, t in zip(n_rows, n_rows[1:])]
 
     cum_effect = cumulative_effect_curve(df=df, treatment=treatment, outcome=outcome, prediction=prediction,
-                                         min_rows=min_rows, steps=steps, effect_fn=effect_fn)
+                                         min_rows=min_rows, steps=steps, ascending=ascending, effect_fn=effect_fn)
 
     return abs(sum([(effect - ate) * (rows / size) * (step_size / size)
                     for rows, effect, step_size in zip(n_rows, cum_effect, step_sizes)]))
