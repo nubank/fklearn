@@ -20,6 +20,7 @@ from fklearn.training.transformation import (
     onehot_categorizer,
     target_categorizer,
     standard_scaler,
+    minmax_scaler,
     ecdfer,
     discrete_ecdfer,
     custom_transformer,
@@ -1235,6 +1236,111 @@ def test_standard_scaler():
             axis=1,
         ).values,
         pred_fn4(input_df_test).values,
+        decimal=5,
+    )
+
+
+def test_minmax_scaler():
+    input_df_train = pd.DataFrame({"feat1_num": [1.0, 0.5, 100.0],
+                                   "feat2_num": [-4.5, 10.2, 7.4]})
+
+    expected_output_train = pd.DataFrame(
+        {"feat1_num": [0.005025, 0.0, 1.0],
+         "feat2_num": [0.0, 1.0, 0.809524]}
+    )
+
+    input_df_test = pd.DataFrame({"feat1_num": [2.0, 4.0, 8.0],
+                                  "feat2_num": [-8.0, -4.0, 8.0]})
+
+    expected_output_test = pd.DataFrame(
+        {"feat1_num": [0.015075, 0.035176, 0.075377],
+         "feat2_num": [-0.238095, 0.034014, 0.850340]}
+    )
+
+    pred_fn1, data1, log = minmax_scaler(input_df_train, ["feat1_num", "feat2_num"])
+    pred_fn2, data2, log = minmax_scaler(
+        input_df_train, ["feat1_num", "feat2_num"], suffix="_suffix"
+    )
+    pred_fn3, data3, log = minmax_scaler(
+        input_df_train, ["feat1_num", "feat2_num"], prefix="prefix_"
+    )
+    pred_fn4, data4, log = minmax_scaler(
+        input_df_train,
+        ["feat1_num"],
+        columns_mapping={"feat1_num": "feat1_num_raw"},
+    )
+
+    assert_almost_equal(expected_output_train.values, data1.values, decimal=5)
+    assert_almost_equal(
+        expected_output_test.values, pred_fn1(input_df_test).values, decimal=5
+    )
+
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_train,
+                input_df_train[["feat1_num", "feat2_num"]].copy().add_suffix("_suffix"),
+            ],
+            axis=1,
+        ).values,
+        data2.values,
+        decimal=5,
+    )
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_test,
+                input_df_test[["feat1_num", "feat2_num"]].copy().add_suffix("_suffix"),
+            ],
+            axis=1,
+        ).values,
+        pred_fn2(input_df_test).values,
+        decimal=5,
+    )
+
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_train,
+                input_df_train[["feat1_num", "feat2_num"]].copy().add_prefix("prefix_"),
+            ],
+            axis=1,
+        ).values,
+        data3.values,
+        decimal=5,
+    )
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_test,
+                input_df_test[["feat1_num", "feat2_num"]].copy().add_prefix("prefix_"),
+            ],
+            axis=1,
+        ).values,
+        pred_fn3(input_df_test).values,
+        decimal=5,
+    )
+
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_train[["feat1_num"]],
+                input_df_train[["feat1_num"]].copy().add_suffix("_raw"),
+            ],
+            axis=1,
+        ).values,
+        data4[["feat1_num", "feat1_num_raw"]].values,
+        decimal=5,
+    )
+    assert_almost_equal(
+        pd.concat(
+            [
+                expected_output_test[["feat1_num"]],
+                input_df_test[["feat1_num"]].copy().add_suffix("_raw"),
+            ],
+            axis=1,
+        ).values,
+        pred_fn4(input_df_test)[["feat1_num", "feat1_num_raw"]].values,
         decimal=5,
     )
 
