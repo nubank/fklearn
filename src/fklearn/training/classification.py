@@ -435,7 +435,8 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
                                         target: str,
                                         vectorizer_params: LogType = None,
                                         logistic_params: LogType = None,
-                                        prediction_column: str = "prediction") -> LearnerReturnType:
+                                        prediction_column: str = "prediction",
+                                        keep_tfidf_object: bool = False) -> LearnerReturnType:
     """
     Fits a text vectorizer (TfidfVectorizer) followed by
     a logistic regression (LogisticRegression).
@@ -466,6 +467,9 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
 
     prediction_column : str
         The name of the column with the predictions from the model.
+
+    keep_tfidf_object : bool (default: False)
+        If True, return the tfidf object as a separate object in the logs.
     """
 
     # set default params
@@ -510,6 +514,9 @@ def nlp_logistic_classification_learner(df: pd.DataFrame,
         'package_version': sk_version,
         'training_samples': len(df)},
         'object': clf}
+
+    if keep_tfidf_object:
+        log["tf_idf_object"] = vect
 
     return p, p(df), log
 
