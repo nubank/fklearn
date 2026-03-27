@@ -20,13 +20,9 @@ from fklearn.causal.cate_learning.meta_learners import (
     _simulate_t_learner_treatment_effect,
     _simulate_treatment_effect,
     causal_s_classification_learner,
-    causal_t_classification_learner
+    causal_t_classification_learner,
 )
-from fklearn.exceptions.exceptions import (
-    MissingControlError,
-    MissingTreatmentError,
-    MultipleTreatmentsError
-)
+from fklearn.exceptions.exceptions import MissingControlError, MissingTreatmentError, MultipleTreatmentsError
 from fklearn.training.classification import logistic_classification_learner
 from fklearn.types import LearnerFnType
 
@@ -57,9 +53,7 @@ def test__append_treatment_feature():
     features = ["feat1", "feat2", "feat3"]
     treatment_feature = "treatment"
 
-    assert _append_treatment_feature(features, treatment_feature) == features + [
-        treatment_feature
-    ]
+    assert _append_treatment_feature(features, treatment_feature) == features + [treatment_feature]
     assert len(features) > 0
     assert treatment_feature
 
@@ -80,9 +74,7 @@ def test__get_unique_treatments():
         }
     )
 
-    filtered = _get_unique_treatments(
-        df, treatment_col="treatment", control_name="control"
-    )
+    filtered = _get_unique_treatments(df, treatment_col="treatment", control_name="control")
     expected = ["treatment_A", "treatment_B", "treatment_C"]
 
     assert sorted(filtered) == sorted(expected)
@@ -107,9 +99,7 @@ def test__filter_by_treatment():
         [3.0, "control", 1],
     ]
 
-    expected: DataFrame = pd.DataFrame(
-        data=expected_values, columns=["feat1", "treatment", "target"]
-    )
+    expected: DataFrame = pd.DataFrame(data=expected_values, columns=["feat1", "treatment", "target"])
 
     results = _filter_by_treatment(
         df,
@@ -220,9 +210,7 @@ def test__create_treatment_flag():
         }
     )
 
-    results = _create_treatment_flag(
-        df, treatment_col="group", control_name="control", treatment_name="treatment"
-    )
+    results = _create_treatment_flag(df, treatment_col="group", control_name="control", treatment_name="treatment")
 
     assert_frame_equal(results, expected)
 
@@ -270,10 +258,7 @@ def test__predict_by_treatment_flag_positive():
         }
     )
 
-    assert (
-        _predict_by_treatment_flag(df, ones_or_zeros_model, True, "prediction")
-        == np.ones(df.shape[0])
-    ).all()
+    assert (_predict_by_treatment_flag(df, ones_or_zeros_model, True, "prediction") == np.ones(df.shape[0])).all()
 
 
 def test__predict_by_treatment_flag_negative():
@@ -285,10 +270,7 @@ def test__predict_by_treatment_flag_negative():
         }
     )
 
-    assert (
-        _predict_by_treatment_flag(df, ones_or_zeros_model, False, "prediction")
-        == np.zeros(df.shape[0])
-    ).all()
+    assert (_predict_by_treatment_flag(df, ones_or_zeros_model, False, "prediction") == np.zeros(df.shape[0])).all()
 
 
 @patch("fklearn.causal.cate_learning.meta_learners._predict_by_treatment_flag")
@@ -338,7 +320,7 @@ def test__simulate_treatment_effect(mock_predict_by_treatment_flag):
         # treatment = A, apply treatment = 0
         [0.6, 0.7, 0.0, 1.0],
         # treatment = B, apply treatment = 1
-        [1.0, 0.5, 1.0, 1.0]
+        [1.0, 0.5, 1.0, 1.0],
         # treatment = B, apply treatment = 0
     ]
 
@@ -478,9 +460,7 @@ def test_get_model_fcn(base_input_df):
     learner = MagicMock()
     learner.side_effect = mock_learner
 
-    mock_fcn, mock_p_df, mock_logs = _get_model_fcn(
-        base_input_df, "treatment", "A", learner
-    )
+    mock_fcn, mock_p_df, mock_logs = _get_model_fcn(base_input_df, "treatment", "A", learner)
 
     assert isinstance(mock_fcn, Callable)
     assert_frame_equal(mock_p_df, df_expected)
@@ -550,9 +530,7 @@ def test_get_learners(mock_get_model_fcn):
     mock_get_model_fcn.assert_has_calls(calls)
 
 
-@patch(
-    "fklearn.causal.cate_learning.meta_learners._simulate_t_learner_treatment_effect"
-)
+@patch("fklearn.causal.cate_learning.meta_learners._simulate_t_learner_treatment_effect")
 @patch("fklearn.causal.cate_learning.meta_learners._get_learners")
 @patch("fklearn.causal.cate_learning.meta_learners._get_unique_treatments")
 def test_causal_t_classification_learner(

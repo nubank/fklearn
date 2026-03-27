@@ -30,9 +30,7 @@ from fklearn.training.transformation import (
 
 
 def test_selector():
-    input_df = pd.DataFrame(
-        {"feat1": [1, 2, 3], "feat2": [100, 200, 300], "target": [0, 1, 0]}
-    )
+    input_df = pd.DataFrame({"feat1": [1, 2, 3], "feat2": [100, 200, 300], "target": [0, 1, 0]})
 
     expected = pd.DataFrame({"feat1": [1, 2, 3], "target": [0, 1, 0]})
 
@@ -57,12 +55,8 @@ def test_capper():
     expected2 = pd.DataFrame({"feat1": [7, 9], "feat2": [75, None]})
 
     pred_fn1, data1, log = capper(input_df, ["feat1", "feat2"], {"feat1": 9})
-    pred_fn2, data2, log = capper(
-        input_df, ["feat1", "feat2"], {"feat1": 9}, suffix="_suffix"
-    )
-    pred_fn3, data3, log = capper(
-        input_df, ["feat1", "feat2"], {"feat1": 9}, prefix="prefix_"
-    )
+    pred_fn2, data2, log = capper(input_df, ["feat1", "feat2"], {"feat1": 9}, suffix="_suffix")
+    pred_fn3, data3, log = capper(input_df, ["feat1", "feat2"], {"feat1": 9}, prefix="prefix_")
     pred_fn4, data4, log = capper(
         input_df,
         ["feat1", "feat2"],
@@ -73,26 +67,14 @@ def test_capper():
     assert expected1.equals(data1)
     assert expected2.equals(pred_fn1(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_suffix("_suffix")], axis=1
-    ).equals(pred_fn2(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_suffix")], axis=1).equals(pred_fn2(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_prefix("prefix_")], axis=1
-    ).equals(pred_fn3(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected2, input_df2.copy().add_prefix("prefix_")], axis=1).equals(pred_fn3(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_suffix("_raw")], axis=1
-    ).equals(pred_fn4(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_raw")], axis=1).equals(data4)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_raw")], axis=1).equals(pred_fn4(input_df2))
 
 
 def test_floorer():
@@ -105,12 +87,8 @@ def test_floorer():
     expected2 = pd.DataFrame({"feat1": [11, 15], "feat2": [50, None]})
 
     pred_fn1, data1, log = floorer(input_df, ["feat1", "feat2"], {"feat1": 11})
-    pred_fn2, data2, log = floorer(
-        input_df, ["feat1", "feat2"], {"feat1": 11}, suffix="_suffix"
-    )
-    pred_fn3, data3, log = floorer(
-        input_df, ["feat1", "feat2"], {"feat1": 11}, prefix="prefix_"
-    )
+    pred_fn2, data2, log = floorer(input_df, ["feat1", "feat2"], {"feat1": 11}, suffix="_suffix")
+    pred_fn3, data3, log = floorer(input_df, ["feat1", "feat2"], {"feat1": 11}, prefix="prefix_")
     pred_fn4, data4, log = floorer(
         input_df,
         ["feat1", "feat2"],
@@ -121,38 +99,22 @@ def test_floorer():
     assert expected1.equals(data1)
     assert expected2.equals(pred_fn1(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_suffix("_suffix")], axis=1
-    ).equals(pred_fn2(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_suffix")], axis=1).equals(pred_fn2(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_prefix("prefix_")], axis=1
-    ).equals(pred_fn3(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected2, input_df2.copy().add_prefix("prefix_")], axis=1).equals(pred_fn3(input_df2))
 
-    assert pd.concat(
-        [expected1, input_df.copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
-    assert pd.concat(
-        [expected2, input_df2.copy().add_suffix("_raw")], axis=1
-    ).equals(pred_fn4(input_df2))
+    assert pd.concat([expected1, input_df.copy().add_suffix("_raw")], axis=1).equals(data4)
+    assert pd.concat([expected2, input_df2.copy().add_suffix("_raw")], axis=1).equals(pred_fn4(input_df2))
 
 
 def test_prediction_ranger():
-    input_df = pd.DataFrame(
-        {"feat1": [10, 13, 10, 15], "prediction": [100, 200, 300, None]}
-    )
+    input_df = pd.DataFrame({"feat1": [10, 13, 10, 15], "prediction": [100, 200, 300, None]})
 
     pred_fn, data, log = prediction_ranger(input_df, 150, 250)
 
-    expected = pd.DataFrame(
-        {"feat1": [10, 13, 10, 15], "prediction": [150, 200, 250, None]}
-    )
+    expected = pd.DataFrame({"feat1": [10, 13, 10, 15], "prediction": [150, 200, 250, None]})
 
     assert expected.equals(data)
 
@@ -175,13 +137,10 @@ def test_value_mapper():
     pred_fn, data_ignore, log = value_mapper(input_df, value_maps)
     pred_fn2, data_ignore2, log2 = value_mapper(input_df, value_maps, suffix="_suffix")
     pred_fn3, data_ignore3, log3 = value_mapper(input_df, value_maps, prefix="prefix_")
-    pred_fn4, data_ignore4, log4 = value_mapper(input_df, value_maps,
-                                                columns_mapping={"feat1": "feat1_raw",
-                                                                 "feat2": "feat2_raw",
-                                                                 "feat3": "feat3_raw"})
-    pred_fn, data_not_ignore, log = value_mapper(
-        input_df, value_maps, ignore_unseen=False
+    pred_fn4, data_ignore4, log4 = value_mapper(
+        input_df, value_maps, columns_mapping={"feat1": "feat1_raw", "feat2": "feat2_raw", "feat3": "feat3_raw"}
     )
+    pred_fn, data_not_ignore, log = value_mapper(input_df, value_maps, ignore_unseen=False)
 
     expected_ignore = pd.DataFrame(
         {
@@ -202,17 +161,11 @@ def test_value_mapper():
     assert expected_ignore.equals(data_ignore)
     assert expected_not_ignore.equals(data_not_ignore)
 
-    assert pd.concat(
-        [expected_ignore, input_df.copy().add_suffix("_suffix")], axis=1
-    ).equals(data_ignore2)
+    assert pd.concat([expected_ignore, input_df.copy().add_suffix("_suffix")], axis=1).equals(data_ignore2)
 
-    assert pd.concat(
-        [expected_ignore, input_df.copy().add_prefix("prefix_")], axis=1
-    ).equals(data_ignore3)
+    assert pd.concat([expected_ignore, input_df.copy().add_prefix("prefix_")], axis=1).equals(data_ignore3)
 
-    assert pd.concat(
-        [expected_ignore, input_df.copy().add_suffix("_raw")], axis=1
-    ).equals(data_ignore4)
+    assert pd.concat([expected_ignore, input_df.copy().add_suffix("_raw")], axis=1).equals(data_ignore4)
 
 
 def test_truncate_categorical():
@@ -256,15 +209,9 @@ def test_truncate_categorical():
         }
     )
 
-    truncate_learner1 = truncate_categorical(
-        columns_to_truncate=["col"], percentile=0.1
-    )
-    truncate_learner2 = truncate_categorical(
-        columns_to_truncate=["col"], percentile=0.1, suffix="_suffix"
-    )
-    truncate_learner3 = truncate_categorical(
-        columns_to_truncate=["col"], percentile=0.1, prefix="prefix_"
-    )
+    truncate_learner1 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1)
+    truncate_learner2 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1, suffix="_suffix")
+    truncate_learner3 = truncate_categorical(columns_to_truncate=["col"], percentile=0.1, prefix="prefix_")
     truncate_learner4 = truncate_categorical(
         columns_to_truncate=["col"],
         percentile=0.1,
@@ -326,28 +273,18 @@ def test_truncate_categorical():
 
 
 def test_rank_categorical():
-    input_df_train = pd.DataFrame(
-        {"col": ["a", "b", "b", "c", "c", "d", "d", "d", nan, nan, nan]}
-    )
+    input_df_train = pd.DataFrame({"col": ["a", "b", "b", "c", "c", "d", "d", "d", nan, nan, nan]})
 
     input_df_test = pd.DataFrame({"col": ["a", "b", "c", "d", "d", nan, nan]})
 
-    expected_output_train = pd.DataFrame(
-        {"col": [4, 2, 2, 3, 3, 1, 1, 1, nan, nan, nan]}
-    )
+    expected_output_train = pd.DataFrame({"col": [4, 2, 2, 3, 3, 1, 1, 1, nan, nan, nan]})
 
     expected_output_test = pd.DataFrame({"col": [4, 2, 3, 1, 1, nan, nan]})
 
     pred_fn1, data1, log = rank_categorical(input_df_train, ["col"])
-    pred_fn2, data2, log = rank_categorical(
-        input_df_train, ["col"], suffix="_suffix"
-    )
-    pred_fn3, data3, log = rank_categorical(
-        input_df_train, ["col"], prefix="prefix_"
-    )
-    pred_fn4, data4, log = rank_categorical(
-        input_df_train, ["col"], columns_mapping={"col": "col_raw"}
-    )
+    pred_fn2, data2, log = rank_categorical(input_df_train, ["col"], suffix="_suffix")
+    pred_fn3, data3, log = rank_categorical(input_df_train, ["col"], prefix="prefix_")
+    pred_fn4, data4, log = rank_categorical(input_df_train, ["col"], columns_mapping={"col": "col_raw"})
 
     assert expected_output_train.equals(data1)
     assert expected_output_test.equals(pred_fn1(input_df_test))
@@ -431,9 +368,7 @@ def test_count_categorizer():
         }
     )
 
-    categorizer_learner1 = count_categorizer(
-        columns_to_categorize=["feat2_cat", "feat3_cat"], replace_unseen=1
-    )
+    categorizer_learner1 = count_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], replace_unseen=1)
     categorizer_learner2 = count_categorizer(
         columns_to_categorize=["feat2_cat", "feat3_cat"],
         replace_unseen=1,
@@ -546,9 +481,7 @@ def test_label_categorizer():
         }
     )
 
-    categorizer_learner1 = label_categorizer(
-        columns_to_categorize=["feat2_cat", "feat3_cat"], replace_unseen=-99
-    )
+    categorizer_learner1 = label_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], replace_unseen=-99)
     categorizer_learner2 = label_categorizer(
         columns_to_categorize=["feat2_cat", "feat3_cat"],
         replace_unseen=-99,
@@ -653,12 +586,8 @@ def test_quantile_biner():
     )
 
     biner_learner1 = quantile_biner(columns_to_bin=["col"], q=4, right=True)
-    biner_learner2 = quantile_biner(
-        columns_to_bin=["col"], q=4, right=True, suffix="_suffix"
-    )
-    biner_learner3 = quantile_biner(
-        columns_to_bin=["col"], q=4, right=True, prefix="prefix_"
-    )
+    biner_learner2 = quantile_biner(columns_to_bin=["col"], q=4, right=True, suffix="_suffix")
+    biner_learner3 = quantile_biner(columns_to_bin=["col"], q=4, right=True, prefix="prefix_")
     biner_learner4 = quantile_biner(
         columns_to_bin=["col"],
         q=4,
@@ -722,131 +651,172 @@ def test_quantile_biner():
 
 @pytest.mark.parametrize(
     "df_train, df_test, columns_to_categorize, drop_first, hardcode, expected_output_train, expected_output_test",
-    [(  # no drop_first - no hardcode
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "sex": ["female", "male", "male", "male"],
-            "region": ["SP", "RG", "MG", nan]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "sex": ["male", "female", "male", "nonbinary"],
-            "region": [nan, nan, "SP", "RG"]
-        }),
-        ["sex", "region"],
-        False, False,
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "fklearn_feat__sex==female": [1, 0, 0, 0],
-            "fklearn_feat__sex==male": [0, 1, 1, 1],
-            "fklearn_feat__region==MG": [0, 0, 1, 0],
-            "fklearn_feat__region==RG": [0, 1, 0, 0],
-            "fklearn_feat__region==SP": [1, 0, 0, 0]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "fklearn_feat__sex==female": [0, 1, 0, 0],
-            "fklearn_feat__sex==male": [1, 0, 1, 0],
-            "fklearn_feat__region==MG": [0, 0, 0, 0],
-            "fklearn_feat__region==RG": [0, 0, 0, 1],
-            "fklearn_feat__region==SP": [0, 0, 1, 0]
-        })
-    ), (  # no drop_first - hardcode
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "sex": ["female", "male", "male", "male"],
-            "region": ["SP", "RG", "MG", nan]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "sex": ["male", "female", "male", "nonbinary"],
-            "region": [nan, nan, "SP", "RG"]
-        }),
-        ["sex", "region"],
-        False, True,
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "fklearn_feat__sex==female": [1, 0, 0, 0],
-            "fklearn_feat__sex==male": [0, 1, 1, 1],
-            "fklearn_feat__sex==nan": [0, 0, 0, 0],
-            "fklearn_feat__region==MG": [0, 0, 1, 0],
-            "fklearn_feat__region==RG": [0, 1, 0, 0],
-            "fklearn_feat__region==SP": [1, 0, 0, 0],
-            "fklearn_feat__region==nan": [0, 0, 0, 1]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "fklearn_feat__sex==female": [0, 1, 0, 0],
-            "fklearn_feat__sex==male": [1, 0, 1, 0],
-            "fklearn_feat__sex==nan": [0, 0, 0, 1],
-            "fklearn_feat__region==MG": [0, 0, 0, 0],
-            "fklearn_feat__region==RG": [0, 0, 0, 1],
-            "fklearn_feat__region==SP": [0, 0, 1, 0],
-            "fklearn_feat__region==nan": [1, 1, 0, 0]
-        }),
-    ), (  # drop_first - hardcode
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "sex": ["female", "male", "male", "male"],
-            "region": ["SP", "RG", "MG", nan]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "sex": ["male", "female", "male", "nonbinary"],
-            "region": [nan, nan, "SP", "RG"]
-        }),
-        ["sex", "region"],
-        True, True,
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "fklearn_feat__sex==male": [0, 1, 1, 1],
-            "fklearn_feat__sex==nan": [0, 0, 0, 0],
-            "fklearn_feat__region==RG": [0, 1, 0, 0],
-            "fklearn_feat__region==SP": [1, 0, 0, 0],
-            "fklearn_feat__region==nan": [0, 0, 0, 1]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "fklearn_feat__sex==male": [1, 0, 1, 0],
-            "fklearn_feat__sex==nan": [0, 0, 0, 1],
-            "fklearn_feat__region==RG": [0, 0, 0, 1],
-            "fklearn_feat__region==SP": [0, 0, 1, 0],
-            "fklearn_feat__region==nan": [1, 1, 0, 0],
-        }),
-    ), (  # drop_first - not hardcode
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "sex": ["female", "male", "male", "male"],
-            "region": ["SP", "RG", "MG", nan]
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "sex": ["male", "female", "male", "nonbinary"],
-            "region": [nan, nan, "SP", "RG"]
-        }),
-        ["sex", "region"],
-        True, False,
-        pd.DataFrame({
-            "feat1_num": [1, 0.5, nan, 100],
-            "fklearn_feat__sex==male": [0, 1, 1, 1],
-            "fklearn_feat__region==RG": [0, 1, 0, 0],
-            "fklearn_feat__region==SP": [1, 0, 0, 0],
-        }),
-        pd.DataFrame({
-            "feat1_num": [2, 20, 200, 2000],
-            "fklearn_feat__sex==male": [1, 0, 1, 0],
-            "fklearn_feat__region==RG": [0, 0, 0, 1],
-            "fklearn_feat__region==SP": [0, 0, 1, 0]
-        }),
-    ),
-    ]
+    [
+        (  # no drop_first - no hardcode
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "sex": ["female", "male", "male", "male"],
+                    "region": ["SP", "RG", "MG", nan],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "sex": ["male", "female", "male", "nonbinary"],
+                    "region": [nan, nan, "SP", "RG"],
+                }
+            ),
+            ["sex", "region"],
+            False,
+            False,
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "fklearn_feat__sex==female": [1, 0, 0, 0],
+                    "fklearn_feat__sex==male": [0, 1, 1, 1],
+                    "fklearn_feat__region==MG": [0, 0, 1, 0],
+                    "fklearn_feat__region==RG": [0, 1, 0, 0],
+                    "fklearn_feat__region==SP": [1, 0, 0, 0],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "fklearn_feat__sex==female": [0, 1, 0, 0],
+                    "fklearn_feat__sex==male": [1, 0, 1, 0],
+                    "fklearn_feat__region==MG": [0, 0, 0, 0],
+                    "fklearn_feat__region==RG": [0, 0, 0, 1],
+                    "fklearn_feat__region==SP": [0, 0, 1, 0],
+                }
+            ),
+        ),
+        (  # no drop_first - hardcode
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "sex": ["female", "male", "male", "male"],
+                    "region": ["SP", "RG", "MG", nan],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "sex": ["male", "female", "male", "nonbinary"],
+                    "region": [nan, nan, "SP", "RG"],
+                }
+            ),
+            ["sex", "region"],
+            False,
+            True,
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "fklearn_feat__sex==female": [1, 0, 0, 0],
+                    "fklearn_feat__sex==male": [0, 1, 1, 1],
+                    "fklearn_feat__sex==nan": [0, 0, 0, 0],
+                    "fklearn_feat__region==MG": [0, 0, 1, 0],
+                    "fklearn_feat__region==RG": [0, 1, 0, 0],
+                    "fklearn_feat__region==SP": [1, 0, 0, 0],
+                    "fklearn_feat__region==nan": [0, 0, 0, 1],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "fklearn_feat__sex==female": [0, 1, 0, 0],
+                    "fklearn_feat__sex==male": [1, 0, 1, 0],
+                    "fklearn_feat__sex==nan": [0, 0, 0, 1],
+                    "fklearn_feat__region==MG": [0, 0, 0, 0],
+                    "fklearn_feat__region==RG": [0, 0, 0, 1],
+                    "fklearn_feat__region==SP": [0, 0, 1, 0],
+                    "fklearn_feat__region==nan": [1, 1, 0, 0],
+                }
+            ),
+        ),
+        (  # drop_first - hardcode
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "sex": ["female", "male", "male", "male"],
+                    "region": ["SP", "RG", "MG", nan],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "sex": ["male", "female", "male", "nonbinary"],
+                    "region": [nan, nan, "SP", "RG"],
+                }
+            ),
+            ["sex", "region"],
+            True,
+            True,
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "fklearn_feat__sex==male": [0, 1, 1, 1],
+                    "fklearn_feat__sex==nan": [0, 0, 0, 0],
+                    "fklearn_feat__region==RG": [0, 1, 0, 0],
+                    "fklearn_feat__region==SP": [1, 0, 0, 0],
+                    "fklearn_feat__region==nan": [0, 0, 0, 1],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "fklearn_feat__sex==male": [1, 0, 1, 0],
+                    "fklearn_feat__sex==nan": [0, 0, 0, 1],
+                    "fklearn_feat__region==RG": [0, 0, 0, 1],
+                    "fklearn_feat__region==SP": [0, 0, 1, 0],
+                    "fklearn_feat__region==nan": [1, 1, 0, 0],
+                }
+            ),
+        ),
+        (  # drop_first - not hardcode
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "sex": ["female", "male", "male", "male"],
+                    "region": ["SP", "RG", "MG", nan],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "sex": ["male", "female", "male", "nonbinary"],
+                    "region": [nan, nan, "SP", "RG"],
+                }
+            ),
+            ["sex", "region"],
+            True,
+            False,
+            pd.DataFrame(
+                {
+                    "feat1_num": [1, 0.5, nan, 100],
+                    "fklearn_feat__sex==male": [0, 1, 1, 1],
+                    "fklearn_feat__region==RG": [0, 1, 0, 0],
+                    "fklearn_feat__region==SP": [1, 0, 0, 0],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "feat1_num": [2, 20, 200, 2000],
+                    "fklearn_feat__sex==male": [1, 0, 1, 0],
+                    "fklearn_feat__region==RG": [0, 0, 0, 1],
+                    "fklearn_feat__region==SP": [0, 0, 1, 0],
+                }
+            ),
+        ),
+    ],
 )
 def test_onehot_categorizer(
-        df_train, df_test, columns_to_categorize, drop_first, hardcode, expected_output_train, expected_output_test
+    df_train, df_test, columns_to_categorize, drop_first, hardcode, expected_output_train, expected_output_test
 ):
 
     categorizer_learner = onehot_categorizer(
-        columns_to_categorize=columns_to_categorize, hardcode_nans=hardcode, drop_first_column=drop_first)
+        columns_to_categorize=columns_to_categorize, hardcode_nans=hardcode, drop_first_column=drop_first
+    )
 
     pred_fn, data, log = categorizer_learner(df_train)
     test_result = pred_fn(df_test)
@@ -915,9 +885,7 @@ def test_target_categorizer():
         )
     )
 
-    input_df_test_continuous_target = pd.DataFrame(
-        {"feat1_num": [2.0, 4.0, 8.0], "feat2_cat": ["b", "a", "c"]}
-    )
+    input_df_test_continuous_target = pd.DataFrame({"feat1_num": [2.0, 4.0, 8.0], "feat2_cat": ["b", "a", "c"]})
 
     expected_output_test_continuous_target = pd.DataFrame(
         OrderedDict(
@@ -929,9 +897,7 @@ def test_target_categorizer():
     )
 
     # Test with binary target
-    categorizer_learner1 = target_categorizer(
-        columns_to_categorize=["feat2_cat", "feat3_cat"], target_column="target"
-    )
+    categorizer_learner1 = target_categorizer(columns_to_categorize=["feat2_cat", "feat3_cat"], target_column="target")
     categorizer_learner2 = target_categorizer(
         columns_to_categorize=["feat2_cat", "feat3_cat"],
         target_column="target",
@@ -957,26 +923,20 @@ def test_target_categorizer():
     pred_fn4, data4, log = categorizer_learner4(input_df_train_binary_target)
 
     assert expected_output_train_binary_target.equals(data1)
-    assert expected_output_test_binary_target.equals(
-        pred_fn1(input_df_test_binary_target)
-    )
+    assert expected_output_test_binary_target.equals(pred_fn1(input_df_test_binary_target))
 
     categorized = ["feat2_cat", "feat3_cat"]
     assert pd.concat(
         [
             expected_output_train_binary_target,
-            input_df_train_binary_target[categorized]
-            .copy()
-            .add_suffix("_suffix"),
+            input_df_train_binary_target[categorized].copy().add_suffix("_suffix"),
         ],
         axis=1,
     ).equals(data2)
     assert pd.concat(
         [
             expected_output_test_binary_target,
-            input_df_test_binary_target[categorized]
-            .copy()
-            .add_suffix("_suffix"),
+            input_df_test_binary_target[categorized].copy().add_suffix("_suffix"),
         ],
         axis=1,
     ).equals(pred_fn2(input_df_test_binary_target))
@@ -984,18 +944,14 @@ def test_target_categorizer():
     assert pd.concat(
         [
             expected_output_train_binary_target,
-            input_df_train_binary_target[categorized]
-            .copy()
-            .add_prefix("prefix_"),
+            input_df_train_binary_target[categorized].copy().add_prefix("prefix_"),
         ],
         axis=1,
     ).equals(data3)
     assert pd.concat(
         [
             expected_output_test_binary_target,
-            input_df_test_binary_target[categorized]
-            .copy()
-            .add_prefix("prefix_"),
+            input_df_test_binary_target[categorized].copy().add_prefix("prefix_"),
         ],
         axis=1,
     ).equals(pred_fn3(input_df_test_binary_target))
@@ -1040,22 +996,12 @@ def test_target_categorizer():
         columns_mapping={"feat2_cat": "feat2_cat_raw"},
     )
 
-    pred_fn1, data1, log = categorizer_learner1(
-        input_df_train_continuous_target
-    )
-    pred_fn2, data2, log = categorizer_learner2(
-        input_df_train_continuous_target
-    )
-    pred_fn3, data3, log = categorizer_learner3(
-        input_df_train_continuous_target
-    )
-    pred_fn4, data4, log = categorizer_learner4(
-        input_df_train_continuous_target
-    )
+    pred_fn1, data1, log = categorizer_learner1(input_df_train_continuous_target)
+    pred_fn2, data2, log = categorizer_learner2(input_df_train_continuous_target)
+    pred_fn3, data3, log = categorizer_learner3(input_df_train_continuous_target)
+    pred_fn4, data4, log = categorizer_learner4(input_df_train_continuous_target)
 
-    assert_almost_equal(
-        expected_output_train_continuous_target.values, data1.values, decimal=5
-    )
+    assert_almost_equal(expected_output_train_continuous_target.values, data1.values, decimal=5)
     assert_almost_equal(
         expected_output_test_continuous_target.values,
         pred_fn1(input_df_test_continuous_target).values,
@@ -1068,16 +1014,11 @@ def test_target_categorizer():
         decimal=5,
     )
     assert (
-        input_df_train_continuous_target[["feat2_cat"]]
-        .copy()
-        .add_suffix("_suffix")
-        .equals(data2[["feat2_cat_suffix"]])
+        input_df_train_continuous_target[["feat2_cat"]].copy().add_suffix("_suffix").equals(data2[["feat2_cat_suffix"]])
     )
     assert_almost_equal(
         expected_output_test_continuous_target.values,
-        pred_fn2(input_df_test_continuous_target)
-        .drop(columns=["feat2_cat_suffix"])
-        .values,
+        pred_fn2(input_df_test_continuous_target).drop(columns=["feat2_cat_suffix"]).values,
         decimal=5,
     )
     assert (
@@ -1093,16 +1034,11 @@ def test_target_categorizer():
         decimal=5,
     )
     assert (
-        input_df_train_continuous_target[["feat2_cat"]]
-        .copy()
-        .add_prefix("prefix_")
-        .equals(data3[["prefix_feat2_cat"]])
+        input_df_train_continuous_target[["feat2_cat"]].copy().add_prefix("prefix_").equals(data3[["prefix_feat2_cat"]])
     )
     assert_almost_equal(
         expected_output_test_continuous_target.values,
-        pred_fn3(input_df_test_continuous_target)
-        .drop(columns=["prefix_feat2_cat"])
-        .values,
+        pred_fn3(input_df_test_continuous_target).drop(columns=["prefix_feat2_cat"]).values,
         decimal=5,
     )
     assert (
@@ -1125,9 +1061,7 @@ def test_target_categorizer():
     )
     assert_almost_equal(
         expected_output_test_continuous_target.values,
-        pred_fn4(input_df_test_continuous_target)
-        .drop(columns=["feat2_cat_raw"])
-        .values,
+        pred_fn4(input_df_test_continuous_target).drop(columns=["feat2_cat_raw"]).values,
         decimal=5,
     )
     assert (
@@ -1141,23 +1075,15 @@ def test_target_categorizer():
 def test_standard_scaler():
     input_df_train = pd.DataFrame({"feat1_num": [1.0, 0.5, 100.0]})
 
-    expected_output_train = pd.DataFrame(
-        {"feat1_num": [-0.70175673, -0.71244338, 1.4142001]}
-    )
+    expected_output_train = pd.DataFrame({"feat1_num": [-0.70175673, -0.71244338, 1.4142001]})
 
     input_df_test = pd.DataFrame({"feat1_num": [2.0, 4.0, 8.0]})
 
-    expected_output_test = pd.DataFrame(
-        {"feat1_num": [-0.68038342, -0.63763682, -0.55214362]}
-    )
+    expected_output_test = pd.DataFrame({"feat1_num": [-0.68038342, -0.63763682, -0.55214362]})
 
     pred_fn1, data1, log = standard_scaler(input_df_train, ["feat1_num"])
-    pred_fn2, data2, log = standard_scaler(
-        input_df_train, ["feat1_num"], suffix="_suffix"
-    )
-    pred_fn3, data3, log = standard_scaler(
-        input_df_train, ["feat1_num"], prefix="prefix_"
-    )
+    pred_fn2, data2, log = standard_scaler(input_df_train, ["feat1_num"], suffix="_suffix")
+    pred_fn3, data3, log = standard_scaler(input_df_train, ["feat1_num"], prefix="prefix_")
     pred_fn4, data4, log = standard_scaler(
         input_df_train,
         ["feat1_num"],
@@ -1165,9 +1091,7 @@ def test_standard_scaler():
     )
 
     assert_almost_equal(expected_output_train.values, data1.values, decimal=5)
-    assert_almost_equal(
-        expected_output_test.values, pred_fn1(input_df_test).values, decimal=5
-    )
+    assert_almost_equal(expected_output_test.values, pred_fn1(input_df_test).values, decimal=5)
 
     assert_almost_equal(
         pd.concat(
@@ -1243,7 +1167,7 @@ def test_custom_transformer():
     input_df = pd.DataFrame(
         {
             "feat1": [1, 2, 3],
-            "feat2": [math.e, math.e ** 2, math.e ** 3],
+            "feat2": [math.e, math.e**2, math.e**3],
             "feat3": [1.5, 2.5, 3.5],
             "target": [1, 4, 9],
         }
@@ -1252,7 +1176,7 @@ def test_custom_transformer():
     expected = pd.DataFrame(
         {
             "feat1": [1, 2, 3],
-            "feat2": [math.e, math.e ** 2, math.e ** 3],
+            "feat2": [math.e, math.e**2, math.e**3],
             "feat3": [1.5, 2.5, 3.5],
             "target": [1.0, 2.0, 3.0],
         }
@@ -1261,7 +1185,7 @@ def test_custom_transformer():
     expected2 = pd.DataFrame(
         {
             "feat1": [1, 4, 9],
-            "feat2": [math.e, math.e ** 2, math.e ** 3],
+            "feat2": [math.e, math.e**2, math.e**3],
             "feat3": [1.5, 2.5, 3.5],
             "target": [1, 4, 9],
         }
@@ -1269,54 +1193,30 @@ def test_custom_transformer():
 
     # the transformed input df should contain the square root of the target column
     pred_fn1, data1, log = custom_transformer(input_df, ["target"], sqrt)
-    pred_fn2, data2, log = custom_transformer(
-        input_df, ["target"], sqrt, suffix="_suffix"
-    )
-    pred_fn3, data3, log = custom_transformer(
-        input_df, ["target"], sqrt, prefix="prefix_"
-    )
-    pred_fn4, data4, log = custom_transformer(
-        input_df, ["target"], sqrt, columns_mapping={"target": "target_raw"}
-    )
+    pred_fn2, data2, log = custom_transformer(input_df, ["target"], sqrt, suffix="_suffix")
+    pred_fn3, data3, log = custom_transformer(input_df, ["target"], sqrt, prefix="prefix_")
+    pred_fn4, data4, log = custom_transformer(input_df, ["target"], sqrt, columns_mapping={"target": "target_raw"})
 
     assert expected.equals(data1)
-    assert pd.concat(
-        [expected, input_df[["target"]].copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
-        [expected, input_df[["target"]].copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
-        [expected, input_df[["target"]].copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
+    assert pd.concat([expected, input_df[["target"]].copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected, input_df[["target"]].copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected, input_df[["target"]].copy().add_suffix("_raw")], axis=1).equals(data4)
 
     # the transformed input df should contain the squared value of the feat1 column
-    pred_fn1, data1, log = custom_transformer(
-        input_df, ["feat1"], lambda x: x ** 2
-    )
-    pred_fn2, data2, log = custom_transformer(
-        input_df, ["feat1"], lambda x: x ** 2, suffix="_suffix"
-    )
-    pred_fn3, data3, log = custom_transformer(
-        input_df, ["feat1"], lambda x: x ** 2, prefix="prefix_"
-    )
+    pred_fn1, data1, log = custom_transformer(input_df, ["feat1"], lambda x: x**2)
+    pred_fn2, data2, log = custom_transformer(input_df, ["feat1"], lambda x: x**2, suffix="_suffix")
+    pred_fn3, data3, log = custom_transformer(input_df, ["feat1"], lambda x: x**2, prefix="prefix_")
     pred_fn4, data4, log = custom_transformer(
         input_df,
         ["feat1"],
-        lambda x: x ** 2,
+        lambda x: x**2,
         columns_mapping={"feat1": "feat1_raw"},
     )
 
     assert expected2.equals(data1)
-    assert pd.concat(
-        [expected2, input_df[["feat1"]].copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
-        [expected2, input_df[["feat1"]].copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
-        [expected2, input_df[["feat1"]].copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
+    assert pd.concat([expected2, input_df[["feat1"]].copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected2, input_df[["feat1"]].copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected2, input_df[["feat1"]].copy().add_suffix("_raw")], axis=1).equals(data4)
 
     expected3 = pd.DataFrame(
         {
@@ -1330,22 +1230,16 @@ def test_custom_transformer():
     expected4 = pd.DataFrame(
         {
             "feat1": [1, 2, 3],
-            "feat2": [math.e, math.e ** 2, math.e ** 3],
+            "feat2": [math.e, math.e**2, math.e**3],
             "feat3": [1.0, 2.0, 3.0],
             "target": [1, 4, 9],
         }
     )
 
     # the transformed input df should contain the log of the target column
-    pred_fn1, data1, log = custom_transformer(
-        input_df, ["feat2"], ln, is_vectorized=True
-    )
-    pred_fn2, data2, log = custom_transformer(
-        input_df, ["feat2"], ln, is_vectorized=True, suffix="_suffix"
-    )
-    pred_fn3, data3, log = custom_transformer(
-        input_df, ["feat2"], ln, is_vectorized=True, prefix="prefix_"
-    )
+    pred_fn1, data1, log = custom_transformer(input_df, ["feat2"], ln, is_vectorized=True)
+    pred_fn2, data2, log = custom_transformer(input_df, ["feat2"], ln, is_vectorized=True, suffix="_suffix")
+    pred_fn3, data3, log = custom_transformer(input_df, ["feat2"], ln, is_vectorized=True, prefix="prefix_")
     pred_fn4, data4, log = custom_transformer(
         input_df,
         ["feat2"],
@@ -1355,26 +1249,14 @@ def test_custom_transformer():
     )
 
     assert_frame_equal(expected3, data1)
-    assert_frame_equal(pd.concat(
-        [expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1
-    ), data2)
-    assert_frame_equal(pd.concat(
-        [expected3, input_df[["feat2"]].copy().add_prefix("prefix_")], axis=1
-    ), data3)
-    assert_frame_equal(pd.concat(
-        [expected3, input_df[["feat2"]].copy().add_suffix("_raw")], axis=1
-    ), data4)
+    assert_frame_equal(pd.concat([expected3, input_df[["feat2"]].copy().add_suffix("_suffix")], axis=1), data2)
+    assert_frame_equal(pd.concat([expected3, input_df[["feat2"]].copy().add_prefix("prefix_")], axis=1), data3)
+    assert_frame_equal(pd.concat([expected3, input_df[["feat2"]].copy().add_suffix("_raw")], axis=1), data4)
 
     # the transformed input df should contain the floor value of the feat1 column
-    pred_fn1, data1, log = custom_transformer(
-        input_df, ["feat3"], floor, is_vectorized=True
-    )
-    pred_fn2, data2, log = custom_transformer(
-        input_df, ["feat3"], floor, is_vectorized=True, suffix="_suffix"
-    )
-    pred_fn3, data3, log = custom_transformer(
-        input_df, ["feat3"], floor, is_vectorized=True, prefix="prefix_"
-    )
+    pred_fn1, data1, log = custom_transformer(input_df, ["feat3"], floor, is_vectorized=True)
+    pred_fn2, data2, log = custom_transformer(input_df, ["feat3"], floor, is_vectorized=True, suffix="_suffix")
+    pred_fn3, data3, log = custom_transformer(input_df, ["feat3"], floor, is_vectorized=True, prefix="prefix_")
     pred_fn4, data4, log = custom_transformer(
         input_df,
         ["feat3"],
@@ -1384,15 +1266,9 @@ def test_custom_transformer():
     )
 
     assert expected4.equals(data1)
-    assert pd.concat(
-        [expected4, input_df[["feat3"]].copy().add_suffix("_suffix")], axis=1
-    ).equals(data2)
-    assert pd.concat(
-        [expected4, input_df[["feat3"]].copy().add_prefix("prefix_")], axis=1
-    ).equals(data3)
-    assert pd.concat(
-        [expected4, input_df[["feat3"]].copy().add_suffix("_raw")], axis=1
-    ).equals(data4)
+    assert pd.concat([expected4, input_df[["feat3"]].copy().add_suffix("_suffix")], axis=1).equals(data2)
+    assert pd.concat([expected4, input_df[["feat3"]].copy().add_prefix("prefix_")], axis=1).equals(data3)
+    assert pd.concat([expected4, input_df[["feat3"]].copy().add_suffix("_raw")], axis=1).equals(data4)
 
 
 def test_null_injector():
@@ -1430,9 +1306,7 @@ def test_null_injector():
     assert p(test).equals(test), "test must be left unchanged"
 
     # test group nans
-    p, result, log = null_injector(
-        train, 0.3, groups=[["a"], ["b", "c"]], seed=42
-    )
+    p, result, log = null_injector(train, 0.3, groups=[["a"], ["b", "c"]], seed=42)
 
     expected = pd.DataFrame(
         {
@@ -1449,13 +1323,9 @@ def test_null_injector():
 
 
 def test_ecdfer():
-    fit_df = pd.DataFrame(
-        {"prediction": [0.1, 0.1, 0.3, 0.5, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9]}
-    )
+    fit_df = pd.DataFrame({"prediction": [0.1, 0.1, 0.3, 0.5, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9]})
 
-    input_df = pd.DataFrame(
-        {"prediction": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]}
-    )
+    input_df = pd.DataFrame({"prediction": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]})
 
     expected_df = pd.DataFrame(
         {
@@ -1480,9 +1350,7 @@ def test_ecdfer():
     ecdf_column = "prediction_ecdf"
     max_range = 1000
 
-    pred_fn, data, log = ecdfer(
-        fit_df, ascending, prediction_column, ecdf_column, max_range
-    )
+    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
     actual_df = pred_fn(input_df)
 
     assert_almost_equal(
@@ -1492,9 +1360,7 @@ def test_ecdfer():
     )
 
     ascending = False
-    pred_fn, data, log = ecdfer(
-        fit_df, ascending, prediction_column, ecdf_column, max_range
-    )
+    pred_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
 
     expected_df = pd.DataFrame(
         {
@@ -1522,22 +1388,16 @@ def test_ecdfer():
 
 
 def test_discrete_ecdfer():
-    fit_df = pd.DataFrame(
-        {"prediction": [0.1, 0.1, 0.3, 0.5, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9]}
-    )
+    fit_df = pd.DataFrame({"prediction": [0.1, 0.1, 0.3, 0.5, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9]})
 
-    input_df = pd.DataFrame(
-        {"prediction": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]}
-    )
+    input_df = pd.DataFrame({"prediction": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0]})
 
     ascending = True
     prediction_column = "prediction"
     ecdf_column = "prediction_ecdf"
     max_range = 1000
 
-    ecdfer_fn, _, _ = ecdfer(
-        fit_df, ascending, prediction_column, ecdf_column, max_range
-    )
+    ecdfer_fn, _, _ = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
     ecdfer_df = ecdfer_fn(input_df)
 
     discrete_ecdfer_fn, _, _ = discrete_ecdfer(
@@ -1557,9 +1417,7 @@ def test_discrete_ecdfer():
     )
 
     ascending = False
-    ecdfer_fn, data, log = ecdfer(
-        fit_df, ascending, prediction_column, ecdf_column, max_range
-    )
+    ecdfer_fn, data, log = ecdfer(fit_df, ascending, prediction_column, ecdf_column, max_range)
     ecdfer_df = ecdfer_fn(input_df)
 
     discrete_ecdfer_fn, _, _ = discrete_ecdfer(
@@ -1598,9 +1456,7 @@ def test_missing_warner():
         }
     )
 
-    p, result, log = missing_warner(
-        train, ["a", "b", "c"], "missing_alert_col_name"
-    )
+    p, result, log = missing_warner(train, ["a", "b", "c"], "missing_alert_col_name")
 
     expected_train_1 = pd.DataFrame(
         {

@@ -18,11 +18,11 @@ def get_best_performing_log(log_list: LogListType, extractor: ExtractorFnType, m
 
 
 def get_used_features(log: Dict) -> List[str]:
-    return first((gen_dict_extract('features', log)))
+    return first((gen_dict_extract("features", log)))
 
 
 def order_feature_importance_avg_from_logs(log: Dict) -> List[str]:
-    d = first(gen_dict_extract('feature_importance', log))
+    d = first(gen_dict_extract("feature_importance", log))
     return sorted(d, key=d.get, reverse=True)
 
 
@@ -40,7 +40,7 @@ def gen_key_avgs_from_dicts(obj: List) -> Dict[str, float]:
 
 
 def gen_dict_extract(key: str, obj: Dict) -> Generator[Any, None, None]:
-    if hasattr(obj, 'items'):
+    if hasattr(obj, "items"):
         for k, v in obj.items():
             if k == key:
                 yield v
@@ -55,5 +55,6 @@ def gen_dict_extract(key: str, obj: Dict) -> Generator[Any, None, None]:
 
 @curry
 def gen_validator_log(eval_log: EvalReturnType, fold_num: int, test_size: int) -> ValidatorReturnType:
-    return {'validator_log': [{'fold_num': fold_num, 'split_log': {'test_size': test_size},
-                               'eval_results': [eval_log]}]}
+    return {
+        "validator_log": [{"fold_num": fold_num, "split_log": {"test_size": test_size}, "eval_results": [eval_log]}]
+    }

@@ -15,11 +15,9 @@ from fklearn.training.utils import log_learner_time, expand_features_encoded
 from fklearn.types import LearnerReturnType
 
 
-def _cv_estimate(model: RegressorMixin,
-                 train_data: pd.DataFrame,
-                 features: List[str],
-                 y: str,
-                 n_splits: int) -> Tuple[pd.Series, List[RegressorMixin]]:
+def _cv_estimate(
+    model: RegressorMixin, train_data: pd.DataFrame, features: List[str], y: str, n_splits: int
+) -> Tuple[pd.Series, List[RegressorMixin]]:
 
     cv = KFold(n_splits=n_splits)
     models = []
@@ -34,20 +32,22 @@ def _cv_estimate(model: RegressorMixin,
 
 
 @curry
-@log_learner_time(learner_name='non_parametric_double_ml_learner')
-def non_parametric_double_ml_learner(df: pd.DataFrame,
-                                     feature_columns: List[str],
-                                     treatment_column: str,
-                                     outcome_column: str,
-                                     debias_model: Union[RegressorMixin, None] = None,
-                                     debias_feature_columns: List[str] = None,
-                                     denoise_model: Union[RegressorMixin, None] = None,
-                                     denoise_feature_columns: List[str] = None,
-                                     final_model: Union[RegressorMixin, None] = None,
-                                     final_model_feature_columns: List[str] = None,
-                                     prediction_column: str = "prediction",
-                                     cv_splits: int = 2,
-                                     encode_extra_cols: bool = True) -> LearnerReturnType:
+@log_learner_time(learner_name="non_parametric_double_ml_learner")
+def non_parametric_double_ml_learner(
+    df: pd.DataFrame,
+    feature_columns: List[str],
+    treatment_column: str,
+    outcome_column: str,
+    debias_model: Union[RegressorMixin, None] = None,
+    debias_feature_columns: List[str] = None,
+    denoise_model: Union[RegressorMixin, None] = None,
+    denoise_feature_columns: List[str] = None,
+    final_model: Union[RegressorMixin, None] = None,
+    final_model_feature_columns: List[str] = None,
+    prediction_column: str = "prediction",
+    cv_splits: int = 2,
+    encode_extra_cols: bool = True,
+) -> LearnerReturnType:
     """
     Fits an Non-Parametric Double/ML Meta Learner for Conditional Average Treatment Effect Estimation. It implements the
     following steps:
@@ -119,45 +119,54 @@ def non_parametric_double_ml_learner(df: pd.DataFrame,
     denoise_model = GradientBoostingRegressor() if denoise_model is None else clone(denoise_model, safe=False)
     final_model = GradientBoostingRegressor() if final_model is None else clone(final_model, safe=False)
 
-    t_hat, mts = _cv_estimate(debias_model, df,
-                              features if debias_feature_columns is None else debias_feature_columns,
-                              treatment_column, cv_splits)
-    y_hat, mys = _cv_estimate(denoise_model, df,
-                              features if denoise_feature_columns is None else denoise_feature_columns,
-                              outcome_column, cv_splits)
+    t_hat, mts = _cv_estimate(
+        debias_model,
+        df,
+        features if debias_feature_columns is None else debias_feature_columns,
+        treatment_column,
+        cv_splits,
+    )
+    y_hat, mys = _cv_estimate(
+        denoise_model,
+        df,
+        features if denoise_feature_columns is None else denoise_feature_columns,
+        outcome_column,
+        cv_splits,
+    )
 
     y_res = df[outcome_column] - y_hat
     t_res = df[treatment_column] - t_hat
 
     final_target = y_res / t_res
-    weights = t_res ** 2
+    weights = t_res**2
     final_model_x = features if final_model_feature_columns is None else final_model_feature_columns
 
-    model_final_fitted = final_model.fit(X=df[final_model_x],
-                                         y=final_target,
-                                         sample_weight=weights)
+    model_final_fitted = final_model.fit(X=df[final_model_x], y=final_target, sample_weight=weights)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         return new_df.assign(**{prediction_column: model_final_fitted.predict(new_df[final_model_x].values)})
 
     p.__doc__ = learner_pred_fn_docstring("non_parametric_double_ml_learner")
 
-    log = {'non_parametric_double_ml_learner': {
-        'features': feature_columns,
-        'debias_feature_columns': debias_feature_columns,
-        'denoise_feature_columns': denoise_feature_columns,
-        'final_model_feature_columns': final_model_feature_columns,
-        'outcome_column': outcome_column,
-        'treatment_column': treatment_column,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sk_version,
-        'feature_importance': None,
-        'training_samples': len(df)},
-        'debias_models': mts,
-        'denoise_models': mys,
-        'cv_splits': cv_splits,
-        'object': model_final_fitted}
+    log = {
+        "non_parametric_double_ml_learner": {
+            "features": feature_columns,
+            "debias_feature_columns": debias_feature_columns,
+            "denoise_feature_columns": denoise_feature_columns,
+            "final_model_feature_columns": final_model_feature_columns,
+            "outcome_column": outcome_column,
+            "treatment_column": treatment_column,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sk_version,
+            "feature_importance": None,
+            "training_samples": len(df),
+        },
+        "debias_models": mts,
+        "denoise_models": mys,
+        "cv_splits": cv_splits,
+        "object": model_final_fitted,
+    }
 
     return p, p(df), log
 

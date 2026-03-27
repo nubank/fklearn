@@ -31,34 +31,31 @@ def aggregate_stop_funcs(*stop_funcs: StopFnType) -> StopFnType:
 
 
 @curry
-def stop_by_iter_num(logs: ListLogListType,
-                     iter_limit: int = 50) -> bool:
+def stop_by_iter_num(logs: ListLogListType, iter_limit: int = 50) -> bool:
     """
-        Checks for logs to see if feature selection should stop
+    Checks for logs to see if feature selection should stop
 
-        Parameters
-        ----------
-        logs : list of list of dict
-            A list of log-like lists of dictionaries evaluations.
+    Parameters
+    ----------
+    logs : list of list of dict
+        A list of log-like lists of dictionaries evaluations.
 
-        iter_limit: int (default 50)
-            Limit of Iterations
+    iter_limit: int (default 50)
+        Limit of Iterations
 
-        Returns
-        ----------
-        stop: bool
-            A boolean whether to stop recursion or not
+    Returns
+    ----------
+    stop: bool
+        A boolean whether to stop recursion or not
     """
 
     return len(logs) >= iter_limit
 
 
 @curry
-def stop_by_no_improvement(logs: ListLogListType,
-                           extractor: ExtractorFnType,
-                           metric_name: str,
-                           early_stop: int = 3,
-                           threshold: float = 0.001) -> bool:
+def stop_by_no_improvement(
+    logs: ListLogListType, extractor: ExtractorFnType, metric_name: str, early_stop: int = 3, threshold: float = 0.001
+) -> bool:
     """
     Checks for logs to see if feature selection should stop
 
@@ -92,17 +89,17 @@ def stop_by_no_improvement(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        [(curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
-         for log in limited_logs[:-1]]
+        [
+            (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
+            for log in limited_logs[:-1]
+        ]
     )
 
 
 @curry
-def stop_by_no_improvement_parallel(logs: ListLogListType,
-                                    extractor: ExtractorFnType,
-                                    metric_name: str,
-                                    early_stop: int = 3,
-                                    threshold: float = 0.001) -> bool:
+def stop_by_no_improvement_parallel(
+    logs: ListLogListType, extractor: ExtractorFnType, metric_name: str, early_stop: int = 3, threshold: float = 0.001
+) -> bool:
     """
     Checks for logs to see if feature selection should stop
 
@@ -138,13 +135,15 @@ def stop_by_no_improvement_parallel(logs: ListLogListType,
     curr_auc = get_avg_metric_from_extractor(limited_logs[-1], extractor, metric_name)
 
     return all(
-        [(curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
-         for log in limited_logs[:-1]])
+        [
+            (curr_auc - get_avg_metric_from_extractor(log, extractor, metric_name)) <= threshold
+            for log in limited_logs[:-1]
+        ]
+    )
 
 
 @curry
-def stop_by_num_features(logs: ListLogListType,
-                         min_num_features: int = 50) -> bool:
+def stop_by_num_features(logs: ListLogListType, min_num_features: int = 50) -> bool:
     """
     Checks for logs to see if feature selection should stop
 
@@ -166,10 +165,9 @@ def stop_by_num_features(logs: ListLogListType,
 
 
 @curry
-def stop_by_num_features_parallel(logs: ListLogListType,
-                                  extractor: ExtractorFnType,
-                                  metric_name: str,
-                                  min_num_features: int = 50) -> bool:
+def stop_by_num_features_parallel(
+    logs: ListLogListType, extractor: ExtractorFnType, metric_name: str, min_num_features: int = 50
+) -> bool:
     """
     Selects the best log out of a list to see if feature selection should stop
 

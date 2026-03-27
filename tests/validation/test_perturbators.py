@@ -1,5 +1,4 @@
-from fklearn.validation.perturbators import \
-    shift_mu, random_noise, nullify, sample_columns, perturbator
+from fklearn.validation.perturbators import shift_mu, random_noise, nullify, sample_columns, perturbator
 
 import pandas as pd
 import numpy as np
@@ -27,7 +26,7 @@ def test_nullify():
 
 
 def test_sample_columns():
-    df = pd.DataFrame(columns=['feature1', 'feature2', 'feature3', 'feature4'])
+    df = pd.DataFrame(columns=["feature1", "feature2", "feature3", "feature4"])
     expected_len = 2
     found = sample_columns(data=df, perc=0.5)
     assert expected_len == len(found)
@@ -35,22 +34,10 @@ def test_sample_columns():
 
 
 def test_perturbator():
-    test_df = pd.DataFrame(
-        {
-            'a': [1, 1, 0],
-            'bb': [2, 0, 0],
-            'target': [0, 1, 2]
-        }
-    )
+    test_df = pd.DataFrame({"a": [1, 1, 0], "bb": [2, 0, 0], "target": [0, 1, 2]})
 
-    expected_df = pd.DataFrame(
-        {
-            'a': [np.nan, np.nan, np.nan],
-            'bb': [2, 0, 0],
-            'target': [0, 1, 2]
-        }
-    )
+    expected_df = pd.DataFrame({"a": [np.nan, np.nan, np.nan], "bb": [2, 0, 0], "target": [0, 1, 2]})
 
-    out_df = perturbator(data=test_df, cols=['a'], corruption_fn=nullify())
+    out_df = perturbator(data=test_df, cols=["a"], corruption_fn=nullify())
 
     assert expected_df.equals(out_df)
