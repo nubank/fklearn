@@ -1,0 +1,11 @@
+apiVersion: workflows.dev/v1alpha1
+kind: TemplateInstance
+metadata:
+  namespace: pipelines
+spec:
+  templateName: python-library-uv-stable
+  input:
+    pythonVersions: ['3.10', '3.11', '3.12', '3.13']
+    runFormatterCheck: "true"
+    runPytestCov: "true"
+    coverageThreshold: "93"

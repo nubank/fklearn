@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.0.0] - 2026-03-27
+- **Breaking Change**
+  - Drop support for Python 3.8 and 3.9. Minimum supported version is now Python 3.10.
+  - Bump numpy to `>=2.1.0,<3` and pandas to `>=2.2.3,<3` for Python 3.13 compatibility.
+  - Rename `test_deps` extra is preserved; legacy `coverage` and `codecov` deps removed from it.
+- **Enhancement**
+  - Add support for Python 3.12 and 3.13.
+  - Migrate build system from setup.py to pyproject.toml with UV package management.
+  - Add `docs` and `demos` extras to pyproject.toml (previously only available via requirements files).
+  - Replace flake8 with ruff for linting and formatting.
+  - Consolidate all tool configs (pytest, mypy, coverage, ruff) into pyproject.toml.
+  - Add `.nu/workflows/ci.yaml` for internal Nubank CI pipeline.
+  - Update GitHub Actions (publish.yaml) to use UV.
+  - Update test_hash_evaluator for numpy 2.x RNG behavior change.
+
 ## [4.0.1] - 2025-02-26
 - **Bug Fix**
   - Fix fn _has_one_unfilled_arg in build_pipeline to correctly check the default value of the parameters
