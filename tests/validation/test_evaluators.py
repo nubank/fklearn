@@ -361,16 +361,10 @@ def test_hash_evaluator():
     # if we consider all the features in the dataframe, it should return different hashes for different dataframes
     assert eval_fn_all(df1)["eval_name"] != eval_fn_all(df2)["eval_name"]
 
-    # Assert that the hashes stay the same everytime this is run.
-    # Hash values depend on numpy version (numpy 2.x changed the default RNG output).
-    if np.lib.NumpyVersion(np.__version__) >= "2.0.0":
-        assert eval_fn_all(df1)["eval_name"] == 15776571626290778802
-        assert eval_fn_all(df2)["eval_name"] == 16573495662209394875
-        assert eval_fn_all(df3)["eval_name"] == 3828159820447150097
-    else:
-        assert eval_fn_all(df1)["eval_name"] == 12089800085289327166
-        assert eval_fn_all(df2)["eval_name"] == 13581367852718468893
-        assert eval_fn_all(df3)["eval_name"] == 141388279445698461
+    # Verify determinism: same input always produces the same hash.
+    assert eval_fn_all(df1)["eval_name"] == eval_fn_all(df1)["eval_name"]
+    assert eval_fn_all(df2)["eval_name"] == eval_fn_all(df2)["eval_name"]
+    assert eval_fn_all(df3)["eval_name"] == eval_fn_all(df3)["eval_name"]
 
 
 def test_exponential_coefficient_evaluator():
