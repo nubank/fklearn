@@ -83,6 +83,7 @@ jobs:
           rm -rf .venv
           uv venv -p ${{ matrix.python-version }} --seed
           uv sync -p ${{ matrix.python-version }} -v --all-extras
+          uv pip install -e .[devel]
       - name: Run tests with coverage
         run: |
           uv run -p ${{ matrix.python-version }} pytest tests/ \
