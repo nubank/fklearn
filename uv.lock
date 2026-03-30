@@ -59,11 +59,6 @@ wheels = [
     { url = "https://pypi.cicd.nubank.world/simple/bleach/6.3.0/bleach-6.3.0-py3-none-any.whl", hash = "sha256:fe10ec77c93ddf3d13a73b035abaac7a9f5e436513864ccdad516693213c65d6" },
 ]
 
-[package.optional-dependencies]
-css = [
-    { name = "tinycss2" },
-]
-
 [[package]]
 name = "catboost"
 version = "1.2.10"
@@ -72,7 +67,7 @@ dependencies = [
     { name = "graphviz" },
     { name = "matplotlib" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "pandas" },
     { name = "plotly" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
@@ -350,7 +345,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://pypi.cicd.nubank.world/simple/contourpy/1.3.3/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880" }
 wheels = [
@@ -524,7 +519,7 @@ wheels = [
 [package.optional-dependencies]
 dataframe = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "pandas" },
     { name = "pyarrow" },
 ]
@@ -540,11 +535,20 @@ wheels = [
 
 [[package]]
 name = "docutils"
-version = "0.21.2"
+version = "0.19"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-sdist = { url = "https://pypi.cicd.nubank.world/simple/docutils/0.21.2/docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/docutils/0.19/docutils-0.19.tar.gz", hash = "sha256:33995a6753c30b7f577febfc2c50411fec6aac7f7ffeb7c4cfe5991072dcf9e6" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/docutils/0.21.2/docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2" },
+    { url = "https://pypi.cicd.nubank.world/simple/docutils/0.19/docutils-0.19-py3-none-any.whl", hash = "sha256:5e1de4d849fee02c63b040a4a3fd567f4ab104defd8a5511fbbc24a8a017efbc" },
+]
+
+[[package]]
+name = "entrypoints"
+version = "0.4"
+source = { registry = "https://pypi.cicd.nubank.world/simple/" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/entrypoints/0.4/entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4" }
+wheels = [
+    { url = "https://pypi.cicd.nubank.world/simple/entrypoints/0.4/entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f" },
 ]
 
 [[package]]
@@ -584,7 +588,7 @@ source = { editable = "." }
 dependencies = [
     { name = "joblib" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "pandas" },
     { name = "scikit-learn", version = "1.7.2", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
     { name = "scikit-learn", version = "1.8.0", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
@@ -663,10 +667,10 @@ requires-dist = [
     { name = "fklearn", extras = ["lgbm", "xgboost", "catboost"], marker = "extra == 'all-models'" },
     { name = "fklearn", extras = ["test-deps", "all"], marker = "extra == 'devel'" },
     { name = "hypothesis", marker = "extra == 'test-deps'", specifier = ">=6.88.3,<7" },
-    { name = "jinja2", marker = "extra == 'docs'", specifier = ">=3,<4" },
+    { name = "jinja2", marker = "extra == 'docs'", specifier = "<3" },
     { name = "joblib", specifier = ">=1.3.2,<2" },
     { name = "lightgbm", marker = "extra == 'lgbm'", specifier = ">=4,<4.6" },
-    { name = "markupsafe", marker = "extra == 'docs'", specifier = ">=2,<3" },
+    { name = "markupsafe", marker = "extra == 'docs'", specifier = "==2.0.1" },
     { name = "matplotlib", marker = "extra == 'demos'", specifier = ">=3.0.2,<4" },
     { name = "mypy", marker = "extra == 'test-deps'", specifier = ">=1.6.1,<2" },
     { name = "nbsphinx", marker = "extra == 'docs'", specifier = ">=0.4.2,<1" },
@@ -678,8 +682,8 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1,<2" },
     { name = "scipy", marker = "extra == 'demos'", specifier = ">=1.2.1,<2" },
     { name = "shap", marker = "extra == 'tools'", specifier = ">=0.43,<0.45" },
-    { name = "sphinx", marker = "extra == 'docs'", specifier = ">=5,<8" },
-    { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=0.4.3,<2" },
+    { name = "sphinx", marker = "extra == 'docs'", specifier = ">=5,<6" },
+    { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=0.4.3,<1" },
     { name = "statsmodels", specifier = ">=0.14.0,<1" },
     { name = "swifter", marker = "extra == 'tools'", specifier = ">=0.24,<2" },
     { name = "toolz", specifier = ">=0.12.0,<1" },
@@ -734,11 +738,11 @@ wheels = [
 
 [[package]]
 name = "fsspec"
-version = "2026.2.0"
+version = "2026.3.0"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-sdist = { url = "https://pypi.cicd.nubank.world/simple/fsspec/2026.2.0/fsspec-2026.2.0.tar.gz", hash = "sha256:6544e34b16869f5aacd5b90bdf1a71acb37792ea3ddf6125ee69a22a53fb8bff" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/fsspec/2026.3.0/fsspec-2026.3.0.tar.gz", hash = "sha256:1ee6a0e28677557f8c2f994e3eea77db6392b4de9cd1f5d7a9e87a0ae9d01b41" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/fsspec/2026.2.0/fsspec-2026.2.0-py3-none-any.whl", hash = "sha256:98de475b5cb3bd66bedd5c4679e87b4fdfe1a3bf4d707b151b3c07e58c9a2437" },
+    { url = "https://pypi.cicd.nubank.world/simple/fsspec/2026.3.0/fsspec-2026.3.0-py3-none-any.whl", hash = "sha256:d2ceafaad1b3457968ed14efa28798162f1638dbb5d2a6868a2db002a5ee39a4" },
 ]
 
 [[package]]
@@ -752,15 +756,15 @@ wheels = [
 
 [[package]]
 name = "hypothesis"
-version = "6.151.9"
+version = "6.151.10"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/hypothesis/6.151.9/hypothesis-6.151.9.tar.gz", hash = "sha256:2f284428dda6c3c48c580de0e18470ff9c7f5ef628a647ee8002f38c3f9097ca" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/hypothesis/6.151.10/hypothesis-6.151.10.tar.gz", hash = "sha256:6c9565af8b4aa3a080b508f66ce9c2a77dd613c7e9073e27fc7e4ef9f45f8a27" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/hypothesis/6.151.9/hypothesis-6.151.9-py3-none-any.whl", hash = "sha256:7b7220585c67759b1b1ef839b1e6e9e3d82ed468cfc1ece43c67184848d7edd9" },
+    { url = "https://pypi.cicd.nubank.world/simple/hypothesis/6.151.10/hypothesis-6.151.10-py3-none-any.whl", hash = "sha256:b0d7728f0c8c2be009f89fcdd6066f70c5439aa0f94adbb06e98261d05f49b05" },
 ]
 
 [[package]]
@@ -804,14 +808,14 @@ wheels = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.6"
+version = "2.11.3"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/jinja2/3.1.6/jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/jinja2/2.11.3/Jinja2-2.11.3.tar.gz", hash = "sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/jinja2/3.1.6/jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67" },
+    { url = "https://pypi.cicd.nubank.world/simple/jinja2/2.11.3/Jinja2-2.11.3-py2.py3-none-any.whl", hash = "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419" },
 ]
 
 [[package]]
@@ -1047,7 +1051,7 @@ version = "4.5.0"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
 ]
@@ -1095,40 +1099,20 @@ wheels = [
 
 [[package]]
 name = "markupsafe"
-version = "2.1.5"
+version = "2.0.1"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-sdist = { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5.tar.gz", hash = "sha256:d283d37a890ba4c1ae73ffadf8046435c76e7bc2247bbb63c00bd1a709c6544b" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1.tar.gz", hash = "sha256:594c67807fb16238b30c44bdf74f36c02cdf22d1c8cda91ef8a0ed8dabf5620a" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:a17a92de5231666cfbe003f0e4b9b3a7ae3afb1ec2845aadc2bacc93ff85febc" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:72b6be590cc35924b02c78ef34b467da4ba07e4e0f0454a2c5907f473fc50ce5" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e61659ba32cf2cf1481e575d0462554625196a1f2fc06a1c777d3f48e8865d46" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2174c595a0d73a3080ca3257b40096db99799265e1c27cc5a610743acd86d62f" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ae2ad8ae6ebee9d2d94b17fb62763125f3f374c25618198f40cbb8b525411900" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:075202fa5b72c86ad32dc7d0b56024ebdbcf2048c0ba09f1cde31bfdd57bcfff" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:598e3276b64aff0e7b3451b72e94fa3c238d452e7ddcd893c3ab324717456bad" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:fce659a462a1be54d2ffcacea5e3ba2d74daa74f30f5f143fe0c58636e355fdd" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-win32.whl", hash = "sha256:d9fad5155d72433c921b782e58892377c44bd6252b5af2f67f16b194987338a4" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp310-cp310-win_amd64.whl", hash = "sha256:bf50cd79a75d181c9181df03572cdce0fbb75cc353bc350712073108cba98de5" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:629ddd2ca402ae6dbedfceeba9c46d5f7b2a61d9749597d4307f943ef198fc1f" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:5b7b716f97b52c5a14bffdf688f971b2d5ef4029127f1ad7a513973cfd818df2" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6ec585f69cec0aa07d945b20805be741395e28ac1627333b1c5b0105962ffced" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b91c037585eba9095565a3556f611e3cbfaa42ca1e865f7b8015fe5c7336d5a5" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7502934a33b54030eaf1194c21c692a534196063db72176b0c4028e140f8f32c" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:0e397ac966fdf721b2c528cf028494e86172b4feba51d65f81ffd65c63798f3f" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:c061bb86a71b42465156a3ee7bd58c8c2ceacdbeb95d05a99893e08b8467359a" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:3a57fdd7ce31c7ff06cdfbf31dafa96cc533c21e443d57f5b1ecc6cdc668ec7f" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-win32.whl", hash = "sha256:397081c1a0bfb5124355710fe79478cdbeb39626492b15d399526ae53422b906" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp311-cp311-win_amd64.whl", hash = "sha256:2b7c57a4dfc4f16f7142221afe5ba4e093e09e728ca65c51f5620c9aaeb9a617" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-macosx_10_9_universal2.whl", hash = "sha256:8dec4936e9c3100156f8a2dc89c4b88d5c435175ff03413b443469c7c8c5f4d1" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:3c6b973f22eb18a789b1460b4b91bf04ae3f0c4234a0a6aa6b0a92f6f7b951d4" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ac07bad82163452a6884fe8fa0963fb98c2346ba78d779ec06bd7a6262132aee" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f5dfb42c4604dddc8e4305050aa6deb084540643ed5804d7455b5df8fe16f5e5" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ea3d8a3d18833cf4304cd2fc9cbb1efe188ca9b5efef2bdac7adc20594a0e46b" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:d050b3361367a06d752db6ead6e7edeb0009be66bc3bae0ee9d97fb326badc2a" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-musllinux_1_1_i686.whl", hash = "sha256:bec0a414d016ac1a18862a519e54b2fd0fc8bbfd6890376898a6c0891dd82e9f" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:58c98fee265677f63a4385256a6d7683ab1832f3ddd1e66fe948d5880c21a169" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-win32.whl", hash = "sha256:8590b4ae07a35970728874632fed7bd57b26b0102df2d2b233b6d9d82f6c62ad" },
-    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.1.5/MarkupSafe-2.1.5-cp312-cp312-win_amd64.whl", hash = "sha256:823b65d8706e32ad2df51ed89496147a42a2a6e01c13cfb6ffb8b1e92bc910bb" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d8446c54dc28c01e5a2dbac5a25f071f6653e6e40f3a8818e8b45d790fe6ef53" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:36bc903cbb393720fad60fc28c10de6acf10dc6cc883f3e24ee4012371399a38" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2d7d807855b419fc2ed3e631034685db6079889a1f01d5d9dac950f764da3dad" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:add36cb2dbb8b736611303cd3bfcee00afd96471b09cda130da3581cbdc56a6d" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:168cd0a3642de83558a5153c8bd34f175a9a6e7f6dc6384b9655d2697312a646" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:4dc8f9fb58f7364b63fd9f85013b780ef83c11857ae79f2feda41e270468dd9b" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:20dca64a3ef2d6e4d5d615a3fd418ad3bde77a47ec8a23d984a12b5b4c74491a" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:cdfba22ea2f0029c9261a4bd07e830a8da012291fbe44dc794e488b6c9bb353a" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-win32.whl", hash = "sha256:99df47edb6bda1249d3e80fdabb1dab8c08ef3975f69aed437cb69d0a5de1e28" },
+    { url = "https://pypi.cicd.nubank.world/simple/markupsafe/2.0.1/MarkupSafe-2.0.1-cp310-cp310-win_amd64.whl", hash = "sha256:e0f138900af21926a02425cf736db95be9f4af72ba1bb21453432a07f6082134" },
 ]
 
 [[package]]
@@ -1142,7 +1126,7 @@ dependencies = [
     { name = "fonttools" },
     { name = "kiwisolver" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyparsing" },
@@ -1194,14 +1178,11 @@ wheels = [
 
 [[package]]
 name = "mistune"
-version = "3.2.0"
+version = "0.8.4"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
-]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/mistune/3.2.0/mistune-3.2.0.tar.gz", hash = "sha256:708487c8a8cdd99c9d90eb3ed4c3ed961246ff78ac82f03418f5183ab70e398a" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/mistune/0.8.4/mistune-0.8.4.tar.gz", hash = "sha256:59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/mistune/3.2.0/mistune-3.2.0-py3-none-any.whl", hash = "sha256:febdc629a3c78616b94393c6580551e0e34cc289987ec6c35ed3f4be42d0eee1" },
+    { url = "https://pypi.cicd.nubank.world/simple/mistune/0.8.4/mistune-0.8.4-py2.py3-none-any.whl", hash = "sha256:88a1051873018da288eee8538d476dffe1262495144b33ecb586c4ab266bb8d4" },
 ]
 
 [[package]]
@@ -1264,27 +1245,28 @@ wheels = [
 
 [[package]]
 name = "nbclient"
-version = "0.10.4"
+version = "0.5.13"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "jupyter-client" },
-    { name = "jupyter-core" },
     { name = "nbformat" },
+    { name = "nest-asyncio" },
     { name = "traitlets" },
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/nbclient/0.10.4/nbclient-0.10.4.tar.gz", hash = "sha256:1e54091b16e6da39e297b0ece3e10f6f29f4ac4e8ee515d29f8a7099bd6553c9" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/nbclient/0.5.13/nbclient-0.5.13.tar.gz", hash = "sha256:40c52c9b5e3c31faecaee69f202b3f53e38d7c1c563de0fadde9d7eda0fdafe8" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/nbclient/0.10.4/nbclient-0.10.4-py3-none-any.whl", hash = "sha256:9162df5a7373d70d606527300a95a975a47c137776cd942e52d9c7e29ff83440" },
+    { url = "https://pypi.cicd.nubank.world/simple/nbclient/0.5.13/nbclient-0.5.13-py3-none-any.whl", hash = "sha256:47ac905af59379913c1f8f541098d2550153cf8dc58553cbe18c702b181518b0" },
 ]
 
 [[package]]
 name = "nbconvert"
-version = "7.17.0"
+version = "6.4.5"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "beautifulsoup4" },
-    { name = "bleach", extra = ["css"] },
+    { name = "bleach" },
     { name = "defusedxml" },
+    { name = "entrypoints" },
     { name = "jinja2" },
     { name = "jupyter-core" },
     { name = "jupyterlab-pygments" },
@@ -1292,14 +1274,14 @@ dependencies = [
     { name = "mistune" },
     { name = "nbclient" },
     { name = "nbformat" },
-    { name = "packaging" },
     { name = "pandocfilters" },
     { name = "pygments" },
+    { name = "testpath" },
     { name = "traitlets" },
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/nbconvert/7.17.0/nbconvert-7.17.0.tar.gz", hash = "sha256:1b2696f1b5be12309f6c7d707c24af604b87dfaf6d950794c7b07acab96dda78" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/nbconvert/6.4.5/nbconvert-6.4.5.tar.gz", hash = "sha256:21163a8e2073c07109ca8f398836e45efdba2aacea68d6f75a8a545fef070d4e" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/nbconvert/7.17.0/nbconvert-7.17.0-py3-none-any.whl", hash = "sha256:4f99a63b337b9a23504347afdab24a11faa7d86b405e5c8f9881cd313336d518" },
+    { url = "https://pypi.cicd.nubank.world/simple/nbconvert/6.4.5/nbconvert-6.4.5-py3-none-any.whl", hash = "sha256:e01d219f55cc79f9701c834d605e8aa3acf35725345d3942e3983937f368ce14" },
 ]
 
 [[package]]
@@ -1335,13 +1317,22 @@ wheels = [
 ]
 
 [[package]]
+name = "nest-asyncio"
+version = "1.6.0"
+source = { registry = "https://pypi.cicd.nubank.world/simple/" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/nest-asyncio/1.6.0/nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe" }
+wheels = [
+    { url = "https://pypi.cicd.nubank.world/simple/nest-asyncio/1.6.0/nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c" },
+]
+
+[[package]]
 name = "numba"
 version = "0.64.0"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "llvmlite" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://pypi.cicd.nubank.world/simple/numba/0.64.0/numba-0.64.0.tar.gz", hash = "sha256:95e7300af648baa3308127b1955b52ce6d11889d16e8cfe637b4f85d2fca52b1" }
 wheels = [
@@ -1430,64 +1421,64 @@ wheels = [
 
 [[package]]
 name = "numpy"
-version = "2.4.3"
+version = "2.4.4"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 resolution-markers = [
     "python_full_version >= '3.12'",
     "python_full_version == '3.11.*'",
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3.tar.gz", hash = "sha256:483a201202b73495f00dbc83796c6ae63137a9bdade074f7648b3e32613412dd" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4.tar.gz", hash = "sha256:2d390634c5182175533585cc89f3608a4682ccb173cc9bb940b2881c8d6f8fa0" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:33b3bf58ee84b172c067f56aeadc7ee9ab6de69c5e800ab5b10295d54c581adb" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:8ba7b51e71c05aa1f9bc3641463cd82308eab40ce0d5c7e1fd4038cbf9938147" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:a1988292870c7cb9d0ebb4cc96b4d447513a9644801de54606dc7aabf2b7d920" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-macosx_14_0_x86_64.whl", hash = "sha256:23b46bb6d8ecb68b58c09944483c135ae5f0e9b8d8858ece5e4ead783771d2a9" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a016db5c5dba78fa8fe9f5d80d6708f9c42ab087a739803c0ac83a43d686a470" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:715de7f82e192e8cae5a507a347d97ad17598f8e026152ca97233e3666daaa71" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:2ddb7919366ee468342b91dea2352824c25b55814a987847b6c52003a7c97f15" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:a315e5234d88067f2d97e1f2ef670a7569df445d55400f1e33d117418d008d52" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-win32.whl", hash = "sha256:2b3f8d2c4589b1a2028d2a770b0fc4d1f332fb5e01521f4de3199a896d158ddd" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-win_amd64.whl", hash = "sha256:77e76d932c49a75617c6d13464e41203cd410956614d0a0e999b25e9e8d27eec" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp311-cp311-win_arm64.whl", hash = "sha256:eb610595dd91560905c132c709412b512135a60f1851ccbd2c959e136431ff67" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:61b0cbabbb6126c8df63b9a3a0c4b1f44ebca5e12ff6997b80fcf267fb3150ef" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:7395e69ff32526710748f92cd8c9849b361830968ea3e24a676f272653e8983e" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:abdce0f71dcb4a00e4e77f3faf05e4616ceccfe72ccaa07f47ee79cda3b7b0f4" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-macosx_14_0_x86_64.whl", hash = "sha256:48da3a4ee1336454b07497ff7ec83903efa5505792c4e6d9bf83d99dc07a1e18" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:32e3bef222ad6b052280311d1d60db8e259e4947052c3ae7dd6817451fc8a4c5" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e7dd01a46700b1967487141a66ac1a3cf0dd8ebf1f08db37d46389401512ca97" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:76f0f283506c28b12bba319c0fab98217e9f9b54e6160e9c79e9f7348ba32e9c" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:737f630a337364665aba3b5a77e56a68cc42d350edd010c345d65a3efa3addcc" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-win32.whl", hash = "sha256:26952e18d82a1dbbc2f008d402021baa8d6fc8e84347a2072a25e08b46d698b9" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-win_amd64.whl", hash = "sha256:65f3c2455188f09678355f5cae1f959a06b778bc66d535da07bf2ef20cd319d5" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp312-cp312-win_arm64.whl", hash = "sha256:2abad5c7fef172b3377502bde47892439bae394a71bc329f31df0fd829b41a9e" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:b346845443716c8e542d54112966383b448f4a3ba5c66409771b8c0889485dd3" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2629289168f4897a3c4e23dc98d6f1731f0fc0fe52fb9db19f974041e4cc12b9" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:bb2e3cf95854233799013779216c57e153c1ee67a0bf92138acca0e429aefaee" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-macosx_14_0_x86_64.whl", hash = "sha256:7f3408ff897f8ab07a07fbe2823d7aee6ff644c097cc1f90382511fe982f647f" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:decb0eb8a53c3b009b0962378065589685d66b23467ef5dac16cbe818afde27f" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d5f51900414fc9204a0e0da158ba2ac52b75656e7dce7e77fb9f84bfa343b4cc" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:6bd06731541f89cdc01b261ba2c9e037f1543df7472517836b78dfb15bd6e476" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:22654fe6be0e5206f553a9250762c653d3698e46686eee53b399ab90da59bd92" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-win32.whl", hash = "sha256:d71e379452a2f670ccb689ec801b1218cd3983e253105d6e83780967e899d687" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-win_amd64.whl", hash = "sha256:0a60e17a14d640f49146cb38e3f105f571318db7826d9b6fef7e4dce758faecd" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313-win_arm64.whl", hash = "sha256:c9619741e9da2059cd9c3f206110b97583c7152c1dc9f8aafd4beb450ac1c89d" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:7aa4e54f6469300ebca1d9eb80acd5253cdfa36f2c03d79a35883687da430875" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-macosx_14_0_arm64.whl", hash = "sha256:d1b90d840b25874cf5cd20c219af10bac3667db3876d9a495609273ebe679070" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-macosx_14_0_x86_64.whl", hash = "sha256:a749547700de0a20a6718293396ec237bb38218049cfce788e08fcb716e8cf73" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:94f3c4a151a2e529adf49c1d54f0f57ff8f9b233ee4d44af623a81553ab86368" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:22c31dc07025123aedf7f2db9e91783df13f1776dc52c6b22c620870dc0fab22" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:148d59127ac95979d6f07e4d460f934ebdd6eed641db9c0db6c73026f2b2101a" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:a97cbf7e905c435865c2d939af3d93f99d18eaaa3cabe4256f4304fb51604349" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-win32.whl", hash = "sha256:be3b8487d725a77acccc9924f65fd8bce9af7fac8c9820df1049424a2115af6c" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-win_amd64.whl", hash = "sha256:1ec84fd7c8e652b0f4aaaf2e6e9cc8eaa9b1b80a537e06b2e3a2fb176eedcb26" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-cp313-cp313t-win_arm64.whl", hash = "sha256:120df8c0a81ebbf5b9020c91439fccd85f5e018a927a39f624845be194a2be02" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:c6b124bfcafb9e8d3ed09130dbee44848c20b3e758b6bbf006e641778927c028" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:76dbb9d4e43c16cf9aa711fcd8de1e2eeb27539dcefb60a1d5e9f12fae1d1ed8" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-macosx_14_0_arm64.whl", hash = "sha256:29363fbfa6f8ee855d7569c96ce524845e3d726d6c19b29eceec7dd555dab152" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-macosx_14_0_x86_64.whl", hash = "sha256:bc71942c789ef415a37f0d4eab90341425a00d538cd0642445d30b41023d3395" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7e58765ad74dcebd3ef0208a5078fba32dc8ec3578fe84a604432950cd043d79" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:8e236dbda4e1d319d681afcbb136c0c4a8e0f1a5c58ceec2adebb547357fe857" },
-    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.3/numpy-2.4.3-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:4b42639cdde6d24e732ff823a3fa5b701d8acad89c4142bc1d0bd6dc85200ba5" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:f983334aea213c99992053ede6168500e5f086ce74fbc4acc3f2b00f5762e9db" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:72944b19f2324114e9dc86a159787333b77874143efcf89a5167ef83cfee8af0" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:86b6f55f5a352b48d7fbfd2dbc3d5b780b2d79f4d3c121f33eb6efb22e9a2015" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-macosx_14_0_x86_64.whl", hash = "sha256:ba1f4fc670ed79f876f70082eff4f9583c15fb9a4b89d6188412de4d18ae2f40" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8a87ec22c87be071b6bdbd27920b129b94f2fc964358ce38f3822635a3e2e03d" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:df3775294accfdd75f32c74ae39fcba920c9a378a2fc18a12b6820aa8c1fb502" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:0d4e437e295f18ec29bc79daf55e8a47a9113df44d66f702f02a293d93a2d6dd" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:6aa3236c78803afbcb255045fbef97a9e25a1f6c9888357d205ddc42f4d6eba5" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-win32.whl", hash = "sha256:30caa73029a225b2d40d9fae193e008e24b2026b7ee1a867b7ee8d96ca1a448e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-win_amd64.whl", hash = "sha256:6bbe4eb67390b0a0265a2c25458f6b90a409d5d069f1041e6aff1e27e3d9a79e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp311-cp311-win_arm64.whl", hash = "sha256:fcfe2045fd2e8f3cb0ce9d4ba6dba6333b8fa05bb8a4939c908cd43322d14c7e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:15716cfef24d3a9762e3acdf87e27f58dc823d1348f765bbea6bef8c639bfa1b" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:23cbfd4c17357c81021f21540da84ee282b9c8fba38a03b7b9d09ba6b951421e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:8b3b60bb7cba2c8c81837661c488637eee696f59a877788a396d33150c35d842" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-macosx_14_0_x86_64.whl", hash = "sha256:e4a010c27ff6f210ff4c6ef34394cd61470d01014439b192ec22552ee867f2a8" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f9e75681b59ddaa5e659898085ae0eaea229d054f2ac0c7e563a62205a700121" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:81f4a14bee47aec54f883e0cad2d73986640c1590eb9bfaaba7ad17394481e6e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:62d6b0f03b694173f9fcb1fb317f7222fd0b0b103e784c6549f5e53a27718c44" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:fbc356aae7adf9e6336d336b9c8111d390a05df88f1805573ebb0807bd06fd1d" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-win32.whl", hash = "sha256:0d35aea54ad1d420c812bfa0385c71cd7cc5bcf7c65fed95fc2cd02fe8c79827" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-win_amd64.whl", hash = "sha256:b5f0362dc928a6ecd9db58868fca5e48485205e3855957bdedea308f8672ea4a" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp312-cp312-win_arm64.whl", hash = "sha256:846300f379b5b12cc769334464656bc882e0735d27d9726568bc932fdc49d5ec" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:08f2e31ed5e6f04b118e49821397f12767934cfdd12a1ce86a058f91e004ee50" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:e823b8b6edc81e747526f70f71a9c0a07ac4e7ad13020aa736bb7c9d67196115" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:4a19d9dba1a76618dd86b164d608566f393f8ec6ac7c44f0cc879011c45e65af" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-macosx_14_0_x86_64.whl", hash = "sha256:d2a8490669bfe99a233298348acc2d824d496dee0e66e31b66a6022c2ad74a5c" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:45dbed2ab436a9e826e302fcdcbe9133f9b0006e5af7168afb8963a6520da103" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c901b15172510173f5cb310eae652908340f8dede90fff9e3bf6c0d8dfd92f83" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:99d838547ace2c4aace6c4f76e879ddfe02bb58a80c1549928477862b7a6d6ed" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:0aec54fd785890ecca25a6003fd9a5aed47ad607bbac5cd64f836ad8666f4959" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-win32.whl", hash = "sha256:07077278157d02f65c43b1b26a3886bce886f95d20aabd11f87932750dfb14ed" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-win_amd64.whl", hash = "sha256:5c70f1cc1c4efbe316a572e2d8b9b9cc44e89b95f79ca3331553fbb63716e2bf" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313-win_arm64.whl", hash = "sha256:ef4059d6e5152fa1a39f888e344c73fdc926e1b2dd58c771d67b0acfbf2aa67d" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:4bbc7f303d125971f60ec0aaad5e12c62d0d2c925f0ab1273debd0e4ba37aba5" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-macosx_14_0_arm64.whl", hash = "sha256:4d6d57903571f86180eb98f8f0c839fa9ebbfb031356d87f1361be91e433f5b7" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-macosx_14_0_x86_64.whl", hash = "sha256:4636de7fd195197b7535f231b5de9e4b36d2c440b6e566d2e4e4746e6af0ca93" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ad2e2ef14e0b04e544ea2fa0a36463f847f113d314aa02e5b402fdf910ef309e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5a285b3b96f951841799528cd1f4f01cd70e7e0204b4abebac9463eecfcf2a40" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:f8474c4241bc18b750be2abea9d7a9ec84f46ef861dbacf86a4f6e043401f79e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:4e874c976154687c1f71715b034739b45c7711bec81db01914770373d125e392" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-win32.whl", hash = "sha256:9c585a1790d5436a5374bac930dad6ed244c046ed91b2b2a3634eb2971d21008" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-win_amd64.whl", hash = "sha256:93e15038125dc1e5345d9b5b68aa7f996ec33b98118d18c6ca0d0b7d6198b7e8" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-cp313-cp313t-win_arm64.whl", hash = "sha256:0dfd3f9d3adbe2920b68b5cd3d51444e13a10792ec7154cd0a2f6e74d4ab3233" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:58c8b5929fcb8287cbd6f0a3fae19c6e03a5c48402ae792962ac465224a629a4" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:eea7ac5d2dce4189771cedb559c738a71512768210dc4e4753b107a2048b3d0e" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-macosx_14_0_arm64.whl", hash = "sha256:51fc224f7ca4d92656d5a5eb315f12eb5fe2c97a66249aa7b5f562528a3be38c" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-macosx_14_0_x86_64.whl", hash = "sha256:28a650663f7314afc3e6ec620f44f333c386aad9f6fc472030865dc0ebb26ee3" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:19710a9ca9992d7174e9c52f643d4272dcd1558c5f7af7f6f8190f633bd651a7" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9b2aec6af35c113b05695ebb5749a787acd63cafc83086a05771d1e1cd1e555f" },
+    { url = "https://pypi.cicd.nubank.world/simple/numpy/2.4.4/numpy-2.4.4-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:f2cf083b324a467e1ab358c105f6cad5ea950f50524668a80c486ff1db24e119" },
 ]
 
 [[package]]
@@ -1514,7 +1505,7 @@ version = "2.3.3"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "python-dateutil" },
     { name = "pytz" },
     { name = "tzdata" },
@@ -1594,7 +1585,7 @@ version = "1.0.2"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://pypi.cicd.nubank.world/simple/patsy/1.0.2/patsy-1.0.2.tar.gz", hash = "sha256:cdc995455f6233e90e22de72c37fcadb344e7586fb83f06696f54d92f8ce74c0" }
 wheels = [
@@ -1781,11 +1772,11 @@ wheels = [
 
 [[package]]
 name = "pygments"
-version = "2.19.2"
+version = "2.20.0"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-sdist = { url = "https://pypi.cicd.nubank.world/simple/pygments/2.19.2/pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/pygments/2.20.0/pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/pygments/2.19.2/pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b" },
+    { url = "https://pypi.cicd.nubank.world/simple/pygments/2.20.0/pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176" },
 ]
 
 [[package]]
@@ -2170,7 +2161,7 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "joblib", marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "threadpoolctl", marker = "python_full_version >= '3.11'" },
 ]
@@ -2270,7 +2261,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://pypi.cicd.nubank.world/simple/scipy/1.17.1/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0" }
 wheels = [
@@ -2324,7 +2315,7 @@ dependencies = [
     { name = "cloudpickle" },
     { name = "numba" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "packaging" },
     { name = "pandas" },
     { name = "scikit-learn", version = "1.7.2", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
@@ -2397,7 +2388,7 @@ wheels = [
 
 [[package]]
 name = "sphinx"
-version = "7.4.7"
+version = "5.1.1"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "alabaster" },
@@ -2416,11 +2407,10 @@ dependencies = [
     { name = "sphinxcontrib-jsmath" },
     { name = "sphinxcontrib-qthelp" },
     { name = "sphinxcontrib-serializinghtml" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/sphinx/7.4.7/sphinx-7.4.7.tar.gz", hash = "sha256:242f92a7ea7e6c5b406fdc2615413890ba9f699114a9c09192d7dfead2ee9cfe" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/sphinx/5.1.1/Sphinx-5.1.1.tar.gz", hash = "sha256:ba3224a4e206e1fbdecf98a4fae4992ef9b24b85ebf7b584bb340156eaf08d89" }
 wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/sphinx/7.4.7/sphinx-7.4.7-py3-none-any.whl", hash = "sha256:c2419e2135d11f1951cd994d6eb18a1835bd8fdd8429f9ca375dc1f3281bd239" },
+    { url = "https://pypi.cicd.nubank.world/simple/sphinx/5.1.1/Sphinx-5.1.1-py3-none-any.whl", hash = "sha256:309a8da80cb6da9f4713438e5b55861877d5d7976b69d87e336733637ea12693" },
 ]
 
 [[package]]
@@ -2495,7 +2485,7 @@ version = "0.14.6"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "packaging" },
     { name = "pandas" },
     { name = "patsy" },
@@ -2543,24 +2533,21 @@ dependencies = [
 sdist = { url = "https://pypi.cicd.nubank.world/simple/swifter/1.4.0/swifter-1.4.0.tar.gz", hash = "sha256:e1bb74476a21b3f07a17aa18c97fdcba8599726bd17da732f09dabcc50e26ba0" }
 
 [[package]]
+name = "testpath"
+version = "0.6.0"
+source = { registry = "https://pypi.cicd.nubank.world/simple/" }
+sdist = { url = "https://pypi.cicd.nubank.world/simple/testpath/0.6.0/testpath-0.6.0.tar.gz", hash = "sha256:2f1b97e6442c02681ebe01bd84f531028a7caea1af3825000f52345c30285e0f" }
+wheels = [
+    { url = "https://pypi.cicd.nubank.world/simple/testpath/0.6.0/testpath-0.6.0-py3-none-any.whl", hash = "sha256:8ada9f80a2ac6fb0391aa7cdb1a7d11cfa8429f693eda83f74dde570fe6fa639" },
+]
+
+[[package]]
 name = "threadpoolctl"
 version = "3.6.0"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 sdist = { url = "https://pypi.cicd.nubank.world/simple/threadpoolctl/3.6.0/threadpoolctl-3.6.0.tar.gz", hash = "sha256:8ab8b4aa3491d812b623328249fab5302a68d2d71745c8a4c719a2fcaba9f44e" }
 wheels = [
     { url = "https://pypi.cicd.nubank.world/simple/threadpoolctl/3.6.0/threadpoolctl-3.6.0-py3-none-any.whl", hash = "sha256:43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb" },
-]
-
-[[package]]
-name = "tinycss2"
-version = "1.4.0"
-source = { registry = "https://pypi.cicd.nubank.world/simple/" }
-dependencies = [
-    { name = "webencodings" },
-]
-sdist = { url = "https://pypi.cicd.nubank.world/simple/tinycss2/1.4.0/tinycss2-1.4.0.tar.gz", hash = "sha256:10c0972f6fc0fbee87c3edb76549357415e94548c1ae10ebccdea16fb404a9b7" }
-wheels = [
-    { url = "https://pypi.cicd.nubank.world/simple/tinycss2/1.4.0/tinycss2-1.4.0-py3-none-any.whl", hash = "sha256:3a49cf47b7675da0b15d0c6e1df8df4ebd96e9394bb905a5775adb0d884c5289" },
 ]
 
 [[package]]
@@ -2688,7 +2675,7 @@ version = "2.1.4"
 source = { registry = "https://pypi.cicd.nubank.world/simple/" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "nvidia-nccl-cu12", marker = "platform_machine != 'aarch64' and sys_platform == 'linux'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.cicd.nubank.world/simple/" }, marker = "python_full_version >= '3.11'" },

@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # ─── Lockfile validation (from python-pr-ci-uv-v3-build) ───
+  # Equivalent of validate-project-structure in the Nu template.
+  # Ensures pyproject.toml exists and uv.lock is in sync.
+  # Old push.yaml: did not have this check.
+  validate-project-structure:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Check project structure
+        run: |
+          if [[ ! -f pyproject.toml ]]; then
+            echo "::error::pyproject.toml not found"
+            exit 1
+          fi
+          uv lock --check
+
+  # ─── Linter (replaces current flake8 job, from python-pr-ci-uv-v3-build) ───
+  # Old: pip install flake8 && flake8 --ignore=E731,W503 --max-line-length=120 src/ tests/
+  # New: ruff check (configured in pyproject.toml [tool.ruff])
+  # Nu template: runLinter defaults to "true".
+  linter:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Lint with ruff
+        run: |
+          uv sync --group dev --no-install-project
+          uv run ruff check src/ tests/
+
+  # ─── Formatter check (from python-pr-ci-uv-v3-build) ───
+  # New job — the old push.yaml didn't have formatting checks.
+  # ruff format replaces black.
+  # Nu template: runFormatterCheck defaults to "false", enabled via input.
+  formatter-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Check formatting with ruff
+        run: |
+          uv sync --group dev --no-install-project
+          uv run ruff format --check src/ tests/
+
+  # ─── Type check (same as current push.yaml mypy step) ───
+  # Old: source env/bin/activate && python3 -m mypy src tests --config mypy.ini
+  # New: uv sync --all-extras && uv run mypy (reads config from pyproject.toml)
+  #
+  # NOTE: The Nu template has runMypy: "false" by default and there is no
+  # runMypy key exposed in python-library-uv-stable's input — so mypy NEVER
+  # runs in the standard Nu template. fklearn's current push.yaml DOES run
+  # mypy (inside the test-suite job, step "Type check"). We keep it as a
+  # separate job for faster feedback. This goes beyond the template default.
+  mypy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Type check with mypy
+        run: |
+          uv sync --all-extras
+          uv run mypy src/ tests/
+
+  # ─── Package build check (replaces current test-packaging job) ───
+  # Old: pip install build twine && python3 -m build && twine check dist/*
+  # New: uv build (twine check not needed — uv validates metadata)
+  test-packaging:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Build package
+        run: uv build
+      - name: Verify package
+        run: |
+          ls -lh dist/
+          echo "Package built successfully"
+
+  # ─── Test suite (replaces current test-suite job, from python-pr-ci-uv-v3-tests) ───
+  # Old: pip install -e .[devel] && pytest --cov-fail-under=93 --cov=src/ tests/
+  # New: uv sync --all-extras && pytest with coverage
+  # Coverage threshold: 93% (matching the current push.yaml)
+  #
+  # NOTE on fail-fast: The Nu template's Tekton matrix has NO fail-fast
+  # concept — all Python versions run independently regardless of failures.
+  # GitHub Actions defaults to fail-fast: true (cancels remaining matrix
+  # jobs when one fails). We set fail-fast: false to match Nu template
+  # behavior and get full visibility into which Python versions pass/fail.
+  #
+  # NOTE on coverage: The Nu template has runPytestCov: "false" and
+  # coverageThreshold: "0" by default — coverage is disabled unless
+  # explicitly configured. fklearn's current push.yaml DOES enforce
+  # --cov-fail-under=93, so we keep it here.
+  test-suite:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Create venv and install dependencies
+        run: |
+          # Match Nu template: explicit venv creation with --seed
+          # --seed installs pip, setuptools, wheel into the venv.
+          # Some packages (e.g. old setup.py-based deps) need setuptools
+          # at install time. Without --seed, the venv only has uv.
+          rm -rf .venv
+          uv venv -p ${{ matrix.python-version }} --seed
+          uv sync -p ${{ matrix.python-version }} -v --all-extras
+      - name: Run tests with coverage
+        run: |
+          uv run -p ${{ matrix.python-version }} pytest tests/ \
+            --showlocals \
+            --cov-fail-under=93 \
+            --cov-report=term \
+            --cov=src/
+
+  # ─── Doc build check (replaces current build-docs job) ───
+  # Old: pip install -e .[devel] && pip install -r docs/requirements.txt &&
+  #      sudo apt-get install pandoc && cd docs/ && make html
+  # New: uv sync with docs extra && make html
+  # Only runs after linter and tests pass (same as current push.yaml:
+  #   "needs: [linter, test-suite]").
+  build-docs:
+    needs: [linter, test-suite]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y pandoc
+          uv sync --extra docs --extra test_deps
+      - name: Build docs
+        run: |
+          cd docs/
+          uv run make html
+
+  # ─── Version bump check (from python-library-pr-check-version-uv-v1) ───
+  # TODO: Implement validate-bump job.
+  # The old push.yaml did not have this check.
+  # See validate_bump_uv.sh in cicd-images/nu-python-builder for reference.
