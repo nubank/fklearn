@@ -90,10 +90,7 @@ testpaths = ["tests"]
 pythonpath = ["./src"]
 
 [tool.coverage.run]
-parallel = true
-concurrency = ["multiprocessing"]
 branch = true
-relative_files = true
 source = ["src/fklearn"]
 
 [tool.coverage.report]
@@ -107,9 +104,6 @@ omit = [
     "*git*",
     "*init*",
     "*version*",
-]
-include = [
-    "*src/fklearn*",
 ]
 
 [tool.mypy]

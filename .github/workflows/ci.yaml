@@ -74,22 +74,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
-      - name: Create venv and install dependencies
-        run: |
-          # Match Nu template: explicit venv creation with --seed
-          # --seed installs pip, setuptools, wheel into the venv.
-          # Some packages (e.g. old setup.py-based deps) need setuptools
-          # at install time. Without --seed, the venv only has uv.
-          rm -rf .venv
-          uv venv -p ${{ matrix.python-version }} --seed
-          uv sync -p ${{ matrix.python-version }} -v --all-extras
+      - name: Install dependencies
+        run: uv sync -p ${{ matrix.python-version }} --all-extras
       - name: Run tests with coverage
         run: |
-          uv run -p ${{ matrix.python-version }} pytest tests/ \
-            --showlocals \
-            --cov-fail-under=93 \
-            --cov-report=term \
-            --cov=src/fklearn
+          uv run -p ${{ matrix.python-version }} pytest \
+            --showlocals --cov --cov-fail-under=93 --cov-report=term
 
   build-docs:
     needs: [linter, test-suite]
