@@ -93,6 +93,8 @@ pythonpath = ["./src"]
 parallel = true
 concurrency = ["multiprocessing"]
 branch = true
+relative_files = true
+source = ["fklearn"]
 
 [tool.coverage.report]
 exclude_lines = [
