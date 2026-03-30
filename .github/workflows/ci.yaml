@@ -89,7 +89,7 @@ jobs:
             --showlocals \
             --cov-fail-under=93 \
             --cov-report=term \
-            --cov=fklearn/
+            --cov=fklearn
 
   build-docs:
     needs: [linter, test-suite]
