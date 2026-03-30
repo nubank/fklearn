@@ -86,11 +86,11 @@ jobs:
           uv pip install -e .[devel]
       - name: Run tests with coverage
         run: |
-          uv run -p ${{ matrix.python-version }} pytest tests/ \
-            --showlocals \
+          uv run -p ${{ matrix.python-version }} python -m pytest \
             --cov-fail-under=93 \
             --cov-report=term \
-            --cov=fklearn
+            --cov=fklearn \
+            tests/
 
   build-docs:
     needs: [linter, test-suite]
