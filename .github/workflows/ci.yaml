@@ -83,14 +83,13 @@ jobs:
           rm -rf .venv
           uv venv -p ${{ matrix.python-version }} --seed
           uv sync -p ${{ matrix.python-version }} -v --all-extras
-          uv pip install -e .[devel]
       - name: Run tests with coverage
         run: |
-          uv run -p ${{ matrix.python-version }} python -m pytest \
+          uv run -p ${{ matrix.python-version }} pytest tests/ \
+            --showlocals \
             --cov-fail-under=93 \
             --cov-report=term \
-            --cov=fklearn \
-            tests/
+            --cov=src/fklearn
 
   build-docs:
     needs: [linter, test-suite]

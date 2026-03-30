@@ -94,7 +94,7 @@ parallel = true
 concurrency = ["multiprocessing"]
 branch = true
 relative_files = true
-source = ["fklearn"]
+source = ["src/fklearn"]
 
 [tool.coverage.report]
 exclude_lines = [
