@@ -1,4 +1,2 @@
-include README.md
-include requirements*.txt
-include conda.txt
-recursive-include src/fklearn/resources *
+include uv.lock
+include pyproject.toml

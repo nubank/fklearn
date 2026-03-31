@@ -9,22 +9,19 @@ version: 2
 sphinx:
   configuration: docs/source/conf.py
 
-# Build documentation with MkDocs
-#mkdocs:
-#  configuration: mkdocs.yml
-
 # Optionally build your docs in additional formats such as PDF and ePub
 formats: all
 
-# Optionally set requirements required to build your docs
+# Install the package with the docs extra (replaces docs/requirements.txt)
 python:
   install:
-    - requirements: docs/requirements.txt
     - method: pip
       path: .
+      extra_requirements:
+        - docs
 
 # Set python and OS version for building docs
 build:
-  os: ubuntu-20.04
+  os: ubuntu-22.04
   tools:
-    python: "3.9"
+    python: "3.12"

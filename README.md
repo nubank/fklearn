@@ -32,13 +32,38 @@ To install via pip:
 pip install fklearn
 ```
 
-You can also install from the source:
+To install with optional dependencies:
 
-```sh
-git clone git@github.com:nubank/fklearn.git
-cd fklearn
-git checkout master
-pip install -e .
+```
+pip install fklearn[lgbm]       # LightGBM support
+pip install fklearn[xgboost]    # XGBoost support
+pip install fklearn[catboost]   # CatBoost support
+pip install fklearn[all_models] # All model backends
+pip install fklearn[all]        # All models + tools
+```
+
+## Development with UV
+
+### Setup
+```bash
+uv sync --extra devel
+```
+
+### Running Tests
+```bash
+uv run pytest --cov=src/
+```
+
+### Linting
+```bash
+uv run ruff check src/ tests/
+uv run ruff format src/ tests/
+```
+
+### Adding Dependencies
+```bash
+uv add <package-name>          # runtime dependency
+uv add --dev <package-name>    # dev dependency
 ```
 
 ## License

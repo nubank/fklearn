@@ -222,3 +222,7 @@ Temporary Items
 
 catboost_info
 cb_model.json
+
+# Migration investigation docs (local reference only)
+docs/numpy2_hash_evaluator_issue.md
+docs/openmp_dependency.md
