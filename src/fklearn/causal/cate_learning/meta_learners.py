@@ -6,11 +6,8 @@ import numpy as np
 import pandas as pd
 from toolz import curry
 
-from fklearn.common_docstrings import (learner_pred_fn_docstring,
-                                       learner_return_docstring)
-from fklearn.exceptions.exceptions import (MissingControlError,
-                                           MissingTreatmentError,
-                                           MultipleTreatmentsError)
+from fklearn.common_docstrings import learner_pred_fn_docstring, learner_return_docstring
+from fklearn.exceptions.exceptions import MissingControlError, MissingTreatmentError, MultipleTreatmentsError
 from fklearn.training.pipeline import build_pipeline
 from fklearn.types import LearnerFnType, LearnerReturnType, PredictFnType
 
@@ -25,18 +22,14 @@ def _get_learner_features(learner: Callable) -> list:
     return inspect.signature(learner).parameters["features"].default
 
 
-def _get_unique_treatments(
-    df: pd.DataFrame, treatment_col: str, control_name: str
-) -> list:
+def _get_unique_treatments(df: pd.DataFrame, treatment_col: str, control_name: str) -> list:
     if control_name not in df[treatment_col].unique():
         raise MissingControlError()
 
     return [col for col in df[treatment_col].unique() if col != control_name]
 
 
-def _filter_by_treatment(
-    df: pd.DataFrame, treatment_col: str, treatment_name: str, control_name: str
-) -> pd.DataFrame:
+def _filter_by_treatment(df: pd.DataFrame, treatment_col: str, treatment_name: str, control_name: str) -> pd.DataFrame:
     treatment_control_values = df[treatment_col].unique()
 
     if control_name not in treatment_control_values:
@@ -45,9 +38,7 @@ def _filter_by_treatment(
     if treatment_name not in treatment_control_values:
         raise MissingTreatmentError()
 
-    treatment_control_df = df.loc[
-        (df[treatment_col] == treatment_name) | (df[treatment_col] == control_name), :
-    ]
+    treatment_control_df = df.loc[(df[treatment_col] == treatment_name) | (df[treatment_col] == control_name), :]
     return treatment_control_df
 
 
@@ -129,17 +120,13 @@ def _simulate_treatment_effect(
     for treatment in treatments:
         learner_fcn = learners[treatment]
 
-        scored_df[
-            f"treatment_{treatment}__{prediction_column}_on_treatment"
-        ] = _predict_by_treatment_flag(
+        scored_df[f"treatment_{treatment}__{prediction_column}_on_treatment"] = _predict_by_treatment_flag(
             df=scored_df,
             learner_fcn=learner_fcn,
             is_treatment=True,
             prediction_column=prediction_column,
         )
-        scored_df[
-            f"treatment_{treatment}__{prediction_column}_on_control"
-        ] = _predict_by_treatment_flag(
+        scored_df[f"treatment_{treatment}__{prediction_column}_on_control"] = _predict_by_treatment_flag(
             df=scored_df,
             learner_fcn=learner_fcn,
             is_treatment=False,
@@ -159,9 +146,7 @@ def _simulate_treatment_effect(
         scored_df[uplift_cols].idxmax(axis=1).values,
     )
     scored_df["suggested_treatment"] = (
-        scored_df["suggested_treatment"]
-        .apply(lambda x: x.replace("__uplift", ""))
-        .values
+        scored_df["suggested_treatment"].apply(lambda x: x.replace("__uplift", "")).values
     )
 
     return scored_df
@@ -257,9 +242,7 @@ def causal_s_classification_learner(
     return p, p(df), log
 
 
-causal_s_classification_learner.__doc__ += learner_return_docstring(
-    "Causal S-Learner Classifier"
-)
+causal_s_classification_learner.__doc__ += learner_return_docstring("Causal S-Learner Classifier")
 
 
 def _simulate_t_learner_treatment_effect(
@@ -279,14 +262,10 @@ def _simulate_t_learner_treatment_effect(
         treatment_fcn = learners[treatment_name]
         treatment_conversion_probability = treatment_fcn(df)[prediction_column].values
 
-        scored_df[
-            f"treatment_{treatment_name}__{prediction_column}_on_treatment"
-        ] = treatment_conversion_probability
+        scored_df[f"treatment_{treatment_name}__{prediction_column}_on_treatment"] = treatment_conversion_probability
 
         uplift_cols.append(f"treatment_{treatment_name}__uplift")
-        scored_df[uplift_cols[-1]] = (
-            treatment_conversion_probability - control_conversion_probability
-        )
+        scored_df[uplift_cols[-1]] = treatment_conversion_probability - control_conversion_probability
 
     scored_df["uplift"] = scored_df[uplift_cols].max(axis=1).values
     scored_df["suggested_treatment"] = np.where(
@@ -295,9 +274,7 @@ def _simulate_t_learner_treatment_effect(
         scored_df[uplift_cols].idxmax(axis=1).values,
     )
     scored_df["suggested_treatment"] = (
-        scored_df["suggested_treatment"]
-        .apply(lambda x: x.replace("__uplift", ""))
-        .values
+        scored_df["suggested_treatment"].apply(lambda x: x.replace("__uplift", "")).values
     )
 
     return scored_df
@@ -334,16 +311,12 @@ def _get_learners(
     learners: Dict[str, Callable] = {}
     logs: Dict[str, dict] = {}
 
-    learner_fcn, _, learner_logs = _get_model_fcn(
-        df, treatment_col, control_name, control_learner
-    )
+    learner_fcn, _, learner_logs = _get_model_fcn(df, treatment_col, control_name, control_learner)
     learners[control_name] = learner_fcn
     logs[control_name] = learner_logs
 
     for treatment_name in unique_treatments:
-        learner_fcn, _, learner_logs = _get_model_fcn(
-            df, treatment_col, treatment_name, treatment_learner
-        )
+        learner_fcn, _, learner_logs = _get_model_fcn(df, treatment_col, treatment_name, treatment_learner)
         learners[treatment_name] = learner_fcn
         logs[treatment_name] = learner_logs
 
@@ -408,9 +381,7 @@ def causal_t_classification_learner(
         learner_transformers = copy.deepcopy(learner_transformers)
         control_learner_pipe = build_pipeline(*[control_learner] + learner_transformers)
 
-        treatment_learner_pipe = build_pipeline(
-            *[treatment_learner] + learner_transformers
-        )
+        treatment_learner_pipe = build_pipeline(*[treatment_learner] + learner_transformers)
     else:
         control_learner_pipe = copy.deepcopy(control_learner)
         treatment_learner_pipe = copy.deepcopy(treatment_learner)
@@ -443,6 +414,4 @@ def causal_t_classification_learner(
     return p, p(df), log
 
 
-causal_t_classification_learner.__doc__ += learner_return_docstring(
-    "Causal T-Learner Classifier"
-)
+causal_t_classification_learner.__doc__ += learner_return_docstring("Causal T-Learner Classifier")

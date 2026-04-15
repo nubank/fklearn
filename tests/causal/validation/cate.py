@@ -19,9 +19,7 @@ DF_INPUT = pd.DataFrame(
 
 
 def test_delta_mean_by_group_and_bin():
-    df_expected = pd.DataFrame(
-        {"prediction_column": [3.0, -4.0], "target_column": [35.0, 10.0]}
-    )
+    df_expected = pd.DataFrame({"prediction_column": [3.0, -4.0], "target_column": [35.0, 10.0]})
 
     df_result = cate_mean_by_bin(
         DF_INPUT,
@@ -55,44 +53,50 @@ def test_cate_mean_by_bin_meta_evaluator():
 
 PROBLEMATIC_PARAMS_PAIRS = [
     (
-        dict(test_data=DF_INPUT,
-             group_column="group_column",
-             control_group_name="3",  # invalid control group name
-             bin_column="bin_column",
-             n_bins=2,
-             allow_dropped_bins=False,
-             inner_evaluator=r2_evaluator,
-             eval_name="cate_r2_evaluator",
-             prediction_column="prediction_column",
-             target_column="target_column"),
-        ValueError
+        dict(
+            test_data=DF_INPUT,
+            group_column="group_column",
+            control_group_name="3",  # invalid control group name
+            bin_column="bin_column",
+            n_bins=2,
+            allow_dropped_bins=False,
+            inner_evaluator=r2_evaluator,
+            eval_name="cate_r2_evaluator",
+            prediction_column="prediction_column",
+            target_column="target_column",
+        ),
+        ValueError,
     ),
     (
-        dict(test_data=DF_INPUT.assign(group_column="2"),  # everyone belongs to the same group
-             group_column="group_column",
-             control_group_name="2",
-             bin_column="bin_column",
-             n_bins=2,
-             allow_dropped_bins=False,
-             inner_evaluator=r2_evaluator,
-             eval_name="cate_r2_evaluator",
-             prediction_column="prediction_column",
-             target_column="target_column"),
-        RuntimeError
+        dict(
+            test_data=DF_INPUT.assign(group_column="2"),  # everyone belongs to the same group
+            group_column="group_column",
+            control_group_name="2",
+            bin_column="bin_column",
+            n_bins=2,
+            allow_dropped_bins=False,
+            inner_evaluator=r2_evaluator,
+            eval_name="cate_r2_evaluator",
+            prediction_column="prediction_column",
+            target_column="target_column",
+        ),
+        RuntimeError,
     ),
     (
-        dict(test_data=DF_INPUT.assign(group_column=["1", "1", "1", "1", "1", "1", "1", "2"]),
-             group_column="group_column",
-             control_group_name="2",
-             bin_column="bin_column",
-             n_bins=3,
-             allow_dropped_bins=False,  # won't be able to create three different bins
-             inner_evaluator=r2_evaluator,
-             eval_name="cate_r2_evaluator",
-             prediction_column="prediction_column",
-             target_column="target_column"),
-        ValueError
-    )
+        dict(
+            test_data=DF_INPUT.assign(group_column=["1", "1", "1", "1", "1", "1", "1", "2"]),
+            group_column="group_column",
+            control_group_name="2",
+            bin_column="bin_column",
+            n_bins=3,
+            allow_dropped_bins=False,  # won't be able to create three different bins
+            inner_evaluator=r2_evaluator,
+            eval_name="cate_r2_evaluator",
+            prediction_column="prediction_column",
+            target_column="target_column",
+        ),
+        ValueError,
+    ),
 ]
 
 

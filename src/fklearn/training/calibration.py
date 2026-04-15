@@ -10,13 +10,15 @@ from fklearn.training.utils import log_learner_time
 
 
 @curry
-@log_learner_time(learner_name='isotonic_calibration_learner')
-def isotonic_calibration_learner(df: pd.DataFrame,
-                                 target_column: str = "target",
-                                 prediction_column: str = "prediction",
-                                 output_column: str = "calibrated_prediction",
-                                 y_min: float = 0.0,
-                                 y_max: float = 1.0) -> LearnerReturnType:
+@log_learner_time(learner_name="isotonic_calibration_learner")
+def isotonic_calibration_learner(
+    df: pd.DataFrame,
+    target_column: str = "target",
+    prediction_column: str = "prediction",
+    output_column: str = "calibrated_prediction",
+    y_min: float = 0.0,
+    y_max: float = 1.0,
+) -> LearnerReturnType:
     """
     Fits a single feature isotonic regression to the dataset.
 
@@ -46,7 +48,7 @@ def isotonic_calibration_learner(df: pd.DataFrame,
 
     """
 
-    clf = IsotonicRegression(y_min=y_min, y_max=y_max, out_of_bounds='clip')
+    clf = IsotonicRegression(y_min=y_min, y_max=y_max, out_of_bounds="clip")
 
     clf.fit(df[prediction_column], df[target_column])
 
@@ -55,14 +57,17 @@ def isotonic_calibration_learner(df: pd.DataFrame,
 
     p.__doc__ = learner_pred_fn_docstring("isotonic_calibration_learner")
 
-    log = {'isotonic_calibration_learner': {
-        'output_column': output_column,
-        'target_column': target_column,
-        'prediction_column': prediction_column,
-        'package': "sklearn",
-        'package_version': sklearn.__version__,
-        'training_samples': len(df)},
-        'object': clf}
+    log = {
+        "isotonic_calibration_learner": {
+            "output_column": output_column,
+            "target_column": target_column,
+            "prediction_column": prediction_column,
+            "package": "sklearn",
+            "package_version": sklearn.__version__,
+            "training_samples": len(df),
+        },
+        "object": clf,
+    }
 
     return p, p(df), log
 
@@ -71,13 +76,15 @@ isotonic_calibration_learner.__doc__ += learner_return_docstring("Isotonic Calib
 
 
 @curry
-@log_learner_time(learner_name='find_thresholds_with_same_risk')
-def find_thresholds_with_same_risk(df: pd.DataFrame,
-                                   sensitive_factor: str,
-                                   unfair_band_column: str,
-                                   model_prediction_output: str,
-                                   target_column: str = "target",
-                                   output_column_name: str = "fair_band") -> LearnerReturnType:
+@log_learner_time(learner_name="find_thresholds_with_same_risk")
+def find_thresholds_with_same_risk(
+    df: pd.DataFrame,
+    sensitive_factor: str,
+    unfair_band_column: str,
+    model_prediction_output: str,
+    target_column: str = "target",
+    output_column_name: str = "fair_band",
+) -> LearnerReturnType:
     """
     Calculate fair calibration, where for each band any sensitive factor group have the same target mean.
 
@@ -107,8 +114,7 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
     """
     sorted_df = df.sort_values(by=model_prediction_output).reset_index(drop=True)
 
-    def _find_thresholds_with_same_risk(df: pd.DataFrame,
-                                        metric_by_band: pd.DataFrame) -> list:
+    def _find_thresholds_with_same_risk(df: pd.DataFrame, metric_by_band: pd.DataFrame) -> list:
         current_threshold = -1
         fair_thresholds = [current_threshold]
 
@@ -135,30 +141,33 @@ def find_thresholds_with_same_risk(df: pd.DataFrame,
 
     for group in sensitive_groups:
         raw_ecdf_with_target = sorted_df[sorted_df[sensitive_factor] == group][[model_prediction_output, target_column]]
-        fair_thresholds[group] = _find_thresholds_with_same_risk(raw_ecdf_with_target,
-                                                                 metric_by_band)
+        fair_thresholds[group] = _find_thresholds_with_same_risk(raw_ecdf_with_target, metric_by_band)
 
     def p(new_df: pd.DataFrame) -> pd.DataFrame:
         new_df_copy = new_df.copy()
-        new_df_copy[output_column_name] = pd.Series(dtype='int')
+        new_df_copy[output_column_name] = pd.Series(dtype="int")
         for group in sensitive_groups:
             group_filter = new_df_copy[sensitive_factor] == group
             n_of_bands = len(fair_thresholds[group]) - 1
             new_df_copy.loc[group_filter, output_column_name] = pd.cut(
                 new_df_copy.loc[group_filter, model_prediction_output],
                 bins=fair_thresholds[group],
-                labels=unfair_bands[:n_of_bands]).astype(float)
+                labels=unfair_bands[:n_of_bands],
+            ).astype(float)
         return new_df_copy[output_column_name]
 
     p.__doc__ = learner_pred_fn_docstring("find_thresholds_with_same_risk")
 
-    log = {'find_thresholds_with_same_risk': {
-        'output_column': output_column_name,
-        'prediction_ecdf': model_prediction_output,
-        'target_column': target_column,
-        'unfair_band_column': unfair_band_column,
-        'sensitive_factor': sensitive_factor,
-        'fair_thresholds': fair_thresholds}}
+    log = {
+        "find_thresholds_with_same_risk": {
+            "output_column": output_column_name,
+            "prediction_ecdf": model_prediction_output,
+            "target_column": target_column,
+            "unfair_band_column": unfair_band_column,
+            "sensitive_factor": sensitive_factor,
+            "fair_thresholds": fair_thresholds,
+        }
+    }
 
     return p, p(df), log
 

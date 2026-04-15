@@ -1,0 +1,132 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fklearn"
+version = "4.1.0"
+description = "Functional machine learning"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10,<3.14"
+authors = [{ name = "Nubank" }]
+# License classifier removed: PEP 639 license expressions (license = "Apache-2.0" above)
+# supersede legacy classifiers. Modern setuptools rejects both being present.
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "joblib>=1.3.2,<2",
+    "numpy>=1.26.0,<2",
+    "pandas>=2.2.3,<3",
+    "scikit-learn>=1,<1.6",
+    "statsmodels>=0.14.0,<1",
+    "toolz>=0.12.0,<1",
+    "tqdm>=4.32.1,<5",
+]
+
+[project.urls]
+Homepage = "https://github.com/nubank/fklearn"
+Documentation = "https://fklearn.readthedocs.io"
+Repository = "https://github.com/nubank/fklearn"
+
+[project.optional-dependencies]
+lgbm = [
+    "lightgbm>=4,<4.6",
+]
+xgboost = [
+    "xgboost>=2,<3",
+]
+catboost = [
+    "catboost>=1.2.2,<2",
+]
+tools = [
+    "shap>=0.43,<0.45",
+    "swifter>=0.24,<2",
+]
+demos = [
+    "matplotlib>=3.0.2,<4",
+    "scipy>=1.2.1,<2",
+]
+docs = [
+    "nbsphinx>=0.4.2,<1",
+    "Sphinx>=5,<6",
+    "sphinx-rtd-theme>=0.4.3,<1",
+    "jinja2<3",
+    "markupsafe==2.0.1",
+]
+all_models = [
+    "fklearn[lgbm,xgboost,catboost]",
+]
+all = [
+    "fklearn[all_models,tools]",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.5",
+    "pytest>=7.4.3,<9",
+    "pytest-cov>=2.6.1,<6",
+    "pytest-xdist>=3.3.1,<4",
+    "mypy>=1.6.1,<2",
+    "hypothesis>=6.88.3,<7",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.pytest.ini_options]
+addopts = "-l --color=yes"
+testpaths = ["tests"]
+pythonpath = ["./src"]
+
+[tool.coverage.run]
+branch = true
+source = ["src/fklearn"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "raise *",
+    "except *",
+]
+omit = [
+    "*test*",
+    "*env*",
+    "*git*",
+    "*init*",
+    "*version*",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = "fklearn.*"
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "fklearn.metrics.pd_extractors.*"
+ignore_errors = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+extend-select = ["E", "F"]
+ignore = ["E731", "E741", "F403"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+line-ending = "auto"
+indent-style = "space"
+docstring-code-format = true
+skip-magic-trailing-comma = false

@@ -10,12 +10,14 @@ from fklearn.types import DateType
 
 
 @curry
-def time_split_dataset(dataset: pd.DataFrame,
-                       train_start_date: DateType,
-                       train_end_date: DateType,
-                       holdout_end_date: DateType,
-                       time_column: str,
-                       holdout_start_date: DateType = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def time_split_dataset(
+    dataset: pd.DataFrame,
+    train_start_date: DateType,
+    train_end_date: DateType,
+    holdout_end_date: DateType,
+    time_column: str,
+    holdout_start_date: DateType = None,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Splits temporal data into a training and testing datasets such that
     all training data comes before the testings one.
@@ -59,26 +61,26 @@ def time_split_dataset(dataset: pd.DataFrame,
 
     holdout_start_date = holdout_start_date if holdout_start_date else train_end_date
 
-    train_set = dataset[
-        (dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
+    train_set = dataset[(dataset[time_column] >= train_start_date) & (dataset[time_column] < train_end_date)]
 
-    test_set = dataset[
-        (dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
+    test_set = dataset[(dataset[time_column] >= holdout_start_date) & (dataset[time_column] < holdout_end_date)]
 
     return train_set, test_set
 
 
 @curry
-def space_time_split_dataset(dataset: pd.DataFrame,
-                             train_start_date: DateType,
-                             train_end_date: DateType,
-                             holdout_end_date: DateType,
-                             split_seed: int,
-                             space_holdout_percentage: float,
-                             space_column: str,
-                             time_column: str,
-                             holdout_space: np.ndarray = None,
-                             holdout_start_date: DateType = None) -> Tuple[pd.DataFrame, ...]:
+def space_time_split_dataset(
+    dataset: pd.DataFrame,
+    train_start_date: DateType,
+    train_end_date: DateType,
+    holdout_end_date: DateType,
+    split_seed: int,
+    space_holdout_percentage: float,
+    space_column: str,
+    time_column: str,
+    holdout_space: np.ndarray = None,
+    holdout_start_date: DateType = None,
+) -> Tuple[pd.DataFrame, ...]:
     """
     Splits panel data using both ID and Time columns, resulting in four datasets
 
@@ -156,9 +158,9 @@ def space_time_split_dataset(dataset: pd.DataFrame,
         train_period_space = np.sort(all_space_in_time)
 
         # randomly sample accounts from the train period to hold out
-        partial_holdout_space = state.choice(train_period_space,
-                                             int(space_holdout_percentage * len(train_period_space)),
-                                             replace=False)
+        partial_holdout_space = state.choice(
+            train_period_space, int(space_holdout_percentage * len(train_period_space)), replace=False
+        )
 
         in_space = pd.Index(all_space_in_time).difference(pd.Index(partial_holdout_space)).values
 
@@ -176,39 +178,40 @@ def space_time_split_dataset(dataset: pd.DataFrame,
 
 
 @curry
-def stratified_split_dataset(dataset: pd.DataFrame, target_column: str, test_size: float,
-                             random_state: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def stratified_split_dataset(
+    dataset: pd.DataFrame, target_column: str, test_size: float, random_state: Optional[int] = None
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-        Splits data into a training and testing datasets such that
-        they maintain the same class ratio of the original dataset.
+    Splits data into a training and testing datasets such that
+    they maintain the same class ratio of the original dataset.
 
-        Parameters
-        ----------
-        dataset : pandas.DataFrame
-            A Pandas' DataFrame with the target column.
-            The model will be trained to predict the target column
-            from the features.
+    Parameters
+    ----------
+    dataset : pandas.DataFrame
+        A Pandas' DataFrame with the target column.
+        The model will be trained to predict the target column
+        from the features.
 
-        target_column : str
-            The name of the target column of `dataset`.
+    target_column : str
+        The name of the target column of `dataset`.
 
-        test_size : float
-            Represent the proportion of the dataset to include in the test split.
-            should be between 0.0 and 1.0.
+    test_size : float
+        Represent the proportion of the dataset to include in the test split.
+        should be between 0.0 and 1.0.
 
-        random_state : int or None, optional (default=None)
-            If int, random_state is the seed used by the random number generator;
-            If None, the random number generator is the RandomState instance used
-            by `np.random`.
+    random_state : int or None, optional (default=None)
+        If int, random_state is the seed used by the random number generator;
+        If None, the random number generator is the RandomState instance used
+        by `np.random`.
 
-        Returns
-        ----------
-        train_set : pandas.DataFrame
-            The train dataset sampled from the full dataset.
+    Returns
+    ----------
+    train_set : pandas.DataFrame
+        The train dataset sampled from the full dataset.
 
-        test_set : pandas.DataFrame
-            The test dataset sampled from the full dataset.
-        """
+    test_set : pandas.DataFrame
+        The test dataset sampled from the full dataset.
+    """
     train_placeholder = np.zeros(len(dataset))
     target = dataset[target_column]
 

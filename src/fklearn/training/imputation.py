@@ -10,11 +10,13 @@ from fklearn.training.utils import log_learner_time
 
 
 @curry
-@log_learner_time(learner_name='imputer')
-def imputer(df: pd.DataFrame,
-            columns_to_impute: List[str],
-            impute_strategy: str = 'median',
-            placeholder_value: Optional[Any] = None) -> LearnerReturnType:
+@log_learner_time(learner_name="imputer")
+def imputer(
+    df: pd.DataFrame,
+    columns_to_impute: List[str],
+    impute_strategy: str = "median",
+    placeholder_value: Optional[Any] = None,
+) -> LearnerReturnType:
     """
     Fits a missing value imputer to the dataset.
 
@@ -46,7 +48,8 @@ def imputer(df: pd.DataFrame,
         columns_imputable = mask_feat_is_na[~mask_feat_is_na].index.values
 
         fill_fn, _, fill_logs = placeholder_imputer(
-            df, columns_to_impute=columns_to_fill, placeholder_value=placeholder_value)
+            df, columns_to_impute=columns_to_fill, placeholder_value=placeholder_value
+        )
     else:
         columns_to_fill = list()
         columns_imputable = columns_to_impute
@@ -58,22 +61,22 @@ def imputer(df: pd.DataFrame,
 
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
         new_data = imp.transform(new_data_set[columns_imputable])
-        new_cols = pd.DataFrame(data=new_data, columns=columns_imputable).to_dict('list')
+        new_cols = pd.DataFrame(data=new_data, columns=columns_imputable).to_dict("list")
         return fill_fn(new_data_set.assign(**new_cols))
 
     p.__doc__ = learner_pred_fn_docstring("imputer")
 
     log = {
-        'imputer': {
-            'impute_strategy': impute_strategy,
-            'placeholder_value': placeholder_value,
-            'columns_to_impute': columns_to_impute,
-            'columns_to_fill': columns_to_fill,
-            'columns_imputable': columns_imputable,
-            'training_proportion_of_nulls': df[columns_to_impute].isnull().mean(axis=0).to_dict(),
-            'statistics': imp.statistics_,
-            'placeholder_imputer_fn': fill_fn,
-            'placeholder_imputer_logs': fill_logs,
+        "imputer": {
+            "impute_strategy": impute_strategy,
+            "placeholder_value": placeholder_value,
+            "columns_to_impute": columns_to_impute,
+            "columns_to_fill": columns_to_fill,
+            "columns_imputable": columns_imputable,
+            "training_proportion_of_nulls": df[columns_to_impute].isnull().mean(axis=0).to_dict(),
+            "statistics": imp.statistics_,
+            "placeholder_imputer_fn": fill_fn,
+            "placeholder_imputer_logs": fill_logs,
         }
     }
 
@@ -84,10 +87,10 @@ imputer.__doc__ += learner_return_docstring("SimpleImputer")
 
 
 @curry
-@log_learner_time(learner_name='placeholder_imputer')
-def placeholder_imputer(df: pd.DataFrame,
-                        columns_to_impute: List[str],
-                        placeholder_value: Any = -999) -> LearnerReturnType:
+@log_learner_time(learner_name="placeholder_imputer")
+def placeholder_imputer(
+    df: pd.DataFrame, columns_to_impute: List[str], placeholder_value: Any = -999
+) -> LearnerReturnType:
     """
     Fills missing values with a fixed value.
 
@@ -106,16 +109,16 @@ def placeholder_imputer(df: pd.DataFrame,
     """
 
     def p(new_data_set: pd.DataFrame) -> pd.DataFrame:
-        new_cols = new_data_set[columns_to_impute].fillna(placeholder_value).to_dict('list')
+        new_cols = new_data_set[columns_to_impute].fillna(placeholder_value).to_dict("list")
         return new_data_set.assign(**new_cols)
 
     p.__doc__ = learner_pred_fn_docstring("placeholder_imputer")
 
     log = {
-        'placeholder_imputer': {
-            'columns_to_impute': columns_to_impute,
-            'training_proportion_of_nulls': df[columns_to_impute].isnull().mean(axis=0).to_dict(),
-            'placeholder_value': placeholder_value
+        "placeholder_imputer": {
+            "columns_to_impute": columns_to_impute,
+            "training_proportion_of_nulls": df[columns_to_impute].isnull().mean(axis=0).to_dict(),
+            "placeholder_value": placeholder_value,
         }
     }
 

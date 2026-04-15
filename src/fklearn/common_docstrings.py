@@ -1,12 +1,15 @@
-
 def learner_pred_fn_docstring(f_name: str, shap: bool = False) -> str:
-    shap_docstring = """
+    shap_docstring = (
+        """
     apply_shap : boolean, optional
         Creates a new output column named "shap" with SHAP values.
         SHAP values can be used for interpretability and feature importances.
         For more information, see https://github.com/slundberg/shap
 
-    """ if shap else ""
+    """
+        if shap
+        else ""
+    )
 
     docstring = """
     Predict function from %s
@@ -29,7 +32,8 @@ def learner_pred_fn_docstring(f_name: str, shap: bool = False) -> str:
 
 
 def learner_return_docstring(model_name: str) -> str:
-    docstring = """
+    docstring = (
+        """
     Returns
     ----------
     p : function pandas.DataFrame -> pandas.DataFrame
@@ -41,7 +45,9 @@ def learner_return_docstring(model_name: str) -> str:
         column with predictions from the model.
 
     log : dict
-        A log-like Dict that stores information of the %s model.""" % model_name
+        A log-like Dict that stores information of the %s model."""
+        % model_name
+    )
 
     return docstring
 

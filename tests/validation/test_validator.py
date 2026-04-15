@@ -67,9 +67,7 @@ def test_validator_iteration(data):
     assert result["eval_results"][0]["some_score"] == 1.2
 
     # test return_eval_fn_on_train=True
-    result = validator_iteration(
-        data, train_index, test_indexes, 1, train_fn, eval_fn, False, True
-    )
+    result = validator_iteration(data, train_index, test_indexes, 1, train_fn, eval_fn, False, True)
     assert result["train_log"]["eval_results"]["some_score"] == 1.2
 
     # test empty dataset warning
@@ -81,9 +79,7 @@ def test_validator_iteration(data):
 
 
 def test_validator():
-    model = lgbm_classification_learner(
-        target="target", features=["feat1", "feat2"], extra_params={"verbose": -1}
-    )
+    model = lgbm_classification_learner(target="target", features=["feat1", "feat2"], extra_params={"verbose": -1})
 
     df_no_gap = pd.DataFrame(
         {
@@ -120,14 +116,10 @@ def test_validator():
         holdout_size=timedelta(30),
     )
 
-    eval_fn_no_gap = evaluators.roc_auc_evaluator(
-        prediction_column="prediction", target_column="target"
-    )
+    eval_fn_no_gap = evaluators.roc_auc_evaluator(prediction_column="prediction", target_column="target")
 
     perturb_fn_train_no_gap = identity
-    perturb_fn_test_no_gap = perturbator(
-        cols=["feat1"], corruption_fn=nullify(perc=0.25)
-    )
+    perturb_fn_test_no_gap = perturbator(cols=["feat1"], corruption_fn=nullify(perc=0.25))
 
     result_no_gap = validator(
         df_no_gap,
@@ -159,9 +151,7 @@ def test_validator():
 
 
 def test_validator_with_gap():
-    model = lgbm_classification_learner(
-        target="target", features=["feat1", "feat2"], extra_params={"verbose": -1}
-    )
+    model = lgbm_classification_learner(target="target", features=["feat1", "feat2"], extra_params={"verbose": -1})
 
     df_gap = pd.DataFrame(
         {
@@ -198,16 +188,12 @@ def test_validator_with_gap():
         holdout_size=timedelta(30),
     )
 
-    eval_fn_gap = evaluators.roc_auc_evaluator(
-        prediction_column="prediction", target_column="target"
-    )
+    eval_fn_gap = evaluators.roc_auc_evaluator(prediction_column="prediction", target_column="target")
 
     with pytest.raises(Exception):
         validator(df_gap, split_fn_gap, model, eval_fn_gap, drop_empty_folds=False)
 
-    validator_log = validator(
-        df_gap, split_fn_gap, model, eval_fn_gap, drop_empty_folds=True
-    )["validator_log"]
+    validator_log = validator(df_gap, split_fn_gap, model, eval_fn_gap, drop_empty_folds=True)["validator_log"]
 
     assert len(validator_log[0]) == 3
     assert len(validator_log[0]["eval_results"]) == 1

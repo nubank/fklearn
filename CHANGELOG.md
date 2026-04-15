@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.1.0] - 2026-03-30
+- **Enhancement**
+  - Add support for Python 3.12 and 3.13.
+  - Drop support for Python 3.8 and 3.9. Minimum supported version is now Python 3.10.
+  - Migrate build system from setup.py to pyproject.toml with UV package management.
+  - Bump minimum numpy from `>=1.24.4` to `>=1.26.0` and pandas from `>=2` to `>=2.2.3`.
+  - Pin scikit-learn to `<1.6` to avoid deprecated `multi_class` parameter removal.
+  - Replace flake8 with ruff for linting and formatting.
+  - Consolidate all tool configs (pytest, mypy, coverage, ruff) into pyproject.toml.
+  - Replace Nu Tekton CI template with GitHub Actions workflow.
+  - Update GitHub Actions (publish.yaml) to use UV.
+  - Add `docs` and `demos` extras to pyproject.toml.
+  - Move `tqdm` to core dependencies (required by `validator.py` at runtime).
+  - Move test deps from optional extras to `[dependency-groups] dev`.
+
 ## [4.0.1] - 2025-02-26
 - **Bug Fix**
   - Fix fn _has_one_unfilled_arg in build_pipeline to correctly check the default value of the parameters

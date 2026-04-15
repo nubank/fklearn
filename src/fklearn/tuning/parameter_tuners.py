@@ -13,15 +13,17 @@ SaveIntermediaryFnType = Callable[[ValidatorReturnType], None]
 
 
 @curry
-def random_search_tuner(space: LogType,
-                        train_set: pd.DataFrame,
-                        param_train_fn: Callable[[LogType], LearnerFnType],
-                        split_fn: SplitterFnType,
-                        eval_fn: EvalFnType,
-                        iterations: int,
-                        random_seed: int = 1,
-                        save_intermediary_fn: SaveIntermediaryFnType = None,
-                        n_jobs: int = 1) -> List[ValidatorReturnType]:
+def random_search_tuner(
+    space: LogType,
+    train_set: pd.DataFrame,
+    param_train_fn: Callable[[LogType], LearnerFnType],
+    split_fn: SplitterFnType,
+    eval_fn: EvalFnType,
+    iterations: int,
+    random_seed: int = 1,
+    save_intermediary_fn: SaveIntermediaryFnType = None,
+    n_jobs: int = 1,
+) -> List[ValidatorReturnType]:
     """
     Runs several training functions with each run taken from the parameter space
 
@@ -33,9 +35,9 @@ def random_search_tuner(space: LogType,
         Example::
 
             space = {
-                'learning_rate': lambda: np.random.choice([1e-3, 1e-2, 1e-1, 1, 10]),
-                'num_estimators': lambda: np.random.choice([20, 100, 150])
-                }
+                "learning_rate": lambda: np.random.choice([1e-3, 1e-2, 1e-1, 1, 10]),
+                "num_estimators": lambda: np.random.choice([20, 100, 150]),
+            }
 
     train_set : pd.DataFrame
         The training set
@@ -46,10 +48,12 @@ def random_search_tuner(space: LogType,
 
             @curry
             def param_train_fn(space, train_set):
-                return xgb_classification_learner(features=["x"],
-                                                  target="target",
-                                                  learning_rate=space["learning_rate"],
-                                                  num_estimators=space["num_estimators"])(train_set)
+                return xgb_classification_learner(
+                    features=["x"],
+                    target="target",
+                    learning_rate=space["learning_rate"],
+                    num_estimators=space["num_estimators"],
+                )(train_set)
 
     split_fn : function(dataset) -> list of folds
         Partially defined split function that takes a dataset and returns
@@ -58,10 +62,9 @@ def random_search_tuner(space: LogType,
         contains validation indexes.
         Examples::
 
-            out_of_time_and_space_splitter(n_splits=n_splits,
-                                           in_time_limit=in_time_limit,
-                                           space_column=space_column,
-                                           time_column=time_column)
+            out_of_time_and_space_splitter(
+                n_splits=n_splits, in_time_limit=in_time_limit, space_column=space_column, time_column=time_column
+            )
 
     eval_fn : function(dataset) -> eval_log
         A base evaluation function that returns a simple evaluation log. Can't be a spited or the extractor won't work.
@@ -104,15 +107,17 @@ def random_search_tuner(space: LogType,
 
 
 @curry
-def grid_search_cv(space: LogType,
-                   train_set: pd.DataFrame,
-                   param_train_fn: Callable[[LogType], LearnerFnType],
-                   split_fn: SplitterFnType,
-                   eval_fn: EvalFnType,
-                   save_intermediary_fn: SaveIntermediaryFnType = None,
-                   load_intermediary_fn: Callable[[str], List[ValidatorReturnType]] = None,
-                   warm_start_file: str = None,
-                   n_jobs: int = 1) -> List[ValidatorReturnType]:
+def grid_search_cv(
+    space: LogType,
+    train_set: pd.DataFrame,
+    param_train_fn: Callable[[LogType], LearnerFnType],
+    split_fn: SplitterFnType,
+    eval_fn: EvalFnType,
+    save_intermediary_fn: SaveIntermediaryFnType = None,
+    load_intermediary_fn: Callable[[str], List[ValidatorReturnType]] = None,
+    warm_start_file: str = None,
+    n_jobs: int = 1,
+) -> List[ValidatorReturnType]:
     """
     Runs several training functions with each run taken from the parameter space
 
@@ -123,10 +128,7 @@ def grid_search_cv(space: LogType,
         Callable must take no parameters and can return always a constant value.
         Example::
 
-            space = {
-                'learning_rate': lambda: [1e-3, 1e-2, 1e-1, 1, 10],
-                'num_estimators': lambda: [20, 100, 150]
-                }
+            space = {"learning_rate": lambda: [1e-3, 1e-2, 1e-1, 1, 10], "num_estimators": lambda: [20, 100, 150]}
 
     train_set : pd.DataFrame
         The training set
@@ -137,10 +139,12 @@ def grid_search_cv(space: LogType,
 
             @curry
             def param_train_fn(space, train_set):
-                return xgb_classification_learner(features=["x"],
-                                                  target="target",
-                                                  learning_rate=space["learning_rate"],
-                                                  num_estimators=space["num_estimators"])(train_set)
+                return xgb_classification_learner(
+                    features=["x"],
+                    target="target",
+                    learning_rate=space["learning_rate"],
+                    num_estimators=space["num_estimators"],
+                )(train_set)
 
     split_fn : function(dataset) -> list of folds
         Partially defined split function that takes a dataset and returns
@@ -149,10 +153,9 @@ def grid_search_cv(space: LogType,
         contains validation indexes.
         Examples::
 
-            out_of_time_and_space_splitter(n_splits=n_splits,
-                                           in_time_limit=in_time_limit,
-                                           space_column=space_column,
-                                           time_column=time_column)
+            out_of_time_and_space_splitter(
+                n_splits=n_splits, in_time_limit=in_time_limit, space_column=space_column, time_column=time_column
+            )
 
     eval_fn : function(dataset) -> eval_log
         A base evaluation function that returns a simple evaluation log. Can't be a spited or the extractor won't work.
@@ -188,7 +191,7 @@ def grid_search_cv(space: LogType,
     def tune_iteration(iter_space: LogType) -> ValidatorReturnType:
         train_fn = param_train_fn(iter_space)
         validator_log = validation_fn(train_data=train_set, split_fn=split_fn, train_fn=train_fn, eval_fn=eval_fn)
-        validator_log['iter_space'] = OrderedDict(sorted(iter_space.items()))
+        validator_log["iter_space"] = OrderedDict(sorted(iter_space.items()))
 
         if save_intermediary_fn is not None:
             save_intermediary_fn(validator_log)
@@ -201,7 +204,7 @@ def grid_search_cv(space: LogType,
 
     if warm_start_file is not None and load_intermediary_fn is not None:
         results = load_intermediary_fn(warm_start_file)
-        computed_combs = set([tuple(log['iter_space'].values()) for log in results])  # type: ignore
+        computed_combs = set([tuple(log["iter_space"].values()) for log in results])  # type: ignore
         combinations = combinations.difference(computed_combs)
 
     return [tune_iteration({k_v[0]: k_v[1] for k_v in zip(sorted_space_keys, comb)}) for comb in combinations]

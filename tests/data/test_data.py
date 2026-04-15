@@ -13,4 +13,4 @@ def test_make_confounded_data():
     traeat_corr = f_rnd.corr().loc[["age", "severity", "sex"], "medication"]
 
     assert f_rnd.shape[1] == df_obs.shape[1] == df_ctf.shape[1]
-    assert np.all(np.abs(traeat_corr) < .05), "assignment is not random!"
+    assert np.all(np.abs(traeat_corr) < 0.05), "assignment is not random!"
