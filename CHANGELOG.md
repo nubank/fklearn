@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.2.1] - 2026-04-22
+- **Enhancement**
+  - Add `valid_dfs` and `callbacks` parameters to `lgbm_regression_learner` for early-stopping and custom LightGBM callback support.
+
 ## [4.2.0] - 2026-04-22
 - **Enhancement**
   - Support `numpy>=1.26,<3` (adds numpy 2.x support).

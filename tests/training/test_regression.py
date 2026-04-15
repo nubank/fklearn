@@ -1,5 +1,6 @@
 from collections import Counter
 
+import lightgbm
 import numpy as np
 import pandas as pd
 
@@ -220,9 +221,10 @@ def test_lgbm_regression_learner():
         extra_params={"max_depth": 2, "seed": 42},
         prediction_column="prediction",
         weight_column="w",
+        callbacks=[lightgbm.log_evaluation()],
     )
 
-    predict_fn, pred_train, log = learner(df_train)
+    predict_fn, pred_train, log = learner(df_train, valid_dfs=[df_train])
 
     pred_test = predict_fn(df_test)
 
