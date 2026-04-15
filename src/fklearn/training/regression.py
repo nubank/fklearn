@@ -459,7 +459,7 @@ def lgbm_regression_learner(
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be binary, if the objective is classification.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -489,6 +489,13 @@ def lgbm_regression_learner(
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+
+    valid_dfs : list of pandas.DataFrame, optional (default=None)
+        A list of datasets to be used for early-stopping during training.
+
+    callbacks : list of callable, or None, optional (default=None)
+        List of callback functions that are applied at each iteration.
+        See Callbacks in LightGBM Python API for more information.
     """
 
     import lightgbm as lgbm
