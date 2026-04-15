@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Optional, List, Union
 
 import numpy as np
 import pandas as pd
@@ -434,7 +434,9 @@ def lgbm_regression_learner(
         extra_params: Dict[str, Any] = None,
         prediction_column: str = "prediction",
         weight_column: str = None,
-        encode_extra_cols: bool = True
+        encode_extra_cols: bool = True,
+        valid_dfs: Optional[List[pd.DataFrame]] = None,
+        callbacks: Optional[List[Callable]] = None,
 ) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
@@ -500,8 +502,16 @@ def lgbm_regression_learner(
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights)
+    valid_sets = [
+        lgbm.Dataset(
+            valid_df[features].values,
+            label=valid_df[target],
+            feature_name=list(map(str, features)),
+            weight=valid_df[weight_column].values if weight_column else None)
+        for valid_df in valid_dfs
+    ] if valid_dfs else [dtrain]
 
-    bst = lgbm.train(params, dtrain, num_estimators)
+    bst = lgbm.train(params, dtrain, num_estimators, valid_sets=valid_sets, callbacks=callbacks)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         col_dict = {prediction_column: bst.predict(new_df[features].values)}
