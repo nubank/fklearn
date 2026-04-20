@@ -18,6 +18,11 @@
     `lightgbm.Dataset` instead of `lightgbm.train` (required by lightgbm >=4). Note:
     a user-supplied `feature_name` is now honored at the Dataset level — previously the
     Dataset always used string-cast `features` regardless of the `feature_name` argument.
+  - `cumulative_effect_curve` (and the gain / relative-gain / `effect_curves` functions
+    that build on it): use a stable sort when ordering rows by prediction score. Previous
+    default (`kind="quicksort"`) produced non-deterministic tie-breaking across numpy
+    versions, which changed the rows included in each cumulative prefix when `prediction`
+    had ties.
 
 ## [4.1.0] - 2026-03-30
 - **Enhancement**
