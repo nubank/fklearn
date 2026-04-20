@@ -1,5 +1,24 @@
 # Changelog
 
+## [4.2.0rc0] - unreleased
+- **Enhancement**
+  - Support `numpy>=1.26,<3` (adds numpy 2.x support).
+  - Bump `scikit-learn` range to `>=1.5,<1.8` (numpy 2.x support starts in 1.5; this
+    raises the minimum supported version, which is a consumer-visible change).
+  - Bump `shap` range to `>=0.43,<0.49`.
+  - Bump `lightgbm` range to `>=4,<5`.
+- **Bug Fix**
+  - `xgb_classification_learner` / `lgbm_classification_learner`: handle SHAP >=0.45
+    returning a single 3D `ndarray` for multiclass `TreeExplainer` (instead of the legacy
+    list of per-class 2D arrays).
+  - `lgbm_classification_learner`: handle SHAP >=0.45 returning a single 2D `ndarray`
+    with a scalar `expected_value` for binary `TreeExplainer` (instead of the legacy
+    `[neg_class, pos_class]` pair).
+  - `lgbm_classification_learner`: pass `feature_name` and `categorical_feature` to
+    `lightgbm.Dataset` instead of `lightgbm.train` (required by lightgbm >=4). Note:
+    a user-supplied `feature_name` is now honored at the Dataset level — previously the
+    Dataset always used string-cast `features` regardless of the `feature_name` argument.
+
 ## [4.1.0] - 2026-03-30
 - **Enhancement**
   - Add support for Python 3.12 and 3.13.

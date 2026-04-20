@@ -207,6 +207,14 @@ def xgb_classification_learner(
             shap_expected_value = explainer.expected_value
 
             if params["objective"] == "multi:softprob":
+                # Compat shim for SHAP multiclass TreeExplainer output:
+                #   - Legacy (SHAP <0.45): list of per-class 2D arrays -> [ndarray(n, f), ...]
+                #   - New    (SHAP >=0.45): single 3D ndarray of shape (n, f, n_classes)
+                # Direction: NEW -> LEGACY. The dict-comprehensions below iterate per class
+                # via enumerate() / zip(), which expects the legacy list-of-arrays shape.
+                if isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+                    shap_values = [shap_values[:, :, i] for i in range(shap_values.shape[2])]
+
                 shap_values_multiclass = {
                     f"shap_values_{class_index}": list(value) for (class_index, value) in enumerate(shap_values)
                 }
@@ -684,10 +692,15 @@ def lgbm_classification_learner(
 
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
+    # lightgbm >=4 requires feature_name/categorical_feature to be passed to Dataset rather
+    # than to train(). Resolve the fklearn "auto" default into actual feature-name strings.
+    resolved_feature_name = list(map(str, features)) if feature_name == "auto" else feature_name
+
     dtrain = lgbm.Dataset(
         df[features].values,
         label=df[target],
-        feature_name=list(map(str, features)),
+        feature_name=resolved_feature_name,
+        categorical_feature=categorical_feature,
         weight=weights,
         init_score=dataset_init_score,
     )
@@ -700,8 +713,6 @@ def lgbm_classification_learner(
         valid_names=valid_names,
         feval=feval,
         init_model=init_model,
-        feature_name=feature_name,
-        categorical_feature=categorical_feature,
         keep_training_booster=keep_training_booster,
         callbacks=callbacks,
     )
@@ -723,6 +734,15 @@ def lgbm_classification_learner(
             shap_expected_value = explainer.expected_value
 
             if is_multiclass_classification:
+                # Compat shim for SHAP multiclass TreeExplainer output:
+                #   - Legacy (SHAP <0.45): list of per-class 2D arrays -> [ndarray(n, f), ...]
+                #   - New    (SHAP >=0.45): single 3D ndarray of shape (n, f, n_classes)
+                # Direction: NEW -> LEGACY. The dict-comprehensions below iterate per class
+                # via enumerate() / zip(), which expects the legacy list-of-arrays shape.
+                # Note: the binary branch below normalizes in the OPPOSITE direction.
+                if isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+                    shap_values = [shap_values[:, :, i] for i in range(shap_values.shape[2])]
+
                 shap_values_multiclass = {
                     f"shap_values_{class_index}": list(value) for (class_index, value) in enumerate(shap_values)
                 }
@@ -735,10 +755,22 @@ def lgbm_classification_learner(
                 shap_output = merge(shap_values_multiclass, shap_expected_value_multiclass)
 
             else:
-                shap_values = list(shap_values[1])
+                # Compat shim for SHAP binary TreeExplainer output:
+                #   - Legacy (SHAP <0.45): list [neg_class_2D, pos_class_2D];
+                #                          expected_value is a 2-element array
+                #   - New    (SHAP >=0.45): single 2D ndarray (positive-class log-odds);
+                #                          expected_value is a scalar
+                # Direction: LEGACY -> NEW. The code below treats shap_values as a single
+                # 2D array and shap_expected_value as a scalar, matching the new format.
+                # Note: this is the OPPOSITE direction from the multiclass branch above.
+                if isinstance(shap_values, list):
+                    shap_values = shap_values[1]
+                    shap_expected_value = shap_expected_value[1]
+
+                shap_values_list = list(shap_values)
                 shap_output = {
-                    "shap_values": shap_values,
-                    "shap_expected_value": np.repeat(shap_expected_value[1], len(shap_values)),
+                    "shap_values": shap_values_list,
+                    "shap_expected_value": np.repeat(shap_expected_value, len(shap_values_list)),
                 }
 
             col_dict = merge(col_dict, shap_output)
