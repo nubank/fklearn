@@ -600,8 +600,6 @@ def test_lgbm_classification_learner_params():
             valid_names=None,
             feval=None,
             init_model=None,
-            feature_name="auto",
-            categorical_feature="auto",
             keep_training_booster=False,
             callbacks=None,
         )
@@ -632,8 +630,146 @@ def test_lgbm_classification_learner_params():
             valid_names=None,
             feval=None,
             init_model=None,
-            feature_name="auto",
-            categorical_feature="auto",
             keep_training_booster=True,
             callbacks=None,
         )
+
+
+def _fit_tiny_xgb_multiclass():
+    df = pd.DataFrame(
+        {
+            "x1": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            "x2": [0, 1, 0, 1, 0, 1],
+            "y": [0, 1, 2, 0, 1, 2],
+        }
+    )
+    learner = xgb_classification_learner(
+        features=["x1", "x2"],
+        target="y",
+        learning_rate=0.1,
+        num_estimators=5,
+        extra_params={"objective": "multi:softprob", "num_class": 3, "max_depth": 2, "seed": 42},
+        prediction_column="prediction",
+    )
+    predict_fn, _, _ = learner(df)
+    return predict_fn, df
+
+
+def _fit_tiny_lgbm_multiclass():
+    df = pd.DataFrame(
+        {
+            "x1": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            "x2": [0, 1, 0, 1, 0, 1],
+            "y": [0, 1, 2, 0, 1, 2],
+        }
+    )
+    learner = lgbm_classification_learner(
+        features=["x1", "x2"],
+        target="y",
+        learning_rate=0.1,
+        num_estimators=5,
+        extra_params={"objective": "multiclass", "num_class": 3, "max_depth": 2, "seed": 42},
+        prediction_column="prediction",
+    )
+    predict_fn, _, _ = learner(df)
+    return predict_fn, df
+
+
+def _fit_tiny_lgbm_binary():
+    df = pd.DataFrame(
+        {
+            "x1": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            "x2": [0, 1, 0, 1, 0, 1],
+            "y": [0, 1, 0, 1, 0, 1],
+        }
+    )
+    learner = lgbm_classification_learner(
+        features=["x1", "x2"],
+        target="y",
+        learning_rate=0.1,
+        num_estimators=5,
+        extra_params={"max_depth": 2, "seed": 42},
+        prediction_column="prediction",
+    )
+    predict_fn, _, _ = learner(df)
+    return predict_fn, df
+
+
+def test_xgb_multiclass_shap_compat_legacy_and_new_formats():
+    """XGB multiclass SHAP must work with both legacy (list of 2D) and new (3D ndarray) outputs."""
+    predict_fn, df = _fit_tiny_xgb_multiclass()
+    n_samples, n_features, n_classes = len(df), 2, 3
+    rng = np.random.default_rng(0)
+
+    legacy_values = [rng.random((n_samples, n_features)) for _ in range(n_classes)]
+    new_values = rng.random((n_samples, n_features, n_classes))
+    expected_value = np.array([0.1, 0.2, 0.3])
+
+    for shap_values in (legacy_values, new_values):
+        mock_explainer = MagicMock()
+        mock_explainer.shap_values.return_value = shap_values
+        mock_explainer.expected_value = expected_value
+
+        with patch("shap.TreeExplainer", return_value=mock_explainer):
+            pred = predict_fn(df, apply_shap=True)
+
+        for i in range(n_classes):
+            assert f"shap_values_{i}" in pred.columns
+            assert f"shap_expected_value_{i}" in pred.columns
+            assert np.vstack(pred[f"shap_values_{i}"]).shape == (n_samples, n_features)
+
+
+def test_lgbm_multiclass_shap_compat_legacy_and_new_formats():
+    """LGBM multiclass SHAP must work with both legacy (list of 2D) and new (3D ndarray) outputs."""
+    predict_fn, df = _fit_tiny_lgbm_multiclass()
+    n_samples, n_features, n_classes = len(df), 2, 3
+    rng = np.random.default_rng(0)
+
+    legacy_values = [rng.random((n_samples, n_features)) for _ in range(n_classes)]
+    new_values = rng.random((n_samples, n_features, n_classes))
+    expected_value = np.array([0.1, 0.2, 0.3])
+
+    for shap_values in (legacy_values, new_values):
+        mock_explainer = MagicMock()
+        mock_explainer.shap_values.return_value = shap_values
+        mock_explainer.expected_value = expected_value
+
+        with patch("shap.TreeExplainer", return_value=mock_explainer):
+            pred = predict_fn(df, apply_shap=True)
+
+        for i in range(n_classes):
+            assert f"shap_values_{i}" in pred.columns
+            assert f"shap_expected_value_{i}" in pred.columns
+            assert np.vstack(pred[f"shap_values_{i}"]).shape == (n_samples, n_features)
+
+
+def test_lgbm_binary_shap_compat_legacy_and_new_formats():
+    """LGBM binary SHAP must work with both legacy (list of 2D, array expected_value) and new
+    (single 2D, scalar expected_value) outputs.
+    """
+    predict_fn, df = _fit_tiny_lgbm_binary()
+    n_samples, n_features = len(df), 2
+    rng = np.random.default_rng(0)
+
+    pos_class_values = rng.random((n_samples, n_features))
+
+    legacy_values = [rng.random((n_samples, n_features)), pos_class_values]
+    legacy_expected = np.array([0.4, 0.6])
+
+    new_values = pos_class_values
+    new_expected = 0.6
+
+    cases = [(legacy_values, legacy_expected), (new_values, new_expected)]
+    for shap_values, expected_value in cases:
+        mock_explainer = MagicMock()
+        mock_explainer.shap_values.return_value = shap_values
+        mock_explainer.expected_value = expected_value
+
+        with patch("shap.TreeExplainer", return_value=mock_explainer):
+            pred = predict_fn(df, apply_shap=True)
+
+        assert "shap_values" in pred.columns
+        assert "shap_expected_value" in pred.columns
+        assert np.vstack(pred["shap_values"]).shape == (n_samples, n_features)
+        assert np.allclose(np.vstack(pred["shap_values"]), pos_class_values)
+        assert np.allclose(pred["shap_expected_value"].to_numpy(), np.repeat(0.6, n_samples))
