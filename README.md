@@ -44,10 +44,20 @@ pip install fklearn[all]        # All models + tools
 
 ## Development with UV
 
+fklearn uses [uv](https://docs.astral.sh/uv/) for dependency management. `uv sync`
+creates a virtual environment, installs all locked dependencies, and installs
+fklearn itself in **editable mode** (the default for uv projects) so changes
+under `src/` are picked up without reinstalling.
+
 ### Setup
 ```bash
-uv sync --extra devel
+uv sync                 # core deps + dev group
+uv sync --all-extras    # also installs lgbm / xgboost / catboost / tools / demos / docs
 ```
+
+The `dev` dependency group (pytest, ruff, mypy, hypothesis) is included by
+default via `tool.uv.default-groups`, so `uv sync` alone is enough for most
+development workflows.
 
 ### Running Tests
 ```bash
@@ -64,6 +74,14 @@ uv run ruff format src/ tests/
 ```bash
 uv add <package-name>          # runtime dependency
 uv add --dev <package-name>    # dev dependency
+```
+
+### Note for Nubank contributors
+
+Regenerate the lockfile with `--default-index https://pypi.org/simple/`:
+
+```bash
+uv lock --default-index https://pypi.org/simple/
 ```
 
 ## License

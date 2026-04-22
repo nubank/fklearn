@@ -583,7 +583,7 @@ wheels = [
 
 [[package]]
 name = "fklearn"
-version = "4.2.0rc0"
+version = "4.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "joblib" },

@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.2.0rc0] - unreleased
+## [4.2.0] - 2026-04-22
 - **Enhancement**
   - Support `numpy>=1.26,<3` (adds numpy 2.x support).
   - Bump `scikit-learn` range to `>=1.5,<1.8` (numpy 2.x support starts in 1.5; this

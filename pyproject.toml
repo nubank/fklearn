@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fklearn"
-version = "4.2.0rc0"
+version = "4.2.0"
 description = "Functional machine learning"
 readme = "README.md"
 license = "Apache-2.0"
