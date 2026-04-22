@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, Optional, List, Union
 
 import numpy as np
 import pandas as pd
@@ -443,6 +443,8 @@ def lgbm_regression_learner(
     prediction_column: str = "prediction",
     weight_column: str = None,
     encode_extra_cols: bool = True,
+    valid_dfs: Optional[List[pd.DataFrame]] = None,
+    callbacks: Optional[List[Callable]] = None,
 ) -> LearnerReturnType:
     """
     Fits an LGBM regressor to the dataset.
@@ -465,7 +467,7 @@ def lgbm_regression_learner(
 
     target : str
         The name of the column in `df` that should be used as target for the model.
-        This column should be binary, since this is a classification model.
+        This column should be binary, if the objective is classification.
 
     learning_rate : float
         Float in the range (0, 1]
@@ -495,6 +497,13 @@ def lgbm_regression_learner(
 
     encode_extra_cols : bool (default: True)
         If True, treats all columns in `df` with name pattern fklearn_feat__col==val` as feature columns.
+
+    valid_dfs : list of pandas.DataFrame, optional (default=None)
+        A list of datasets to be used for early-stopping during training.
+
+    callbacks : list of callable, or None, optional (default=None)
+        List of callback functions that are applied at each iteration.
+        See Callbacks in LightGBM Python API for more information.
     """
 
     import lightgbm as lgbm
@@ -508,8 +517,21 @@ def lgbm_regression_learner(
     features = features if not encode_extra_cols else expand_features_encoded(df, features)
 
     dtrain = lgbm.Dataset(df[features].values, label=df[target], feature_name=list(map(str, features)), weight=weights)
+    valid_sets = (
+        [
+            lgbm.Dataset(
+                valid_df[features].values,
+                label=valid_df[target],
+                feature_name=list(map(str, features)),
+                weight=valid_df[weight_column].values if weight_column else None,
+            )
+            for valid_df in valid_dfs
+        ]
+        if valid_dfs is not None
+        else None
+    )
 
-    bst = lgbm.train(params, dtrain, num_estimators)
+    bst = lgbm.train(params, dtrain, num_estimators, valid_sets=valid_sets, callbacks=callbacks)
 
     def p(new_df: pd.DataFrame, apply_shap: bool = False) -> pd.DataFrame:
         col_dict = {prediction_column: bst.predict(new_df[features].values)}
