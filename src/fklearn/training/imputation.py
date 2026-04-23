@@ -7,6 +7,13 @@ from toolz import curry, identity
 from fklearn.common_docstrings import learner_return_docstring, learner_pred_fn_docstring
 from fklearn.types import LearnerReturnType
 from fklearn.training.utils import log_learner_time
+from fklearn.validation import (
+    validate_columns_exist,
+    validate_nonempty_df,
+    validate_value_in_set,
+)
+
+VALID_IMPUTE_STRATEGIES = ['mean', 'median', 'most_frequent']
 
 
 @curry
@@ -41,6 +48,10 @@ def imputer(
         NA values on training. For transformation, NA values on those features
         will be replaced by `fill_value`.
     """
+    # Input validation
+    validate_nonempty_df(df, context='imputer')
+    validate_columns_exist(df, columns_to_impute, context='imputer')
+    validate_value_in_set(impute_strategy, 'impute_strategy', VALID_IMPUTE_STRATEGIES)
 
     if placeholder_value is not None:
         mask_feat_is_na = df[columns_to_impute].isna().all(axis=0)
