@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.2.2] - 2026-04-24
+- **Internal**
+  - CI: add `validate-bump` job to the `push` workflow, backed by `scripts/validate_bump.sh`, so PRs that modify `src/`, `pyproject.toml` or `uv.lock` must bump the version (and, for non-patch bumps, update the CHANGELOG).
+- **Documentation**
+  - Update `docs/source/contributing.rst` to reflect the UV migration: drop `pip install -e .[devel]`, `flake8`, `mypy.ini` and `requirements.txt` references; replace with `uv sync`, `uv run ruff check/format` and `uv run mypy` instructions; update supported Python range to 3.10–3.13. Add a top-level *Quick start* block and a clearer *Build documentation* section that documents the `pandoc` system requirement (needed by `nbsphinx`) and the required `cd docs/` step.
+  - Update `docs/source/getting_started.rst` to state Python 3.10+ (was 3.8+) and show UV-based install-from-source.
+  - Fix Sphinx docs build: drop the stale `fklearn.version` autodoc entry from `docs/source/api/fklearn.rst` (the `version` submodule was removed in the UV migration — `__version__` now comes from `importlib.metadata`), and set `language = "en"` in `docs/source/conf.py` to silence the Sphinx ≥5 `language = None` warning.
+
 ## [4.2.1] - 2026-04-22
 - **Enhancement**
   - Add `valid_dfs` and `callbacks` parameters to `lgbm_regression_learner` for early-stopping and custom LightGBM callback support.
