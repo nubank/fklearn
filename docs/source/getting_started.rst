@@ -5,25 +5,29 @@ Getting started
 Installation
 ------------
 
-The fklearn library is compatible only with Python 3.8+.
+The fklearn library is compatible only with Python 3.10+.
 In order to install it using pip, run:
 
 .. code-block:: bash
 
     pip install fklearn
 
-You can also install it from the source:
+You can also install it from the source. fklearn uses
+`uv <https://docs.astral.sh/uv/>`_ for dependency management:
 
 .. code-block:: bash
 
     # clone the repository
     git clone -b master https://github.com/nubank/fklearn.git --depth=1
-    
+
     # open the folder
     cd fklearn
-    
-    # install the dependencies
-    pip install -e .
+
+    # install the dependencies (creates .venv, installs fklearn editable)
+    uv sync
+
+    # or, with all optional extras (lgbm, xgboost, catboost, tools, demos, docs):
+    uv sync --all-extras
 
 
 If you are a macOS user, you may need to install some dependencies in order to use LGBM. If you have brew installed,

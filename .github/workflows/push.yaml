@@ -22,6 +22,16 @@ jobs:
           fi
           uv lock --check
 
+  validate-bump:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v7
+      - name: Validate version bump and CHANGELOG
+        run: bash scripts/validate_bump.sh
+
   linter:
     runs-on: ubuntu-24.04
     steps:
@@ -94,8 +104,3 @@ jobs:
         run: |
           cd docs/
           uv run make html
-
-  # ─── Version bump check (from python-library-pr-check-version-uv-v1) ───
-  # TODO: Implement validate-bump job.
-  # The old push.yaml did not have this check.
-  # See validate_bump_uv.sh in cicd-images/nu-python-builder for reference.

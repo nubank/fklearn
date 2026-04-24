@@ -47,34 +47,39 @@ This will create a folder called ``fklearn`` and will connect to the upstream(ma
 Development environment
 -----------------------
 
-We recommend you to create a virtual environment before starting to work with the code, after that you can ensure that everything is working fine by running all tests locally before start writing any new code.
+fklearn uses `uv <https://docs.astral.sh/uv/>`_ for dependency and virtual-environment management.
+``uv sync`` creates an isolated ``.venv`` in the project root, installs all locked
+dependencies, and installs fklearn itself in editable mode — so changes under
+``src/`` are picked up without reinstalling.
 
-Creating the virtual environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install uv
+~~~~~~~~~~
+
+Follow the `uv installation guide <https://docs.astral.sh/uv/getting-started/installation/>`_,
+for example:
 
 .. code-block:: bash
 
-  # Use an ENV_DIR of you choice. We are using ~/venvs
-  python3 -m venv ~/venvs/fklearn-dev
-  source ~/venvs/fklearn-dev/activate
+  curl -LsSf https://astral.sh/uv/install.sh | sh
 
-Install the requirements
+Install the dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-This command will install all the test dependencies. To install the package you can follow the `installation instructions <https://fklearn.readthedocs.io/en/latest/getting_started.html#installation>`_.
+From the repository root:
 
 .. code-block:: bash
 
-  python3 -m pip install -qe .[devel]
+  uv sync                 # core deps + dev group (pytest, ruff, mypy, hypothesis)
+  uv sync --all-extras    # also installs lgbm / xgboost / catboost / tools / demos / docs
 
 First testing
 ~~~~~~~~~~~~~
 
-The following command should run all tests, if every test pass, you should be ready to start developing new stuff
+The following command should run all tests. If every test passes, you should be ready to start developing new stuff:
 
 .. code-block:: bash
 
-  python3 -m pytest tests/
+  uv run pytest tests/
 
 Creating a development branch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -106,28 +111,26 @@ In this session we'll guide you on how to contribute with the code. This is a gu
 Code standards
 --------------
 
-This project is compatible only with python 3.8 to 3.11 and follows the `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_
-And we use this `import formatting <https://google.github.io/styleguide/pyguide.html?showone=Imports_formatting#313-imports-formatting>`_
+This project is compatible with Python 3.10 to 3.13 and follows the
+`pep8 style <https://www.python.org/dev/peps/pep-0008/>`_, and we use this
+`import formatting <https://google.github.io/styleguide/pyguide.html?showone=Imports_formatting#313-imports-formatting>`_.
 
-In order to check if your code is following our codestyle, you can run from the root directory of the repo the next commands:
-
-.. code-block:: bash
-
-  python3 -m pip install -q flake8
-  python3 -m flake8 \
-    --ignore=E731,W503 \
-    --filename=\*.py \
-    --exclude=__init__.py \
-    --show-source \
-    --statistics \
-    --max-line-length=120 \
-    src/ tests/
-
-We also use mypy for type checking, which you can run with:
+We use `ruff <https://docs.astral.sh/ruff/>`_ for both linting and formatting, with
+configuration living under ``[tool.ruff]`` in ``pyproject.toml``. From the root
+directory of the repo you can run:
 
 .. code-block:: bash
 
-  python3 -m mypy src tests --config mypy.ini
+  uv run ruff check src/ tests/          # lint
+  uv run ruff format --check src/ tests/ # check formatting (CI mode)
+  uv run ruff format src/ tests/         # apply formatting
+
+We also use mypy for type checking (configuration under ``[tool.mypy]`` in
+``pyproject.toml``):
+
+.. code-block:: bash
+
+  uv run mypy src/ tests/
 
 Run tests
 ---------
@@ -137,13 +140,13 @@ After you finish your feature development or bug fix, you should run your tests,
 
 .. code-block:: bash
 
-  python3 -m pytest tests/
+  uv run pytest tests/
 
 Or if you want to run only one test:
 
 .. code-block:: bash
 
-  python3 -m pytest tests/test-file-name.py::test_method_name
+  uv run pytest tests/test-file-name.py::test_method_name
 
 
 You must write tests for every feature **always**, you can look at the other tests to have a better idea how we implement them.
@@ -153,7 +156,7 @@ Document your code
 ------------------
 
 All methods should have type annotations, this allow us to know what that method expect as parameters, and what is the expected output.
-You can learn more about it in `typing docs <https://docs.python.org/3.8/library/typing.html>`_
+You can learn more about it in `typing docs <https://docs.python.org/3/library/typing.html>`_
 
 To document your code you should add docstrings, all methods with docstring will appear in this documentation's api file.
 If you created a new file, you may need to add it to the ``api.rst`` following the structure
@@ -213,13 +216,32 @@ When you make changes in the docs, please make sure, we still be able to build i
 Build documentation
 -------------------
 
-From ``docs/`` folder, install `requirements.txt` and run
+Docs dependencies are declared as the ``docs`` extra in ``pyproject.toml``. Building
+also requires `pandoc <https://pandoc.org/installing.html>`_ on your system for the
+notebook-based examples (``nbsphinx``) — ``uv`` cannot provide this.
+
+On macOS you can get it (together with ``libomp``) via the repo's ``Brewfile``:
 
 .. code-block:: bash
 
-  make html
+  brew bundle
 
-This command will build the documentation inside ``docs/build/html`` and you can check locally how it looks, and if everything worked.
+On Debian/Ubuntu:
+
+.. code-block:: bash
+
+  sudo apt-get install -y pandoc
+
+Then install the docs extra and build the HTML. The ``Makefile`` lives in ``docs/``,
+so you must ``cd`` there first:
+
+.. code-block:: bash
+
+  uv sync --extra docs
+  cd docs/
+  uv run make html
+
+This will build the documentation inside ``docs/build/html`` where you can check locally how it looks.
 
 Send your changes to Fklearn repo
 =================================
@@ -295,16 +317,20 @@ Use Semantic versioning to set library versions, more info: `semver.org <https:/
 
 (from semver.org summary)
 
-You don't need to set the version in your PR, we'll take care of this when we decide to release a new version.
-Today the process is:
+If your PR changes code under ``src/``, ``pyproject.toml`` or ``uv.lock``, you are expected to bump
+the ``version`` in ``pyproject.toml`` and — for minor/major bumps — add a matching section to
+``CHANGELOG.md``. This is enforced in CI by the ``validate-bump`` job
+(``scripts/validate_bump.sh``), which follows semver rules:
 
-- Create a new ``milestone`` X.Y.Z (maintainers only)
-- Some PR/issues are attributed to this new milestone
-- Merge all the related PRs (maintainers only)
-- Create a new PR: ``Bump package to X.Y.Z`` This PR update the version and the change log (maintainers only)
-- Create a tag ``X.Y.Z`` (maintainers only)
+- Patch bump (``X.Y.Z`` → ``X.Y.Z+1``) for backwards-compatible bug fixes.
+- Minor bump (``X.Y.Z`` → ``X.Y+1.0``) for backwards-compatible new functionality (requires a CHANGELOG entry).
+- Major bump (``X.Y.Z`` → ``X+1.0.0``) for incompatible API changes (requires a CHANGELOG entry).
 
-This last step will trigger the CI to build the package and send the version to pypi
+Release process (maintainers only):
+
+- Create a new ``milestone`` X.Y.Z
+- Attribute PRs/issues to that milestone and merge them
+- Once the target set of PRs is merged, cut a release by creating a tag ``X.Y.Z``
 
 When we add new functionality, the past version will be moved to another branch. For example, if we're at version ``1.13.7`` and a new functionality is implemented,
 we create a new branch ``1.13.x``, and protect it(this way we can't delete it), the new code is merged to master branch, and them we create the tag ``1.14.0``

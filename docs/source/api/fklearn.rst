@@ -26,14 +26,6 @@ fklearn.common\_docstrings module
     :undoc-members:
     :show-inheritance:
 
-fklearn.version module
-----------------------
-
-.. automodule:: fklearn.version
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
