@@ -2,7 +2,7 @@
 
 ## [4.2.2] - 2026-04-24
 - **Internal**
-  - CI: add `validate-bump` job to the `push` workflow, backed by `scripts/validate_bump.sh`, so PRs that modify `src/`, `pyproject.toml` or `uv.lock` must bump the version (and, for non-patch bumps, update the CHANGELOG).
+  - CI: add `validate-bump` job to the `push` workflow, backed by `scripts/validate_bump.sh`, so PRs that modify `src/`, `pyproject.toml` or `uv.lock` must bump the version (and, for non-patch bumps, update the CHANGELOG). `get_default_branch` falls back through `git symbolic-ref` → `$GITHUB_BASE_REF` → `git remote show origin`, so the script works locally (where `git clone` sets `origin/HEAD`) and in GitHub Actions (where `actions/checkout@v6` does not).
 - **Documentation**
   - Update `docs/source/contributing.rst` to reflect the UV migration: drop `pip install -e .[devel]`, `flake8`, `mypy.ini` and `requirements.txt` references; replace with `uv sync`, `uv run ruff check/format` and `uv run mypy` instructions; update supported Python range to 3.10–3.13. Add a top-level *Quick start* block and a clearer *Build documentation* section that documents the `pandoc` system requirement (needed by `nbsphinx`) and the required `cd docs/` step.
   - Update `docs/source/getting_started.rst` to state Python 3.10+ (was 3.8+) and show UV-based install-from-source.

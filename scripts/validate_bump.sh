@@ -21,8 +21,23 @@ extract_version() {
 
 get_default_branch() {
     local ref="refs/remotes/origin/"
-    git symbolic-ref "${ref}HEAD" | sed "s@^${ref}@@"
-    # Alternative is "git remote show origin", but it takes ~2 s
+    local value
+
+    # 1) Local symbolic-ref — set by `git clone`, but NOT by actions/checkout.
+    if value="$(git symbolic-ref "${ref}HEAD" 2>/dev/null)"; then
+        echo "${value#${ref}}"
+        return
+    fi
+
+    # 2) GitHub Actions on a pull_request event exposes the base branch here.
+    if [[ -n "${GITHUB_BASE_REF:-}" ]]; then
+        echo "${GITHUB_BASE_REF}"
+        return
+    fi
+
+    # 3) Fallback: ask the remote (needs network, takes ~1-2 s).
+    git remote show origin 2>/dev/null \
+        | awk '/HEAD branch/ {print $NF}'
 }
 
 parent_branch="$(get_default_branch)"
