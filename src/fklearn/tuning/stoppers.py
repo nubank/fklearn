@@ -153,7 +153,7 @@ def stop_by_num_features(logs: ListLogListType, min_num_features: int = 50) -> b
         A list of log-like lists of dictionaries evaluations.
 
     min_num_features: int (default 50)
-        The minimun number of features the model can have before stopping
+        The minimum number of features the model can have before stopping
 
     Returns
     -------
@@ -183,7 +183,7 @@ def stop_by_num_features_parallel(
         String with the name of the column that refers to the metric column to be extracted
 
     min_num_features: int (default 50)
-        The minimun number of features the model can have before stopping
+        The minimum number of features the model can have before stopping
 
     Returns
     ----------
