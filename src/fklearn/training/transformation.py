@@ -69,7 +69,7 @@ def capper(df: pd.DataFrame, columns_to_cap: List[str], precomputed_caps: Dict[s
         A Pandas' DataFrame that must contain `columns_to_cap` columns.
 
     columns_to_cap : list of str
-        A list os column names that should be caped.
+        A list of column names that should be capped.
 
     precomputed_caps : dict
         A dictionary on the format {"column_name" : cap_value}.
@@ -103,9 +103,9 @@ def floorer(
 ) -> LearnerReturnType:
     """
     Learns the minimum value for each of the `columns_to_floor`
-    and used that as the floot for those columns. If precomputed floors
+    and used that as the floor for those columns. If precomputed floors
     are passed, the function uses that as the cap value instead of
-    computing the minimun.
+    computing the minimum.
 
     Parameters
     ----------
@@ -114,7 +114,7 @@ def floorer(
         A Pandas' DataFrame that must contain `columns_to_floor` columns.
 
     columns_to_floor : list of str
-        A list os column names that should be floored.
+        A list of column names that should be floored.
 
     precomputed_floors : dict
         A dictionary on the format {"column_name" : floor_value}
