@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.2.3] - 2026-06-10
+- **Enhancement**
+  - Relax `toolz` requirement: drop both the lower (`>=0.12.0`) and upper (`<1`) bounds (now declared simply as `toolz`). `fklearn` only relies on stable `toolz` APIs (`curry`, `compose`, `pipe`, `merge`, `assoc`, etc.) that are unchanged across `0.x` and `1.x`, so the previous cap was unnecessarily restrictive for downstream consumers. The locked version moves from `0.12.1` to `1.1.0`.
+- **Internal**
+  - Refresh `uv.lock` (`uv lock --upgrade`) against the new `toolz` spec; transitive dev / docs / extras dependencies are picked up at their latest compatible versions.
+
 ## [4.2.2] - 2026-04-24
 - **Internal**
   - CI: add `validate-bump` job to the `push` workflow, backed by `scripts/validate_bump.sh`, so PRs that modify `src/`, `pyproject.toml` or `uv.lock` must bump the version (and, for non-patch bumps, update the CHANGELOG). `get_default_branch` falls back through `git symbolic-ref` → `$GITHUB_BASE_REF` → `git remote show origin`, so the script works locally (where `git clone` sets `origin/HEAD`) and in GitHub Actions (where `actions/checkout@v6` does not).

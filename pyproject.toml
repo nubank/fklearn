@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fklearn"
-version = "4.2.2"
+version = "4.2.3"
 description = "Functional machine learning"
 readme = "README.md"
 license = "Apache-2.0"
@@ -25,7 +25,7 @@ dependencies = [
     "pandas>=2.2.3,<3",
     "scikit-learn>=1.5,<1.8",
     "statsmodels>=0.14.0,<1",
-    "toolz>=0.12.0,<1",
+    "toolz",
     "tqdm>=4.32.1,<5",
 ]
 
