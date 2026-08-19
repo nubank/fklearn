@@ -55,7 +55,7 @@ def imputer(
         columns_imputable = columns_to_impute
         fill_fn, _, fill_logs = identity, None, dict()
 
-    imp = SimpleImputer(strategy=impute_strategy)
+    imp = SimpleImputer(strategy=impute_strategy, keep_empty_features=True)
 
     imp.fit(df[columns_imputable].values)
 
