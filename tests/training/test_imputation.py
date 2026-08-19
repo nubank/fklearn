@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from fklearn.training.imputation import imputer, placeholder_imputer
 
@@ -30,24 +31,23 @@ def test_imputer_with_fill_value():
     assert expected.equals(pred_fn(df))
 
 
-def test_imputer_all_na_column_without_placeholder():
+@pytest.mark.parametrize("impute_strategy", ["mean", "median", "most_frequent"])
+def test_imputer_all_na_column_without_placeholder(impute_strategy):
     # Regression test for #124: an entirely-NaN column in `columns_to_impute`
     # used to crash `imputer` with the default `placeholder_value=None`, because
     # SimpleImputer silently dropped the empty feature and the output no longer
     # matched `columns_imputable`. It should instead keep the column and impute a
-    # default value (0.0).
+    # default value (0.0). This holds for every non-constant strategy.
     input_df = pd.DataFrame({"col1": [10, 13, 10], "col2": [None, None, None]})
 
     input_df2 = pd.DataFrame({"col1": [10, None], "col2": [None, 100]})
 
-    expected1 = pd.DataFrame({"col1": [10.0, 13.0, 10.0], "col2": [0.0, 0.0, 0.0]})
+    pred_fn, data, log = imputer(input_df, ["col1", "col2"], impute_strategy)
 
-    expected2 = pd.DataFrame({"col1": [10.0, 11.0], "col2": [0.0, 100.0]})
-
-    pred_fn, data, log = imputer(input_df, ["col1", "col2"], "mean")
-
-    assert expected1.equals(data)
-    assert expected2.equals(pred_fn(input_df2))
+    # the entirely-NaN column is kept and imputed with the default value (0.0)
+    assert list(data["col2"]) == [0.0, 0.0, 0.0]
+    # on new data, valid values are preserved and missing entries stay 0.0
+    assert list(pred_fn(input_df2)["col2"]) == [0.0, 100.0]
 
 
 def test_placeholder_imputer():
