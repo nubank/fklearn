@@ -55,6 +55,10 @@ def imputer(
         columns_imputable = columns_to_impute
         fill_fn, _, fill_logs = identity, None, dict()
 
+    # `keep_empty_features` keeps all-NaN columns instead of silently dropping
+    # them (see #124). It was introduced in scikit-learn 1.2 and is therefore
+    # always available under fklearn's declared floor (`scikit-learn>=1.5`), so
+    # no version guard is needed.
     imp = SimpleImputer(strategy=impute_strategy, keep_empty_features=True)
 
     imp.fit(df[columns_imputable].values)
