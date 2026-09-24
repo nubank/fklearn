@@ -67,6 +67,7 @@ uv run pytest --cov=src/
 ### Linting
 ```bash
 uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
 uv run ruff format src/ tests/
 ```
 
