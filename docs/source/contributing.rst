@@ -111,7 +111,7 @@ In this session we'll guide you on how to contribute with the code. This is a gu
 Code standards
 --------------
 
-This project is compatible with Python 3.10 to 3.13 and follows the
+This project is compatible with Python 3.10 to 3.14 and follows the
 `pep8 style <https://www.python.org/dev/peps/pep-0008/>`_, and we use this
 `import formatting <https://google.github.io/styleguide/pyguide.html?showone=Imports_formatting#313-imports-formatting>`_.
 

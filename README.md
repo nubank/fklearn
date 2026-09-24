@@ -81,8 +81,12 @@ uv add --dev <package-name>    # dev dependency
 Regenerate the lockfile with `--default-index https://pypi.org/simple/`:
 
 ```bash
-uv lock --default-index https://pypi.org/simple/
+uv lock --no-config --default-index https://pypi.org/simple/
 ```
+
+`--no-config` excludes local index settings such as Nubank's internal registry.
+Before committing the lockfile, check that package source URLs point to public
+PyPI and contain no credentials.
 
 ## License
 

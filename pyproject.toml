@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fklearn"
-version = "4.2.3"
+version = "4.3.0"
 description = "Functional machine learning"
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 authors = [{ name = "Nubank" }]
 # License classifier removed: PEP 639 license expressions (license = "Apache-2.0" above)
 # supersede legacy classifiers. Modern setuptools rejects both being present.
@@ -17,6 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
 ]
 dependencies = [

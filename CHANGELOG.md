@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.0] - 2026-09-24
+- **Enhancement**
+  - Add Python 3.14 support and include it in the CI test matrix.
+- **Internal**
+  - Refresh `uv.lock` from public PyPI for the expanded Python range.
+
 ## [4.2.3] - 2026-06-10
 - **Enhancement**
   - Relax `toolz` requirement: drop both the lower (`>=0.12.0`) and upper (`<1`) bounds (now declared simply as `toolz`). `fklearn` only relies on stable `toolz` APIs (`curry`, `compose`, `pipe`, `merge`, `assoc`, etc.) that are unchanged across `0.x` and `1.x`, so the previous cap was unnecessarily restrictive for downstream consumers. The locked version moves from `0.12.1` to `1.1.0`.
