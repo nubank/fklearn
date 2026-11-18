@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.3.1] - 2026-11-18
+- **Internal**
+  - Bump `certifi` in `uv.lock` from `2026.5.20` to `2026.10.23`, which removes the emSign root CAs whose intermediate CA keys were compromised ([GHSA-6q48-6c7w-9gw2](https://github.com/advisories/GHSA-6q48-6c7w-9gw2)). `certifi` is not a declared dependency (only the `docs` extra pulls it in, via `sphinx` → `requests`), so the package's declared dependencies are unchanged.
+
 ## [4.3.0] - 2026-09-24
 - **Enhancement**
   - Add Python 3.14 support and include it in the CI test matrix.
