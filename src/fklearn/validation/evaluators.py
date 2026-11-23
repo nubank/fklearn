@@ -768,7 +768,7 @@ def ndcg_evaluator(
         eval_name = f"ndcg_evaluator__{target_column}"
 
     rel = np.argsort(test_data[prediction_column])[::-1][:k]
-    cum_gain = test_data[target_column][rel]
+    cum_gain = test_data[target_column].iloc[rel]
 
     ideal_cum_gain = np.sort(test_data[target_column])[::-1][:k]
 
