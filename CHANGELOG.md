@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.3.2]
+- **Bug Fix**
+  - `ndcg_evaluator`: rank rows positionally when ordering by the prediction column instead of looking them up by index label. The evaluator crashed with `KeyError` on DataFrames with non-contiguous indexes (the folded subsets produced by splitters inside `validator`) and silently scored the wrong rows when the index was a permutation of `0..n-1`.
+
 ## [4.3.1] - 2026-11-18
 - **Internal**
   - Bump `certifi` in `uv.lock` from `2026.5.20` to `2026.10.23`, which removes the emSign root CAs whose intermediate CA keys were compromised ([GHSA-6q48-6c7w-9gw2](https://github.com/advisories/GHSA-6q48-6c7w-9gw2)). `certifi` is not a declared dependency (only the `docs` extra pulls it in, via `sphinx` → `requests`), so the package's declared dependencies are unchanged.

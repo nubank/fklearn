@@ -238,6 +238,22 @@ def test_ndcg_evaluator(exponential_gain):
         assert result["ndcg_evaluator__target"] == 1.0
 
 
+@pytest.mark.parametrize("exponential_gain", [False, True])
+def test_ndcg_evaluator_arbitrary_index(exponential_gain):
+    """Rows must be ranked by prediction positionally, not looked up by index
+    label: splitters inside `validator` hand evaluators DataFrames whose indexes
+    are scattered subsets or permutations of the original one."""
+    predictions = pd.DataFrame({"target": [0.0, 1.0, 0.0, 2.0, 3.0], "prediction": [0.9, 0.1, 0.8, 0.7, 0.2]})
+    expected = ndcg_evaluator(predictions, exponential_gain=exponential_gain)["ndcg_evaluator__target"]
+
+    scattered_index = predictions.set_index(pd.Index([10, 20, 30, 40, 50]))
+    permuted_index = predictions.set_index(pd.Index([4, 2, 0, 1, 3]))
+
+    for df in (scattered_index, permuted_index):
+        result = ndcg_evaluator(df, exponential_gain=exponential_gain)["ndcg_evaluator__target"]
+        assert result == expected
+
+
 def test_split_evaluator():
     predictions = pd.DataFrame(
         {"split_col_a": [1, 1, 0], "split_col_b": [2, 0, 0], "target": [0, 1, 2], "prediction": [0.5, 0.9, 1.5]}
